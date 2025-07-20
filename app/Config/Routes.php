@@ -19,3 +19,5 @@ $routes->get('/reset-password/(:any)', 'Auth::reset/$1');
 $routes->post('/reset-password/(:any)', 'Auth::resetPost/$1');
 $routes->get('/change-password', 'Auth::changePassword');
 $routes->post('/change-password', 'Auth::changePasswordPost');
+// services
+$routes->get('/services', 'Services::index');
