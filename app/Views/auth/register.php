@@ -1,21 +1,55 @@
 <?= view('layout/header.php'); ?>
-<div class="container py-4 m-5">
- <div class="row justify-content-center">
-  <div class="shadow p-4 rounded col-md-4">
-   <h3 class="mb-4 text-center">Login</h3>
 
-   <?php if (session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
-   <?php endif; ?>
+<div class="auth-container">
+ <div class="auth-card register">
+  <div class="auth-header">
+   <h2>Create Account</h2>
+   <p>Join us today!</p>
+  </div>
 
-   <form method="post" action="<?= base_url('/register') ?>">
-    <input type="text" name="username" required placeholder="Username" class="form-control mb-2">
-    <input type="email" name="email" required placeholder="Email" class="form-control mb-2">
-    <input type="password" name="password" required placeholder="Password" class="form-control mb-2">
-    <button type="submit" class="btn btn-primary w-100">Register</button>
-   </form>
+  <?php if (session()->getFlashdata('error')): ?>
+   <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+  <?php endif; ?>
 
+  <form method="post" action="<?= base_url('/register') ?>" class="auth-form">
+   <div class="row">
+    <div class="form-group col-lg-6">
+     <label for="firstname">First Name</label>
+     <input type="text" id="firstname" name="firstname" required class="form-control" placeholder="John">
+    </div>
+
+    <div class="form-group col-lg-6">
+     <label for="lastname">Last Name</label>
+     <input type="text" id="lastname" name="lastname" required class="form-control" placeholder="Doe">
+    </div>
+
+    <div class="form-group col-lg-6">
+     <label for="username">Username</label>
+     <input type="text" id="username" name="username" required class="form-control" placeholder="johndoe">
+    </div>
+
+    <div class="form-group col-lg-6">
+     <label for="email">Email</label>
+     <input type="email" id="email" name="email" required class="form-control" placeholder="john@example.com">
+    </div>
+
+    <div class="form-group col-lg-6">
+     <label for="password">Password</label>
+     <input type="password" id="password" name="password" required class="form-control" placeholder="••••••••">
+    </div>
+    <div class="form-group col-lg-6">
+     <label for="password">Confirm Password</label>
+     <input type="password" id="password" name="confirm_password" required class="form-control" placeholder="••••••••">
+    </div>
+   </div>
+
+   <button type="submit" class="btn-auth">Register</button>
+  </form>
+
+  <div class="auth-footer">
+   <p>Already have an account? <a href="<?= base_url('/login') ?>">Sign in</a></p>
   </div>
  </div>
 </div>
+
 <?= view('layout/footer.php'); ?>

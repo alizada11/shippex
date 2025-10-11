@@ -1,25 +1,42 @@
 <?= view('layout/header.php'); ?>
-<div class="container m-5 py-4">
- <div class=" row justify-content-center">
-  <div class="shadow rounded p-4 col-md-4">
-   <h3 class="mb-4 text-center">Login</h3>
 
-   <?php if (session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
-   <?php endif; ?>
+<div class="auth-container">
+ <div class="auth-card">
+  <div class="auth-header">
+   <h2>Welcome Back</h2>
+   <p>Please enter your credentials</p>
+  </div>
 
-   <form method="post" action="<?= base_url('/login-post') ?>">
-    <div class="mb-3">
-     <input type="email" name="email" class="form-control" placeholder="Email" required>
+  <?php if (session()->getFlashdata('error')): ?>
+   <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+  <?php endif; ?>
+
+  <form method="post" action="<?= base_url('/login-post') ?>" class="auth-form">
+   <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required class="form-control" placeholder="john@example.com">
+   </div>
+
+   <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required class="form-control" placeholder="••••••••">
+   </div>
+
+   <div class="form-options">
+    <div class="form-check">
+     <input type="checkbox" id="remember" class="form-check-input">
+     <label for="remember" class="form-check-label">Remember me</label>
     </div>
+    <a href="<?= base_url('/forgot-password') ?>" class="forgot-password">Forgot password?</a>
+   </div>
 
-    <div class="mb-3">
-     <input type="password" name="password" class="form-control" placeholder="Password" required>
-    </div>
+   <button type="submit" class="btn-auth">Login</button>
+  </form>
 
-    <button type="submit" class="btn btn-primary w-100">Login</button>
-   </form>
+  <div class="auth-footer">
+   <p>Don't have an account? <a href="<?= base_url('/register') ?>">Register</a></p>
   </div>
  </div>
 </div>
+
 <?= view('layout/footer.php'); ?>

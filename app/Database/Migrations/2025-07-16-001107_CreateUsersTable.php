@@ -11,6 +11,8 @@ class CreateUsersTable extends Migration
         $this->forge->addField([
             'id'       => ['type' => 'INT', 'auto_increment' => true],
             'username' => ['type' => 'VARCHAR', 'constraint' => 100],
+            'firstname' => ['type' => 'VARCHAR', 'constraint' => 100],
+            'lastname' => ['type' => 'VARCHAR', 'constraint' => 100],
             'email'    => ['type' => 'VARCHAR', 'constraint' => 150],
             'password' => ['type' => 'VARCHAR', 'constraint' => 255],
             'role'     => ['type' => 'ENUM("admin","staff")', 'default' => 'staff'],

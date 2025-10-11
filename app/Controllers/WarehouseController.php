@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Controllers\BaseController;
+use App\Models\VirtualAddressModel;
+use App\Models\UserModel;
+
+class WarehouseController extends BaseController
+{
+ protected $addressModel;
+ protected $userModel;
+ protected $token;
+ public function __construct()
+ {
+
+
+  $this->addressModel = new VirtualAddressModel();
+  $this->userModel = new \App\Models\UserModel(); // Assumes you have a UserModel
+  $this->token = getenv('EASYSHIP_API_TOKEN');
+  if (!$this->token) {
+   log_message('error', 'Easyship API token is not set.');
+   throw new \Exception('Easyship API token is missing.');
+  }
+ }
+
+ public function index()
+ {
+  $data['addresses'] = $this->addressModel->orderBy('id', 'DESC')->findAll();
+  return view('admin/warehouses/index', $data);
+ }
+
+ public function create()
+ {
+  $data['users'] = $this->userModel->findAll();
+  return view('admin/warehouses/create', $data);
+ }
+
+ public function store()
+ {
+  $this->addressModel->save($this->request->getPost());
+  return redirect()->to('/warehouse')->with('success', 'Warehouse address added successfully.');
+ }
+
+ public function edit($id)
+ {
+  $data['address'] = $this->addressModel->find($id);
+  $data['users'] = $this->userModel->findAll();
+  return view('admin/warehouses/edit', $data);
+ }
+
+ public function update($id)
+ {
+  $this->addressModel->update($id, $this->request->getPost());
+  return redirect()->to('/warehouse')->with('success', 'Warehouse address updated successfully.');
+ }
+
+ public function delete($id)
+ {
+  $this->addressModel->delete($id);
+  return redirect()->to('/warehouse')->with('success', 'Warehouse address deleted.');
+ }
+
+
+ public function view($code = null)
+ {
+  $addressesModel = new \App\Models\VirtualAddressModel();
+  $addresses = $addressesModel->findAll();
+
+  $allowed = [];
+
+  foreach ($addresses as $adr) {
+   $allowed[] = $adr['code'];   // ✅ appends to the array
+  }
+
+  // Or alternatively:
+  // $allowed = array_column($addresses, 'code');
+
+
+  if (!$code || !in_array($code, $allowed)) {
+   // Show 404 if code is not allowed
+   throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Warehouse not found");
+  }
+
+
+  $client = new \GuzzleHttp\Client();
+
+  $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
+   'headers' => [
+    'Authorization' => 'Bearer ' . trim($this->token),
+    'Content-Type'  => 'application/json',
+    'Accept'        => 'application/json; version=2024-09',
+   ],
+  ]);
+
+  // Decode JSON into associative array
+  $data = json_decode($response->getBody(), true);
+
+  // Extract categories
+  $categories = $data['item_categories'] ?? [];
+  // Convert code to view file name
+  $viewFile = $code . '-warehouse';
+
+  // Load the view from app/Views/warehouse/
+  return view('warehouses/' . $viewFile, compact('categories'));
+ }
+}

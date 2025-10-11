@@ -8,6 +8,8 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\FontModel;
+use CodeIgniter\View\View;
 
 /**
  * Class BaseController
@@ -46,6 +48,7 @@ abstract class BaseController extends Controller
     /**
      * @return void
      */
+    protected $defaultFont;
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Do Not Edit This Line
@@ -54,5 +57,13 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = service('session');
+
+        $fontModel = new FontModel();
+        $fontRow = $fontModel->where('is_default', 1)->first();
+        $this->defaultFont = $fontRow['font_name'] ?? 'Roboto';
+        log_message('debug', 'Default font selected: ' . $this->defaultFont);
+
+        // ✅ Set global view variable
+        service('renderer')->setVar('defaultFont', $this->defaultFont);
     }
 }

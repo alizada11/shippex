@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 
-class Auth extends Controller
+class Auth extends BaseController
 {
     public function login()
     {
@@ -29,7 +29,7 @@ class Auth extends Controller
                 'role' => $user['role'],
                 'logged_in' => true,
             ]);
-            return redirect()->to('/admin');
+            return redirect()->to('/dashboard');
         } else {
             return redirect()->back()->with('error', 'Invalid login credentials.');
         }
@@ -43,10 +43,12 @@ class Auth extends Controller
     {
         $model = new \App\Models\UserModel();
         $data = [
+            'firstname' => $this->request->getPost('firstname'),
+            'lastname' => $this->request->getPost('lastname'),
             'username' => $this->request->getPost('username'),
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => 'staff',
+            'role'     => 'customer',
             'created_at' => date('Y-m-d H:i:s'),
         ];
         $model->insert($data);
@@ -106,19 +108,43 @@ class Auth extends Controller
 
     public function changePasswordPost()
     {
-        $userId = session()->get('user_id');
+        $session = session();
+        $userId = $session->get('user_id');
         $model = new \App\Models\UserModel();
         $user = $model->find($userId);
 
-        if (!password_verify($this->request->getPost('current_password'), $user['password'])) {
+        // Validate inputs
+        $currentPassword = $this->request->getPost('current_password');
+        $newPassword = $this->request->getPost('new_password');
+        $confirmPassword = $this->request->getPost('confirm_password');
+
+        if (!$currentPassword || !$newPassword || !$confirmPassword) {
+            return redirect()->back()->with('error', 'All password fields are required.');
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            return redirect()->back()->with('error', 'New password and confirm password do not match.');
+        }
+
+        if (!password_verify($currentPassword, $user['password'])) {
             return redirect()->back()->with('error', 'Incorrect current password.');
         }
 
-        $newPass = password_hash($this->request->getPost('new_password'), PASSWORD_DEFAULT);
-        $model->update($userId, ['password' => $newPass]);
+        if (strlen($newPassword) < 8) {
+            return redirect()->back()->with('error', 'New password must be at least 8 characters long.');
+        }
 
-        return redirect()->back()->with('success', 'Password changed successfully.');
+        // Optional: Add more password strength validation here (uppercase, numbers, symbols, etc.)
+
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        if ($model->update($userId, ['password' => $hashedPassword])) {
+            return redirect()->back()->with('success', 'Password changed successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update password. Please try again.');
+        }
     }
+
 
     public function logout()
     {
