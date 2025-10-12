@@ -23,9 +23,9 @@ if (!function_exists('warehousesMenu')) {
     $html = '';
 
     foreach ($addresses as $adr) {
-      $url = base_url('/warehouses/' . $adr['code']);
-      $html .= '<li><a class="dropdown-item" href="' . $url . '">'
-        . esc($adr['code']) . ' Warehouses</a></li>';
+      $url = base_url('warehouse/' . $adr['code']); // no leading slash
+      $html .= '<li><a class="dropdown-item py-2" href="' . $url . '">'
+        . esc($adr['code']) . ' Warehouse</a></li>';
     }
 
     return $html;

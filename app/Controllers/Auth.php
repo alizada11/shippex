@@ -74,8 +74,17 @@ class Auth extends BaseController
                 'created_at' => date('Y-m-d H:i:s')
             ]);
 
-            // TODO: Send email (dummy link here)
-            $link = base_url('/reset-password/' . $token);
+            $link['text'] = base_url('/reset-password/' . $token);
+
+            $message = view('emails/forgot_password', $link);
+
+            $email->setTo($email);
+            $email->setSubject('Password Reset Link');
+            $email->setMessage($message);
+            $email->setMailType('html'); // Important
+
+            $email->send();
+
             return redirect()->back()->with('success', "Reset link: $link");
         }
 

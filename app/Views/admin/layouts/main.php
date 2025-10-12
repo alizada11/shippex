@@ -58,14 +58,10 @@
       </li>
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), '/warehouse') !== false) ? 'active' : '' ?>" href="<?= base_url('/warehouse') ?>">
-        <i class="fas fa-warehouse me-2"></i> Warehouses
+        <i class="fas fa-location me-2"></i> Warehouses
        </a>
       </li>
-      <li class="nav-item">
-       <a class="nav-link <?= (strpos(current_url(), '/admin/blog') !== false) ? 'active' : '' ?>" href="<?= base_url('/admin/blog/posts') ?>">
-        <i class="fas fa-list me-2"></i> Blogs
-       </a>
-      </li>
+
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), '/users') !== false) ? 'active' : '' ?>" href="#">
         <i class="fas fa-users me-2"></i> Users
@@ -77,24 +73,9 @@
        </a>
       </li>
       <li class="nav-item">
-       <a class="nav-link <?= (strpos(current_url(), '/admin/fonts') !== false) ? 'active' : '' ?> <?= (strpos(current_url(), '/admin/site-config') !== false) ? 'active' : '' ?>" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu">
-        <i class="fas fa-cogs me-2"></i> Settings
-        <i class="fas fa-chevron-down float-end mt-1 small"></i>
+       <a class="nav-link <?= (strpos(current_url(), '/fonts') !== false) ? 'active' : '' ?>" href="<?= site_url('/admin/fonts/select') ?>">
+        <i class="fas fa-font me-2"></i> Font Settings
        </a>
-       <div class="collapse ps-4" id="settingsSubmenu">
-        <ul class="nav flex-column">
-         <li class="nav-item">
-          <a class="nav-link" href="<?= site_url('/admin/fonts/select') ?>">
-           <i class="fas fa-font me-2"></i> Font Settings
-          </a>
-         </li>
-         <li class="nav-item">
-          <a class="nav-link" href="<?= site_url('/admin/site-config') ?>">
-           <i class="fas fa-wrench me-2"></i> Site Configuration
-          </a>
-         </li>
-        </ul>
-       </div>
       </li>
       <!-- Divider -->
       <div class="d-flex align-items-center my-3 text-secondary">
@@ -106,7 +87,6 @@
         <hr class="m-0 text-secondary">
        </div>
       </div>
-
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), '/admin/cms') !== false) ? 'active' : '' ?> " data-bs-toggle="collapse" href="#homeSection" role="button" aria-expanded="false" aria-controls="homeSection">
         <i class="fas fa-home me-2"></i> Home Page
@@ -142,31 +122,18 @@
         </ul>
        </div>
       </li>
-      <!-- <li class="nav-item">
-       <a class="nav-link <?= (strpos(current_url(), '/admin/cms') !== false) ? 'active' : '' ?> " data-bs-toggle="collapse" href="#howItWorks" role="button" aria-expanded="false" aria-controls="howItWorks">
-        <i class="fas fa-question me-2"></i> How It Works
-        <i class="fas fa-chevron-down float-end mt-1 small"></i>
+      <li class="nav-item">
+       <a class="nav-link <?= (strpos(current_url(), '/admin/blog') !== false) ? 'active' : '' ?>" href="<?= base_url('/admin/blog/posts') ?>">
+        <i class="fas fa-list me-2"></i> Blogs
        </a>
-       <div class="collapse ps-1" id="howItWorks">
-        <ul class="nav flex-column">
-         <li class="nav-item">
-          <a class="nav-link" href="<?= site_url('/admin/how-it-works-page') ?>">
-           <i class="fas fa-font me-2"></i>How it works
-          </a>
-         </li>
-         <li class="nav-item">
-          <a class="nav-link" href="<?= site_url('/admin/cms/steps') ?>">
-           <i class="fas fa-wrench me-2"></i> Steeps
-          </a>
-         </li>
-         <li class="nav-item">
-          <a class="nav-link" href="<?= site_url('/admin/cms/why-choose') ?>">
-           <i class="fas fa-map me-2"></i> Why Choose Us
-          </a>
-         </li>
-        </ul>
-       </div>
-      </li> -->
+      </li>
+      <li class="nav-item">
+       <a class="nav-link <?= (strpos(current_url(), '/admin/w_pages') !== false) ? 'active' : '' ?>" href="<?= base_url('/admin/w_pages') ?>">
+        <i class="fas fa-warehouse me-2"></i> Warehouses Page
+       </a>
+      </li>
+
+
       <li class="nav-item">
        <a class="nav-link" href="<?= base_url('admin/how-it-works') ?>">
         <i class="fas fa-question me-2"></i> How it Works
@@ -177,8 +144,9 @@
    </nav>
 
    <!-- Main Content -->
-   <main class="col-md-10 ms-sm-auto content">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white rounded-3 mb-4">
+
+   <main class="col-md-10 ms-sm-auto m-0 p-0">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top mb-4">
      <div class="container-fluid">
       <div class="d-flex align-items-center">
        <button class="btn btn-sm d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCollapse">
@@ -196,8 +164,10 @@
       </div>
      </div>
     </nav>
+    <div class="row content">
 
-    <?= $this->renderSection('content') ?>
+     <?= $this->renderSection('content') ?>
+    </div>
    </main>
   </div>
  </div>

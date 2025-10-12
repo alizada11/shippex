@@ -5,16 +5,18 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\VirtualAddressModel;
 use App\Models\UserModel;
+use App\Models\WarehouseModel;
 
 class WarehouseController extends BaseController
 {
  protected $addressModel;
  protected $userModel;
  protected $token;
+ protected $warehouseModel;
  public function __construct()
  {
 
-
+  $this->warehouseModel = new WarehouseModel();
   $this->addressModel = new VirtualAddressModel();
   $this->userModel = new \App\Models\UserModel(); // Assumes you have a UserModel
   $this->token = getenv('EASYSHIP_API_TOKEN');
@@ -103,5 +105,50 @@ class WarehouseController extends BaseController
 
   // Load the view from app/Views/warehouse/
   return view('warehouses/' . $viewFile, compact('categories'));
+ }
+
+ public function show($countryCode)
+ {
+
+  $client = new \GuzzleHttp\Client();
+
+  $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
+   'headers' => [
+    'Authorization' => 'Bearer ' . trim($this->token),
+    'Content-Type'  => 'application/json',
+    'Accept'        => 'application/json; version=2024-09',
+   ],
+  ]);
+
+  // Decode JSON into associative array
+  $data = json_decode($response->getBody(), true);
+
+  // Extract categories
+  $categories = $data['item_categories'] ?? [];
+  $client = new \GuzzleHttp\Client();
+
+  $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
+   'headers' => [
+    'Authorization' => 'Bearer ' . trim($this->token),
+    'Content-Type'  => 'application/json',
+    'Accept'        => 'application/json; version=2024-09',
+   ],
+  ]);
+
+  // Decode JSON into associative array
+  $data = json_decode($response->getBody(), true);
+
+  // Extract categories
+  $data['categories'] = $data['item_categories'] ?? [];
+
+  $data['warehouse'] = $this->warehouseModel
+   ->where('country_code', strtoupper($countryCode))
+   ->first();
+
+  if (!$data['warehouse']) {
+   throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+  }
+
+  return view('warehouses/show', $data);
  }
 }

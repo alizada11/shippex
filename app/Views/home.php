@@ -496,7 +496,67 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Material Icons -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+<style>
+  /* Hero */
+  .heros {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(1200px 500px at 10% -20%, rgba(107, 77, 246, .16), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(255, 122, 26, .18), transparent 60%);
+    padding: 2.6rem 1rem 1rem;
+  }
 
+  .hero-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem;
+    align-items: start
+  }
+
+  .heros h1 {
+    font-size: clamp(1.9rem, 2.8vw, 3rem);
+    margin: .25rem 0 .75rem;
+    font-weight: 800;
+    letter-spacing: -.02em
+  }
+
+  .heros p {
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    color: #2b2f47;
+    max-width: 60ch
+  }
+
+  .heros .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 1rem 0 1.25rem
+  }
+
+  .pill {
+    background: white;
+    border: 1px solid #eceef6;
+    color: #37406b;
+    padding: .45rem .65rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .9rem
+  }
+
+  .cta-row {
+    display: flex;
+    gap: .7rem;
+    flex-wrap: wrap;
+    margin-top: 1rem
+  }
+
+  .cta-row .btn {
+    padding: .85rem 1.05rem
+  }
+</style>
 <script>
   $(document).ready(function() {
     // Form validation

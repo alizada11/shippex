@@ -35,7 +35,7 @@ use CodeIgniter\Database\BaseUtils;
     </div>
   </div> -->
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2">
     <div class="container">
       <a class="navbar-brand" class="logo" href="<?= base_url('/') ?>">
         <img src="<?= base_url('images/logo.png'); ?>" alt="Logo">
@@ -49,7 +49,7 @@ use CodeIgniter\Database\BaseUtils;
         <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item"><a class="nav-link menu-link" href="<?= base_url('/how-it-works') ?>">How Shippex Works</a></li>
           <li class="nav-item dropdown">
-            <a class="nav-link menu-link dropdown-toggle <?= (strpos(current_url(), '/wearhouses') !== false) ? 'active' : '' ?>"
+            <a class="nav-link menu-link dropdown-toggle <?= (strpos(current_url(), '/warehouses') !== false) ? 'active' : '' ?>"
               href="#"
               id="warehousesDropdown"
               role="button"

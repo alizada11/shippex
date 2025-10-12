@@ -23,11 +23,11 @@
    </div>
 
    <div class="form-options">
-    <div class="form-check">
+    <div class="form-check d-flex align-items-center gap-2">
      <input type="checkbox" id="remember" class="form-check-input">
      <label for="remember" class="form-check-label">Remember me</label>
     </div>
-    <a href="<?= base_url('/forgot-password') ?>" class="forgot-password">Forgot password?</a>
+    <a href="<?= base_url('/forgot') ?>" class="forgot-password">Forgot password?</a>
    </div>
 
    <button type="submit" class="btn-auth">Login</button>

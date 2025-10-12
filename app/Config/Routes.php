@@ -185,6 +185,19 @@ $routes->group(
   $routes->get('/shopper/view/(:num)', 'Shopper::view/$1');
  }
 );
+// warehouses
+// Frontend route
+$routes->get('warehouse/(:segment)', 'WarehouseController::show/$1');
+
+// Admin routes
+$routes->group('admin/w_pages/', function ($routes) {
+ $routes->get('/', 'Warehouse::index');
+ $routes->get('create', 'Warehouse::create');
+ $routes->post('store', 'Warehouse::store');
+ $routes->get('edit/(:num)', 'Warehouse::edit/$1');
+ $routes->post('update/(:num)', 'Warehouse::update/$1');
+});
+
 
 $routes->group(
  'profile',

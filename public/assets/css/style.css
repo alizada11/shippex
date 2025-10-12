@@ -97,6 +97,9 @@
   border: none;
   padding: 12px 24px;
 }
+.navbar-brand img {
+  border-radius: 50%;
+}
 .navbar .nav-link {
   position: relative;
 }
@@ -113,6 +116,7 @@
   left: 0;
   background-color: var(--primary-color);
 }
+
 /* border pseudo-element */
 .navbar .nav-item .nav-link.menu-link:hover::before {
   width: 100%;
