@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 11, 2025 at 06:50 PM
+-- Generation Time: Oct 12, 2025 at 07:25 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -125,7 +125,8 @@ INSERT INTO `booking_status_history` (`id`, `book_id`, `old_status`, `new_status
 (29, 16, 'accepted', 'pending', 4, '2025-10-06 15:28:31'),
 (30, 16, 'pending', 'accepted', 4, '2025-10-06 15:28:35'),
 (31, 16, 'accepted', 'pending', 4, '2025-10-06 15:29:15'),
-(32, 16, 'pending', 'accepted', 4, '2025-10-06 15:29:18');
+(32, 16, 'pending', 'accepted', 4, '2025-10-06 15:29:18'),
+(33, 23, 'pending', 'accepted', 4, '2025-10-11 17:59:07');
 
 -- --------------------------------------------------------
 
@@ -224,13 +225,14 @@ CREATE TABLE `fonts` (
 
 INSERT INTO `fonts` (`id`, `font_name`, `is_default`) VALUES
 (1, 'Adamina', 0),
-(2, 'Rubik', 1),
+(2, 'Rubik', 0),
 (3, 'Chocolate Classical Sans', 0),
 (4, 'Rubik', 0),
 (5, 'Rubik', 0),
 (6, 'Aboreto', 0),
 (7, 'Poppins', 0),
-(8, 'Lato', 0);
+(8, 'Lato', 0),
+(9, 'Inter', 1);
 
 -- --------------------------------------------------------
 
@@ -404,7 +406,8 @@ INSERT INTO `migrations` (`id`, `version`, `class`, `group`, `namespace`, `time`
 (16, '2025-09-13-081735', 'App\\Database\\Migrations\\AddBackgroundToPromoCards', 'default', 'App', 1757751508, 15),
 (17, '2025-09-14-135234', 'App\\Database\\Migrations\\CreateHowItWorksSections', 'default', 'App', 1757858017, 16),
 (18, '2025-09-14-135301', 'App\\Database\\Migrations\\CreateHowItWorksSteps', 'default', 'App', 1757858017, 16),
-(19, '2025-09-14-135323', 'App\\Database\\Migrations\\CreateWhyChoose', 'default', 'App', 1757858017, 16);
+(19, '2025-09-14-135323', 'App\\Database\\Migrations\\CreateWhyChoose', 'default', 'App', 1757858017, 16),
+(20, '2025-10-12-103514', 'App\\Database\\Migrations\\CreateWarehousesTable', 'default', 'App', 1760265342, 17);
 
 -- --------------------------------------------------------
 
@@ -443,7 +446,13 @@ CREATE TABLE `password_resets` (
 --
 
 INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
-(1, 'jawad@mail.com', '80d138a7543968831fe83c9e679d1ab1590f85adb36f4dda247f91d772cd94e8', '2025-08-15 22:54:20');
+(1, 'jawad@mail.com', '80d138a7543968831fe83c9e679d1ab1590f85adb36f4dda247f91d772cd94e8', '2025-08-15 22:54:20'),
+(2, 'codewithja@gmail.com', '84c223fef2c223a00f8d239076f2082634d1fd6d114b3b87a8e0b8d37922635d', '2025-10-12 17:13:42'),
+(3, 'codewithja@gmail.com', '5843f495bc7f1f357c018cdcac64dac09253149ff72aa7390d7807b5c5a519ee', '2025-10-12 17:15:31'),
+(4, 'codewithja@gmail.com', 'b254c214e12a66c901d972402b532688ad494159f54ebf37ae5cc7a04be08c04', '2025-10-12 17:21:26'),
+(5, 'codewithja@gmail.com', 'ce27b9ac416e32d50694e7b47f4eb4c43f537e691024c0f9aa0f42a36603449e', '2025-10-12 17:22:05'),
+(6, 'codewithja@gmail.com', 'f9d97c5686dac6419383f5e56e1759fda146d1a71bad458d6281714bf423a150', '2025-10-12 17:22:30'),
+(7, 'codewithja@gmail.com', '0901e5a132d074d60edc1465bf33cfcd813052f433b1d567b6f461807186edb0', '2025-10-12 17:22:46');
 
 -- --------------------------------------------------------
 
@@ -502,7 +511,8 @@ CREATE TABLE `promo_cards` (
 --
 
 INSERT INTO `promo_cards` (`id`, `title`, `description`, `button_text`, `button_url`, `image`, `background`, `created_at`, `updated_at`) VALUES
-(1, 'Free Return to Sender', 'Shop with confidence, because the returns are on us! You heard it right, if there is any reason why you want to return your item to the sender, we won’t charge a fee for that. This means ZERO risk for you! ', 'Free Return', 'http://localhost:8080/admin/cms/promo-cards/create', '1757844452_26792d5f759fca2b0bb3.webp', '1757845094_757365a5370614b16a3a.webp', '2025-09-14 10:07:33', '2025-09-14 10:18:14');
+(1, 'Free Return to Sender', 'Shop with confidence, because the returns are on us! You heard it right, if there is any reason why you want to return your item to the sender, we won’t charge a fee for that. This means ZERO risk for you! ', 'Free Return', 'http://localhost:8080/admin/cms/promo-cards/create', '1757844452_26792d5f759fca2b0bb3.webp', '1757845094_757365a5370614b16a3a.webp', '2025-09-14 10:07:33', '2025-09-14 10:18:14'),
+(2, 'Price Match Guarantee', 'Quality usually comes at a higher price, but not always and forward2me is the perfect example! Having a top-rated service at a competitive price might seem surprising but IT\'S A FACT! \r\n\r\n', 'Match Prices', 'https://shippex.online/shipping/rates', '1760288707_151362c243f0423f8b18.webp', '1760288707_119a2015b9884508cab1.webp', '2025-10-12 17:05:07', '2025-10-12 17:05:07');
 
 -- --------------------------------------------------------
 
@@ -553,7 +563,9 @@ INSERT INTO `shipping_bookings` (`id`, `user_id`, `origin_line_1`, `origin_city`
 (18, 6, 'Streetn9', 'NY', 'NY', '10003', 'US', 'Street 9', 'New York', 'NY', '07008', 'US', '1.00', 'toys', '12.00', '20.00', '21.00', 'UPS', 'UPS® Ground Saver', '1 - 3 days', 'shipping', 'AED', '1757952844_fc104ed7da76b4382583.webp', 'paid', '23.17', 'UPS® Ground Saver (1-3 working days) No additional taxes to be paid at delivery', '2025-09-15 15:52:42', '2025-10-06 13:15:15', '{\"id\":\"0NY70248VK675463J\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"codewithja@gmail.com\",\"account_id\":\"ZAN4KREDN2GE2\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"23.17\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"jawad alizada\"},\"address\":{\"address_line_1\":\"street 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"8W804871CU807841F\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"23.17\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"23.17\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"1.30\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"21.87\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/8W804871CU807841F\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/8W804871CU807841F\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/0NY70248VK675463J\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T13:15:14Z\",\"update_time\":\"2025-10-06T13:15:14Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"email_address\":\"codewithja@gmail.com\",\"payer_id\":\"ZAN4KREDN2GE2\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T13:14:09Z\",\"update_time\":\"2025-10-06T13:15:14Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/0NY70248VK675463J\",\"rel\":\"self\",\"method\":\"GET\"}]}'),
 (19, 4, 'Street ', 'NYC', 'NY', '10003', 'US', 'Street 9', 'NYC', 'NY', '07008', 'US', '2.00', 'cameras', '20.00', '20.00', '10.00', 'UPS', 'UPS® Ground Saver', '1 - 3 days', 'accepted', 'AED', NULL, NULL, '23.21', 'UPS® Ground Saver (1-3 working days) No additional taxes to be paid at delivery', '2025-10-02 12:54:02', '2025-10-02 12:54:48', ''),
 (20, 4, 'Street 9', 'NYC', 'NY', '10003', 'US', 'Stree 9', 'NYC', 'NY', '07008', 'US', '1.00', 'accessory_no_battery', '20.00', '20.00', '20.00', 'FedEx', 'FedEx Ground® Economy', '4 - 4 days', 'pending', 'AED', NULL, NULL, '26.04', 'FedEx Ground® Economy (4 working days) No additional taxes to be paid at delivery', '2025-10-06 10:57:36', '2025-10-06 14:58:21', ''),
-(21, 4, 'street ', 'NYC', 'NY', '10003', 'US', 'Street 9', 'NYC', 'NY', '07008', 'US', '1.00', 'computers_laptops', '12.00', '10.00', '21.00', 'USPS', 'USPS - Ground Advantage Signature', '2 - 5 days', 'pending', 'AED', NULL, NULL, '36.18', 'USPS - Ground Advantage Signature (2-5 working days) No additional taxes to be paid at delivery', '2025-10-06 18:14:47', '2025-10-06 18:14:47', '');
+(21, 4, 'street ', 'NYC', 'NY', '10003', 'US', 'Street 9', 'NYC', 'NY', '07008', 'US', '1.00', 'computers_laptops', '12.00', '10.00', '21.00', 'USPS', 'USPS - Ground Advantage Signature', '2 - 5 days', 'pending', 'AED', NULL, NULL, '36.18', 'USPS - Ground Advantage Signature (2-5 working days) No additional taxes to be paid at delivery', '2025-10-06 18:14:47', '2025-10-06 18:14:47', ''),
+(22, 4, 'street', 'NYC', 'NY', '10003', 'US', 'Stree ', 'NYC', 'NY', '07008', 'US', '2.00', 'computers_laptops', '12.00', '20.00', '21.00', 'USPS', 'USPS - Priority Mail', '1 - 3 days', 'pending', 'AED', NULL, NULL, '26.70', 'USPS - Priority Mail (1-3 working days) No additional taxes to be paid at delivery', '2025-10-11 17:50:00', '2025-10-11 17:50:00', ''),
+(23, 6, 'street ', 'NYC', 'NY', '10003', 'US', 'Street', 'NYC', 'NY', '07008', 'US', '2.00', 'computers_laptops', '20.00', '20.00', '20.00', 'USPS', 'USPS - Priority Mail Signature', '1 - 3 days', 'shipping', 'AED', '1760205532_05a5ecd26d3ee09b1bf6.jpg', 'paid', '41.50', 'USPS - Priority Mail Signature (1-3 working days) No additional taxes to be paid at delivery', '2025-10-11 17:56:17', '2025-10-11 18:00:27', '{\"id\":\"26K660229P687794D\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawadalizada1@gmail.com\",\"account_id\":\"F63Y7FCAJBAH6\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"Street 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"4LM53108K6364850F\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"1.94\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"39.56\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-11T18:00:27Z\",\"update_time\":\"2025-10-11T18:00:27Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"jawadalizada1@gmail.com\",\"payer_id\":\"F63Y7FCAJBAH6\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-11T17:59:33Z\",\"update_time\":\"2025-10-11T18:00:28Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"self\",\"method\":\"GET\"}]}');
 
 -- --------------------------------------------------------
 
@@ -581,7 +593,8 @@ INSERT INTO `shopper_items` (`id`, `request_id`, `name`, `url`, `size`, `color`,
 (2, 2, 'Jolie Ward', 'https://www.qyk.com.au', 'Neque repellendus C', 'Eaque eaque fugit n', 'Quas ex eos et possi', 442, NULL),
 (4, 3, 'Maxine Morse', 'https://www.befy.net', 'Praesentium nostrud ', 'Expedita perspiciati', 'Do nesciunt omnis o', 256, NULL),
 (5, 4, 'pen', 'https://www.pen.com', 'small', 'red', 'please gift wrap', 1, NULL),
-(7, 1, 'Joseph Guzman', 'https://www.loharykywepup.me.uk', 'Id sint ex occaecat ', 'Est sit commodi ven', 'Qui obcaecati quis q', 2, NULL);
+(7, 1, 'Joseph Guzman', 'https://www.loharykywepup.me.uk', 'Id sint ex occaecat ', 'Est sit commodi ven', 'Qui obcaecati quis q', 2, NULL),
+(8, 5, 'Macbook Pro', 'https://www.apple.com', '12', 'red', 'Please gift wrap', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -612,7 +625,8 @@ INSERT INTO `shopper_requests` (`id`, `user_id`, `status`, `payment_status`, `pa
 (1, 6, 'saved', NULL, NULL, NULL, 0, 'Aspernatur Nam nostr', 'Facilis rerum perfer', 1, '2025-08-10 10:25:16', '2025-08-26 10:29:37'),
 (2, 6, 'wait_for_payment', NULL, NULL, 200, 1, 'Aut rerum aut non ex', 'Modi qui ex nobis ve', 0, '2025-08-11 09:09:27', '2025-10-06 13:19:17'),
 (3, 6, 'pending', NULL, NULL, NULL, 1, 'Quod dolorem aut rep', 'Excepturi architecto', 0, '2025-08-11 09:27:34', '2025-08-11 09:27:34'),
-(4, 6, 'processing', 'paid', '{\"id\":\"3RX37202MW237084A\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"mail@gmail.com\",\"account_id\":\"CQWTNAWBGSMMW\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"5HG29991A4375142Y\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.03\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"290.97\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T14:09:39Z\",\"update_time\":\"2025-10-06T14:09:39Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"mail@gmail.com\",\"payer_id\":\"CQWTNAWBGSMMW\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T14:08:42Z\",\"update_time\":\"2025-10-06T14:09:39Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"self\",\"method\":\"GET\"}]}', 302, 0, 'first class', 'send everything together', 0, '2025-08-24 23:08:31', '2025-10-06 14:09:39');
+(4, 6, 'processing', 'paid', '{\"id\":\"3RX37202MW237084A\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"mail@gmail.com\",\"account_id\":\"CQWTNAWBGSMMW\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"5HG29991A4375142Y\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.03\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"290.97\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T14:09:39Z\",\"update_time\":\"2025-10-06T14:09:39Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"mail@gmail.com\",\"payer_id\":\"CQWTNAWBGSMMW\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T14:08:42Z\",\"update_time\":\"2025-10-06T14:09:39Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"self\",\"method\":\"GET\"}]}', 302, 0, 'first class', 'send everything together', 0, '2025-08-24 23:08:31', '2025-10-06 14:09:39'),
+(5, 6, 'wait_for_payment', NULL, NULL, 900, 0, 'First class', 'Send everything together', 0, '2025-10-11 18:03:04', '2025-10-11 18:03:57');
 
 -- --------------------------------------------------------
 
@@ -664,11 +678,54 @@ CREATE TABLE `virtual_addresses` (
 --
 
 INSERT INTO `virtual_addresses` (`id`, `user_id`, `code`, `country`, `city`, `address_line`, `postal_code`, `phone`, `is_default`, `created_at`, `updated_at`) VALUES
-(2, 4, 'US', 'Japan', 'Shibayama-machi, Sambu-gun', 'Address Line 1: Iwayama Imorido 114-7 IACT-S  \r\nAddress Line 2: Suite #BXA609  \r\nPrefecture: Chiba  \r\n', '289-1608', '000000000000', 1, '2025-08-12 10:59:48', '2025-10-02 12:17:27'),
-(3, 4, 'UK', 'Germany', 'Schwedt  ', 'Address Line 1: Schwetder Allee 23  \r\nAddress Line 2: Forward2Me 422245  \r\nState/County: Brandenburg  \r\n', '16303', '+48746601138', 1, '2025-08-12 11:16:32', '2025-10-02 12:16:06'),
-(4, 4, 'JP', 'United Kingdom', 'Preston  ', 'Address Line 1: 422245 York House  \r\nAddress Line 2: Green Lane West  \r\nCounty: Lancashire  \r\n', 'PR3 1NJ  ', '+441995606060', 1, '2025-08-15 10:02:24', '2025-10-02 12:15:05'),
-(5, 4, 'DE', 'United States', 'Delaware (DE)  ', 'Address Line 1: 807B Kiamensi Rd  \r\nAddress Line 2: C-422245  \r\n', '19804  ', '+12083286027', 1, '2025-09-15 15:48:30', '2025-10-02 12:14:00'),
+(2, 4, 'JP', 'Japan', 'Shibayama-machi, Sambu-gun', 'Address Line 1: Iwayama Imorido 114-7 IACT-S  \r\nAddress Line 2: Suite #BXA609  \r\nPrefecture: Chiba  \r\n', '289-1608', '000000000000', 1, '2025-08-12 10:59:48', '2025-10-02 12:17:27'),
+(3, 4, 'DE', 'Germany', 'Schwedt  ', 'Address Line 1: Schwetder Allee 23  \r\nAddress Line 2: Forward2Me 422245  \r\nState/County: Brandenburg  \r\n', '16303', '+48746601138', 1, '2025-08-12 11:16:32', '2025-10-02 12:16:06'),
+(4, 4, 'UK', 'United Kingdom', 'Preston  ', 'Address Line 1: 422245 York House  \r\nAddress Line 2: Green Lane West  \r\nCounty: Lancashire  \r\n', 'PR3 1NJ  ', '+441995606060', 1, '2025-08-15 10:02:24', '2025-10-02 12:15:05'),
+(5, 4, 'US', 'United States', 'Delaware (DE)  ', 'Address Line 1: 807B Kiamensi Rd  \r\nAddress Line 2: C-422245  \r\n', '19804  ', '+12083286027', 1, '2025-09-15 15:48:30', '2025-10-02 12:14:00'),
 (6, 4, 'AT', 'Austria', 'Rastenfeld  ', 'Address Line 1: Rastenfeld 151  \r\nAddress Line 2: Suite #BXA609  \r\n\r\n', '3532  ', '0000000000', 1, '2025-10-02 12:18:23', '2025-10-02 12:23:20');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `warehouses`
+--
+
+CREATE TABLE `warehouses` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `country_code` varchar(10) NOT NULL,
+  `country_name` varchar(100) NOT NULL,
+  `banner_image` varchar(255) DEFAULT NULL,
+  `hero_image` varchar(255) NOT NULL,
+  `hero_title` varchar(255) NOT NULL,
+  `hero_description_1` text DEFAULT NULL,
+  `hero_description_2` text DEFAULT NULL,
+  `hero_cta_text` varchar(100) NOT NULL DEFAULT 'START SAVING',
+  `hero_cta_link` varchar(255) DEFAULT NULL,
+  `brands_title` varchar(255) DEFAULT NULL,
+  `brands_text` text DEFAULT NULL,
+  `brands_image` varchar(255) DEFAULT NULL,
+  `shipping_text` varchar(255) DEFAULT NULL,
+  `payment_text` varchar(255) DEFAULT NULL,
+  `bottom_title` varchar(255) DEFAULT NULL,
+  `bottom_paragraph_1` text DEFAULT NULL,
+  `bottom_paragraph_2` text DEFAULT NULL,
+  `bottom_cta_text` varchar(100) DEFAULT NULL,
+  `bottom_cta_link` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `warehouses`
+--
+
+INSERT INTO `warehouses` (`id`, `country_code`, `country_name`, `banner_image`, `hero_image`, `hero_title`, `hero_description_1`, `hero_description_2`, `hero_cta_text`, `hero_cta_link`, `brands_title`, `brands_text`, `brands_image`, `shipping_text`, `payment_text`, `bottom_title`, `bottom_paragraph_1`, `bottom_paragraph_2`, `bottom_cta_text`, `bottom_cta_link`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'AT', 'Austria', '1760276658_550b0bae96ee27007af1.webp', '1760276658_2de5781ccce3d0b20993.webp', 'SHOP ONLINE IN AUSTRIA AND SHIP WORLDWIDE', 'Everything Austria has to offer is ready and waiting. Unlock Austrian parcel forwarding with forward2me and shop online as if you lived there. Austria is home to a mix of traditional and modern brands, offering high-quality products in fashion, electronics, and lifestyle goods.\r\n', 'We are one of the leading international parcel forwarding services, with years of experience shipping parcels worldwide. With our Austrian forwarding address, you can shop from trusted retailers and popular marketplaces across Europe — from everyday essentials to premium items — all delivered safely to your doorstep.', 'Start Shippin', '/shipping/rates', 'Austrian Brands We Reship', 'Your Austrian forwarding address lets you shop from some of Europe’s most respected and reliable brands. Unlock Amazon.at international shipping or shop from Zalando Austria, MediaMarkt, Conrad, Intersport, and Billa Online.\r\n<p>\r\nOur package forwarding service brings the best Austrian brands to your fingertips. Buy from trending beauty and lifestyle brands like Rosenrot, Logona, or discover unique Austrian artisans on Etsy Austria and eBay.at who normally don’t ship internationally.\r\n</p><p>\r\nWith Austrian parcel forwarding, you can also shop for the latest tech from Conrad, Electronic4You, or explore Austrian fashion from LIEBESKIND, Wolford, and Swarovski.\r\n</p><p>\r\nWhatever you’re after, as an international shopper, you can now access Austrian online stores and order to the UK, Europe, Asia, Australia, and beyond — quickly, safely, and reliably.</p>', '1760276658_615ecd71e4ceaa06fe38.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use Austrian Parcel Forwarding', 'Our Austrian parcel forwarding service lets you access a wide variety of products from Austria that you may not find locally. By shopping online from Austria, you can explore both popular retailers and local specialty brands that offer premium quality and unique selections. Whether you’re looking for cutting-edge electronics, stylish clothing, or traditional Austrian goods, we make it simple for international shoppers.', 'Get a parcel forwarding address in Austria and shop at Amazon.at, Ebay.at, or directly from Austrian brands. Receive toys and games from Ravensburger Austria, books from Thalia, or the latest fashion from Görtz Austria and Wolford, all shipped to your country safely and efficiently.', 'Start Shipping Now', '/shipping/rates', 1, '2025-10-12 11:55:48', '2025-10-12 13:44:18'),
+(2, 'US', 'United States', '1760271475_8de66e11a31f5573aa3a.webp', '1760271475_ebd8b140d085bba39c16.webp', 'SHOP ONLINE IN USA AND SHIP WORLDWIDE', 'Everything the US has to offer is ready and waiting. Unlock US parcel forwarding with forward2me and you can shop like you live there. The US has one of the largest markets in the world, with an incredible variety of products on offer from some of the biggest brands on the planet.', 'We are one of the leading international parcel forwarding services with years of experience shipping parcels. We offer parcel forwarding services that ship products from famous brands all over the world from the UK, EU, Turkey, and Japan.', 'START SAVING', '/services', 'US Brands We Reship', 'Your US forwarding address lets you shop at the biggest brands in the world. Unlock US Amazon international shipping or shop from Nike US, Adidas, Zappos, Target, Best Buy and Walmart.\r\n\r\nWe offer a package forwarding service that puts the best brands at your fingertips. You can buy from the trending brands in beauty, like Rare Beauty or Glossier or buy from tiny independent sellers on Etsy and eBay who wouldn’t normally offer international shipping. Package forwarding services let you buy the latest tech from brands like Apple and GameStop or stock up on US fashion from Hollister, Vans, or Nordstrom Rack.\r\n\r\nWhatever you’re after, as an international shopper, you can now access US online shops and order all around the world, to UK, Europe, Asia, Australia, and more.', '1760271475_db08dcbdc23d892ec2d7.webp', '', '', 'Why Use European Parcel Forwarding', 'Our Europe parcel forwarding service lets you get hold of all kinds of items you never thought you could. If you buy goods online from Europe you’ll be able to shop at a wide range of stores and brands that just may not be available where you live. Whether you’re after the best in European technology or stylish clothing, we’re here to help.', '', 'Start Shoipping', '/shipping/rates', 1, '2025-10-12 12:17:55', '2025-10-12 12:17:55'),
+(4, 'DE', 'Germany', '1760274458_3e84e1a4ace47831844d.webp', '1760274458_d25498e0b327335df915.webp', 'Germany Ware Houses', 'Everything Germany has to offer is ready and waiting. Unlock German parcel forwarding with forward2me and shop online as if you lived there. Germany is home to some of Europe’s most respected brands, offering world-class quality, precision, and innovation across fashion, electronics, and home goods.', 'We are one of the leading international parcel forwarding services with years of experience shipping parcels worldwide. With our German forwarding address, you can shop from trusted retailers and popular marketplaces across the EU — from electronics and luxury goods to everyday essentials. Enjoy reliable delivery and fast international shipping from Germany to anywhere in the world.', 'Start Shipping', '/shipping/rates', 'German Brands We Reship', 'Your German forwarding address lets you shop from some of Europe’s most trusted and innovative brands. Unlock German Amazon.de international shipping or shop from Zalando, Otto, MediaMarkt, Saturn, Adidas, and Puma.\r\n<p>\r\nOur package forwarding service puts the best of Germany right at your fingertips. Buy from trending beauty and lifestyle brands like Nivea, Weleda, and Sebamed, or discover local artisans and unique sellers on Etsy Germany and eBay.de who don’t normally offer international shipping.\r\n\r\nWith German parcel forwarding, you can also get access to top tech retailers like Conrad, Cyberport, and Notebooksbilliger, or explore German fashion from Hugo Boss, Esprit, and s.Oliver.\r\n</p><p>\r\nWhatever you’re looking for, as an international shopper, you can now access German online stores and order to the UK, Europe, Asia, Australia, and beyond — quickly, safely, and affordably.\r\n</p>', '1760274966_c8f24e96f8c3264ff6b3.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use German Parcel Forwarding?', 'Our German parcel forwarding service lets you access a wide range of products from Germany that you might not find locally. By shopping online from Germany, you can explore top retailers, popular marketplaces, and unique local brands that deliver quality, innovation, and style. Whether you’re after cutting-edge technology, premium fashion, or specialty goods, we make it easy for international shoppers to get what they want.', 'Get a parcel forwarding address in Germany and shop at Amazon.de, Ebay.de, or from iconic German brands. Receive toys and games from Steiff and Ravensburger, books from Hugendubel, and the latest fashion from Görtz. All delivered quickly and reliably to your doorstep anywhere in the world.', 'Start Shopping Now', '/shopper', 1, '2025-10-12 11:55:48', '2025-10-12 13:21:49'),
+(5, 'JP', 'Japan', '1760278584_d65a8eb2b5dbb74661b7.webp', '1760278584_fb9346072b9b5b2324fc.webp', 'SHOP ONLINE IN JAPAN AND SHIP WORLDWIDE', 'Everything Japan has to offer is ready and waiting. Unlock Japanese parcel forwarding with forward2me and shop online as if you lived there. Japan is renowned for cutting-edge electronics, unique fashion, and high-quality lifestyle products.\r\n', 'We are one of the leading international parcel forwarding services, with years of experience shipping parcels worldwide. With our Japanese forwarding address, you can shop from trusted retailers and exclusive brands across Japan — all delivered safely to your doorstep.', 'Start Shopping Now', '/shopper', 'Japan Brands We Reship', 'Your Japanese forwarding address lets you shop from some of Japan’s most popular and trusted brands. Unlock Amazon Japan international shipping or shop from Uniqlo, Rakuten, Muji, Bic Camera, Yodobashi, and Don Quijote.\r\n<p>\r\nOur package forwarding service puts the best Japanese products at your fingertips. Buy trending beauty and lifestyle items from Shiseido, DHC, or discover unique Japanese sellers on Mercari Japan and Rakuten Ichiba.\r\n</p>\r\nWith Japanese parcel forwarding, you can also access electronics from Sony, Nintendo, or stock up on Japanese fashion and accessories from GU, Comme des Garçons, and Issey Miyake.\r\n<p>\r\nWhatever you’re after, as an international shopper, you can now access Japanese online stores and order to Europe, the US, Australia, and Asia — quickly, safely, and reliably.\r\n</p>', '1760278584_9903697b6a9d529c2b7d.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use Japanese Parcel Forwarding', 'Our Japanese parcel forwarding service lets you access a wide range of Japanese products that are otherwise hard to get internationally. From electronics to fashion to traditional goods, Japan’s online market is vast and unique.\r\n', 'Get a parcel forwarding address in Japan and shop at Amazon Japan, Rakuten, or from Japanese brands directly. Receive electronics from Sony and Nintendo, collectibles from Bandai, or fashion from Uniqlo and Comme des Garçons, all shipped securely to your country.', 'Start Shipping', '/shipping/rates', 1, '2025-10-12 11:55:48', '2025-10-12 14:16:24'),
+(6, 'UK', 'United Kingdom', '1760278409_3c417549b3128359a989.webp', '1760278409_5edd1ba83d9ea1221c91.webp', 'SHOP ONLINE IN UTED KINGDOM AND SHIP WORLDWIDE', 'Everything the UK has to offer is ready and waiting. Unlock UK parcel forwarding with forward2me and shop online as if you lived there. The UK is home to globally recognized brands and a diverse online market offering electronics, fashion, beauty, and more.', 'We are one of the leading international parcel forwarding services, with years of experience shipping parcels worldwide. With our UK forwarding address, you can shop from trusted retailers and popular marketplaces across Europe and beyond — all delivered safely to your doorstep.', 'Start Shoppint', '/shoppre', 'UK Brands We Reship', 'Your UK forwarding address lets you shop from some of the world’s most trusted brands. Unlock Amazon UK international shipping or shop from John Lewis, Marks & Spencer, Argos, Currys, Boots, and ASOS.\r\n<p>\r\nOur package forwarding service puts the best UK brands at your fingertips. Buy trending beauty and lifestyle products from The Body Shop, Charlotte Tilbury, or discover local independent sellers on Etsy UK and eBay UK.\r\n</p>\r\nWith UK parcel forwarding, you can also access top tech retailers like Apple UK and Game, or stock up on UK fashion from Topshop, H&M UK, or River Island.\r\n<p>\r\nWhatever you’re after, as an international shopper, you can now access UK online stores and order to Europe, Asia, Australia, and the US — quickly, safely, and reliably.\r\n</p>', '1760278409_d98d60bb0269176aa92c.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use UK Parcel Forwarding', 'Our UK parcel forwarding service lets you access a wide variety of products from the UK that you may not find locally. By shopping online from the UK, you can explore top retailers, local specialists, and international brands that deliver quality and style.\r\n', 'Get a parcel forwarding address in the UK and shop at Amazon UK, eBay UK, or directly from UK brands. Receive toys and games from LEGO UK, books from Waterstones, and the latest fashion from Marks & Spencer and Topshop, all shipped securely to your country.', 'Start Shipping Now', '/shipping/rates', 1, '2025-10-12 11:55:48', '2025-10-12 14:13:29');
 
 -- --------------------------------------------------------
 
@@ -839,6 +896,13 @@ ALTER TABLE `virtual_addresses`
   ADD KEY `virtual_addresses_user_id_foreign` (`user_id`);
 
 --
+-- Indexes for table `warehouses`
+--
+ALTER TABLE `warehouses`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `country_code` (`country_code`);
+
+--
 -- Indexes for table `why_choose`
 --
 ALTER TABLE `why_choose`
@@ -864,7 +928,7 @@ ALTER TABLE `blog_categories`
 -- AUTO_INCREMENT for table `booking_status_history`
 --
 ALTER TABLE `booking_status_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `delivered_today`
@@ -882,7 +946,7 @@ ALTER TABLE `faqs`
 -- AUTO_INCREMENT for table `fonts`
 --
 ALTER TABLE `fonts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `hero_section`
@@ -918,7 +982,7 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `pages`
@@ -930,7 +994,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -942,25 +1006,25 @@ ALTER TABLE `posts`
 -- AUTO_INCREMENT for table `promo_cards`
 --
 ALTER TABLE `promo_cards`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `shipping_bookings`
 --
 ALTER TABLE `shipping_bookings`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `shopper_items`
 --
 ALTER TABLE `shopper_items`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `shopper_requests`
 --
 ALTER TABLE `shopper_requests`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -973,6 +1037,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `virtual_addresses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `warehouses`
+--
+ALTER TABLE `warehouses`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `why_choose`
