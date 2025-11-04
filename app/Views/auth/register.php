@@ -7,6 +7,16 @@
    <p>Join us today!</p>
   </div>
 
+  <?php if (session()->getFlashdata('errors')): ?>
+   <div class="alert alert-danger">
+    <ul style="margin: 0;">
+     <?php foreach (session()->getFlashdata('errors') as $error): ?>
+      <li><?= esc($error) ?></li>
+     <?php endforeach ?>
+    </ul>
+   </div>
+  <?php endif; ?>
+
   <?php if (session()->getFlashdata('error')): ?>
    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
   <?php endif; ?>
@@ -15,22 +25,22 @@
    <div class="row">
     <div class="form-group col-lg-6">
      <label for="firstname">First Name</label>
-     <input type="text" id="firstname" name="firstname" required class="form-control" placeholder="John">
+     <input type="text" id="firstname" name="firstname" required class="form-control" placeholder="First Name">
     </div>
 
     <div class="form-group col-lg-6">
      <label for="lastname">Last Name</label>
-     <input type="text" id="lastname" name="lastname" required class="form-control" placeholder="Doe">
+     <input type="text" id="lastname" name="lastname" required class="form-control" placeholder="Last Name">
     </div>
 
     <div class="form-group col-lg-6">
      <label for="username">Username</label>
-     <input type="text" id="username" name="username" required class="form-control" placeholder="johndoe">
+     <input type="text" id="username" name="username" required class="form-control" placeholder="username">
     </div>
 
     <div class="form-group col-lg-6">
      <label for="email">Email</label>
-     <input type="email" id="email" name="email" required class="form-control" placeholder="john@example.com">
+     <input type="email" id="email" name="email" required class="form-control" placeholder="email@example.com">
     </div>
 
     <div class="form-group col-lg-6">

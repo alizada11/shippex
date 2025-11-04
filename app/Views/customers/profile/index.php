@@ -4,7 +4,7 @@
 <form method="POST" action="<?= base_url('change-password') ?>">
  <div class="col-12">
   <div class="card card-my h-100">
-   <h1 class="card-header">Personal Details</h1>
+   <h2 class="card-header">Personal Details</h2>
    <div class="card-body">
     <p class="text-center mb-4">You can change your password when you need to.</p>
 
@@ -57,9 +57,7 @@
 
 
     <div class="row justify-content-between">
-     <div class=" col-lg-4 col-xl-3 my-3">
-      <a href="<?= base_url('company/') ?>" class=" btn btn-block btn-secondary text-uppercase">Go to company details</a>
-     </div>
+
      <div class="col-lg-4 col-xl-3 my-3 text-right">
       <button type="submit" data-submit-button="" class="btn btn-block btn-primary text-uppercase" id="profile-form-submit">Update Profile</button>
      </div>

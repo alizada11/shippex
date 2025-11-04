@@ -2,9 +2,13 @@
 
 <?= $this->section('content') ?>
 <div class="container my-4">
-    <h2>Select Google Font</h2>
 
-    <div class="card shadow p-3">
+    <div class="card shadow-sm p-3">
+        <div class="card-headr">
+            <h2>Select Google Font</h2>
+
+        </div>
+
         <form method="post" action="<?= site_url('admin/fonts/save') ?>">
             <label for="fontSelect" class="form-label">Choose a font:</label>
             <select class="form-control" id="fontSelect" name="font_name" style="width: 100%;">
@@ -26,7 +30,7 @@
         </form>
     </div>
     <hr>
-    <div class="card shadow-lg">
+    <div class="card shadow-sm">
         <div class="card-header bg-gradient-info">
             <h3 class="mb-0"><i class="fas fa-history mr-2"></i>Font History</h3>
         </div>
@@ -46,7 +50,7 @@
                             <tr>
                                 <td class="pl-4 font-weight-bold"><?= $font['font_name'] ?></td>
                                 <td>
-                                    <span style="font-family: '<?= $font['font_name'] ?>'important!;">Sample Text</span>
+                                    <span style="font-family: '<?= $font['font_name'] ?>'">Sample Text</span>
                                 </td>
                                 <td>
                                     <?php if ($font['is_default']): ?>

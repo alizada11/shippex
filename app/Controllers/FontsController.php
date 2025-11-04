@@ -48,7 +48,9 @@ class FontsController extends BaseController
   $fontModel->where('is_default', 1)->set(['is_default' => 0])->update();
   $fontModel->where('id', $id)->set(['is_default' => 1])->update();
   $data['message'] = 'Font upddated!';
-  $data['selected_fonts'] = $fontModel->findAll();
+  $data['latest_font'] = $fontModel
+   ->orderBy('id', 'DESC')
+   ->first();
   return view('admin/settings/select_font', $data);
  }
 }

@@ -7,92 +7,183 @@ use CodeIgniter\Controller;
 
 class Auth extends BaseController
 {
+
+    public function index()
+    {
+
+        $data['title'] = 'Users List';
+        $data['users'] = (new UserModel())->findAll(5);
+
+
+        return view('admin/users/index', $data);
+    }
+
+    public function userProfile($id)
+    {
+        $userModel = new UserModel();
+
+
+        $data['profile'] = $userModel->where('id', $id)->first();
+
+        return view('admin/users/profile', $data);
+    }
     public function login()
     {
-        return view('auth/login');
+        $data['title'] = 'Login';
+        return view('auth/login', $data);
     }
 
     public function loginPost()
     {
         $session = session();
         $model = new UserModel();
+        $response = service('response');
+
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
+        $remember = $this->request->getPost('remember'); // checkbox value
 
-        $user = $model->where('email', $email)->first();
+        // Find user by email or username
+        $user = $model
+            ->groupStart()
+            ->where('email', $email)
+            ->orWhere('username', $email)
+            ->groupEnd()
+            ->first();
 
         if ($user && password_verify($password, $user['password'])) {
-            $session->set([
-                'user_id' => $user['id'],
-                'username' => $user['username'],
-                'email' => $user['email'],
-                'role' => $user['role'],
+
+            //Set session data
+            $sessionData = [
+                'user_id'   => $user['id'],
+                'full_name' => $user['firstname'] . ' ' . $user['lastname'],
+                'username'  => $user['username'],
+                'email'     => $user['email'],
+                'role'      => $user['role'],
                 'logged_in' => true,
-            ]);
-            return redirect()->to('/dashboard');
-        } else {
-            return redirect()->back()->with('error', 'Invalid login credentials.');
+            ];
+            $session->set($sessionData);
+
+            //Handle "Remember Me"
+            if ($remember) {
+                $token = bin2hex(random_bytes(32)); // secure random token
+
+                // Save token in database
+                $model->update($user['id'], ['remember_token' => $token]);
+
+                // Set persistent cookie (30 days)
+                $response->setCookie([
+                    'name'     => 'remember_token',
+                    'value'    => $token,
+                    'expire'   => 60 * 60 * 24 * 30, // 30 days
+                    'path'     => '/',
+                    'domain'   => '',                // leave empty for localhost
+                    'secure'   => false,             // true in production (HTTPS)
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+            }
+
+            //Redirect safely with cookie attached
+            return $response->redirect('/dashboard');
         }
+
+        // Invalid credentials
+        return redirect()->back()->with('error', 'Invalid login credentials.');
     }
+
+
+
     public function register()
     {
-        return view('auth/register');
+        $data['title'] = 'Register Form';
+        return view('auth/register', $data);
     }
 
     public function registerPost()
     {
+        $validation = \Config\Services::validation();
         $model = new \App\Models\UserModel();
+
         $data = [
             'firstname' => $this->request->getPost('firstname'),
-            'lastname' => $this->request->getPost('lastname'),
-            'username' => $this->request->getPost('username'),
-            'email'    => $this->request->getPost('email'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => 'customer',
-            'created_at' => date('Y-m-d H:i:s'),
+            'lastname'  => $this->request->getPost('lastname'),
+            'username'  => $this->request->getPost('username'),
+            'email'     => $this->request->getPost('email'),
+            'password'  => $this->request->getPost('password'),
         ];
-        $model->insert($data);
+
+        // Define validation rules
+        $rules = [
+            'firstname' => 'required|min_length[2]|max_length[50]',
+            'lastname'  => 'required|min_length[2]|max_length[50]',
+            'username'  => 'required|min_length[3]|max_length[30]|is_unique[users.username]',
+            'email'     => 'required|valid_email|is_unique[users.email]',
+            'password'  => 'required|min_length[6]',
+        ];
+
+        if (! $this->validate($rules)) {
+            // If validation fails, redirect back with errors
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        // If valid, insert user
+        $model->insert([
+            'firstname'  => $data['firstname'],
+            'lastname'   => $data['lastname'],
+            'username'   => $data['username'],
+            'email'      => $data['email'],
+            'password'   => password_hash($data['password'], PASSWORD_DEFAULT),
+            'role'       => 'customer',
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
         return redirect()->to('/login')->with('success', 'Registered successfully!');
     }
+
     public function forgot()
     {
-        return view('auth/forgot');
+        $data['title'] = 'Frogot Password';
+        return view('auth/forgot', $data);
     }
 
     public function forgotPost()
     {
-        $email = $this->request->getPost('email');
+        $user_email = $this->request->getPost('email');
         $model = new \App\Models\UserModel();
-        $user = $model->where('email', $email)->first();
+        $user = $model->where('email', $user_email)->first();
 
         if ($user) {
             $token = bin2hex(random_bytes(32));
             $db = \Config\Database::connect();
             $db->table('password_resets')->insert([
-                'email' => $email,
+                'email' => $user_email,
                 'token' => $token,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
-
+            $link['name'] = $user['firstname'] . ' ' . $user['lastname'];
             $link['text'] = base_url('/reset-password/' . $token);
 
             $message = view('emails/forgot_password', $link);
 
-            $email->setTo($email);
+            $email = \Config\Services::email();
+
+            $email->setTo($user_email);
             $email->setSubject('Password Reset Link');
             $email->setMessage($message);
             $email->setMailType('html'); // Important
 
             $email->send();
 
-            return redirect()->back()->with('success', "Reset link: $link");
+            return redirect()->back()->with('success', "Reset link has been sent via email, please check yout email");
         }
 
         return redirect()->back()->with('error', 'Email not found.');
     }
     public function reset($token)
     {
-        return view('auth/reset', ['token' => $token]);
+
+        return view('auth/reset', ['token' => $token, 'title' => 'New Password']);
     }
 
     public function resetPost($token)
@@ -154,10 +245,25 @@ class Auth extends BaseController
         }
     }
 
-
     public function logout()
     {
-        session()->destroy();
+        $session = session();
+        helper('cookie');
+
+        $userId = $session->get('user_id');
+
+        if ($userId) {
+            $userModel = new UserModel();
+            // Remove remember_token from DB
+            $userModel->update($userId, ['remember_token' => null]);
+        }
+
+        // Delete remember_token cookie from browser
+        delete_cookie('remember_token', '/');
+
+        // Destroy the session completely
+        $session->destroy();
+
         return redirect()->to('/login');
     }
 }

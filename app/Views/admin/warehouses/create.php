@@ -10,15 +10,7 @@
   <div class="card-body">
    <form action="/warehouse/store" method="post" class="simple-form">
     <div class="row g-3">
-     <!-- User Selection -->
-     <div class="col-12">
-      <label class="form-label text-shippex-purple fw-bold">User</label>
-      <select name="user_id" class="form-control form-control-lg" required>
-       <?php foreach ($users as $user): ?>
-        <option value="<?= $user['id'] ?>"><?= esc($user['username']) ?> (ID: <?= $user['id'] ?>)</option>
-       <?php endforeach; ?>
-      </select>
-     </div>
+
 
      <!-- Country -->
      <div class="col-md-6">
@@ -69,8 +61,8 @@
      <!-- Default Checkbox -->
      <div class="col-12 mt-2">
       <div class="form-check">
-       <input type="checkbox" name="is_default" id="isDefault" value="1" class="form-check-input" checked>
-       <label class="form-check-label text-shippex-purple fw-bold" for="isDefault">Set as Default Warehouse</label>
+       <input type="checkbox" name="is_active" id="isDefault" value="1" class="form-check-input" checked>
+       <label class="form-check-label text-shippex-purple fw-bold" for="isDefault">Is Active</label>
       </div>
      </div>
 

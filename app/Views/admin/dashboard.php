@@ -30,7 +30,7 @@
  </div>
 </div>
 
-<div class="card mt-4">
+<div class="card mt-4 p-0">
  <div class="card-header d-flex justify-content-between">
   <span>Recent Users</span>
   <a class="link text-white" href="<?= base_url('/') ?>">View All</a>
@@ -59,17 +59,5 @@
   </table>
  </div>
 </div>
-<div class="card mb-4">
- <div class="card-header bg-primary text-white">📦 Your Assigned Warehouse Address</div>
- <div class="card-body">
-  <?php if ($address): ?>
-   <p><strong>Country:</strong> <?= esc($address['country']) ?></p>
-   <p><strong>Address:</strong><br><?= nl2br(esc($address['address_line'])) ?></p>
-   <p><strong>Postal Code:</strong> <?= esc($address['postal_code']) ?></p>
-   <p><strong>Phone:</strong> <?= esc($address['phone']) ?></p>
-  <?php else: ?>
-   <p class="text-danger">No warehouse address assigned yet. Please contact support.</p>
-  <?php endif; ?>
- </div>
-</div>
+
 <?= $this->endSection() ?>

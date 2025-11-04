@@ -9,14 +9,13 @@ class VirtualAddressModel extends Model
  protected $table = 'virtual_addresses';
  protected $primaryKey = 'id';
  protected $allowedFields = [
-  'user_id',
   'country',
   'address_line',
   'postal_code',
   'phone',
   'city',
   'code',
-  'is_default'
+  'is_active'
  ];
  protected $useTimestamps = true;
 }

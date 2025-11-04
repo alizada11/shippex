@@ -9,7 +9,7 @@
   <div class="container py-4">
    <div class="card shadow-sm">
     <div class="card-header bg-shippex-purple text-white d-flex justify-content-between align-items-center">
-     <h3 class="mb-0">Shipping Requests</h3>
+     <h3 class="mb-0">Shopper Requests</h3>
 
     </div>
     <div class="card-body p-0">

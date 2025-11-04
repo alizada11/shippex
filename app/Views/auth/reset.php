@@ -1,29 +1,26 @@
-<!DOCTYPE html>
-<html>
+<?= view('layout/header.php'); ?>
 
-<head>
- <title>Admin Login</title>
- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body class="bg-light">
- <div class="container mt-5">
-  <div class="row justify-content-center">
-   <div class="col-md-4">
-    <h3 class="mb-4 text-center">Login</h3>
-
-    <?php if (session()->getFlashdata('error')): ?>
-     <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
-    <?php endif; ?>
-
-    <form method="post" action="<?= base_url('/reset-password/' . $token) ?>">
-     <input type="password" name="password" placeholder="New password" class="form-control mb-2" required>
-     <button class="btn btn-success w-100">Reset Password</button>
-    </form>
-
-   </div>
+<div class="auth-container">
+ <div class="auth-card">
+  <div class="auth-header">
+   <h3>Please Enter Your New Passwor</h3>
   </div>
- </div>
-</body>
 
-</html>
+  <?php if (session()->getFlashdata('error')): ?>
+   <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+  <?php endif; ?>
+  <?php if (session()->getFlashdata('success')): ?>
+   <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+  <?php endif; ?>
+
+  <form method="post" action="<?= base_url('/reset-password/' . $token) ?>" class="auth-form">
+   <div class="form-group mb-4">
+    <input type="password" id="password" name="password" required class="form-control" placeholder="New Password">
+   </div>
+
+   <button type="submit" class="btn-auth">Change Password</button>
+  </form>
+
+ </div>
+</div>
+<?= view('layout/footer.php'); ?>

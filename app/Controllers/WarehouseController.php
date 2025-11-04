@@ -53,9 +53,16 @@ class WarehouseController extends BaseController
 
  public function update($id)
  {
-  $this->addressModel->update($id, $this->request->getPost());
+  $data = $this->request->getPost();
+
+  // If checkbox not in post data, set it manually
+  $data['is_active'] = $this->request->getPost('is_active') ? 1 : 0;
+
+  $this->addressModel->update($id, $data);
+
   return redirect()->to('/warehouse')->with('success', 'Warehouse address updated successfully.');
  }
+
 
  public function delete($id)
  {

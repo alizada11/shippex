@@ -9,6 +9,9 @@ use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use App\Services\EasyshipService;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;
 
 class Shipping extends BaseController
 {
@@ -168,25 +171,39 @@ class Shipping extends BaseController
 
     public function shippingRates()
     {
+        $client = new Client();
 
+        try {
+            $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . trim($this->token),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json; version=2024-09',
+                ],
+                'timeout' => 10, // optional: fail faster if API is unresponsive
+            ]);
 
-        $client = new \GuzzleHttp\Client();
+            $data = json_decode($response->getBody(), true);
+            $categories = $data['item_categories'] ?? [];
+        } catch (ConnectException $e) {
+            // Network or timeout issue
+            $categories = [];
+            $errorMessage = 'Unable to connect to the shipping service right now. Please try again later.';
+        } catch (RequestException $e) {
+            // API responded with 4xx/5xx error
+            $categories = [];
+            $errorMessage = 'We are unable to retrieve shipping rates at the moment. Please try again shortly.';
+        } catch (\Exception $e) {
+            // Catch-all for unexpected errors
+            $categories = [];
+            $errorMessage = 'An unexpected error occurred while fetching shipping information.';
+        }
 
-        $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . trim($this->token),
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json; version=2024-09',
-            ],
+        // Pass message to the view
+        return view('shipping-rates', [
+            'categories' => $categories,
+            'error' => $errorMessage ?? null,
         ]);
-
-        // Decode JSON into associative array
-        $data = json_decode($response->getBody(), true);
-
-        // Extract categories
-        $categories = $data['item_categories'] ?? [];
-
-        return view('shipping-rates', compact('categories'));
     }
 
 
@@ -230,68 +247,119 @@ class Shipping extends BaseController
 
         $bookingModel = new \App\Models\ShippingBookingModel();
         $historyModel = new \App\Models\BookingStatusHistoryModel();
+        $userModel = new \App\Models\UserModel();
+        $packageModel = new \App\Models\PackageModel();
+        $usersWarehouseModel = new \App\Models\WarehouseRequestModel();
 
-        // get current order
-        $order = $bookingModel->find($bookingId);
-        if (! $order) {
+        // Get current booking
+        $booking = $bookingModel->find($bookingId);
+        if (! $booking) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $oldStatus = $order['status'];
+        $oldStatus = $booking['status'];
+        $statusOrder = [
+            'pending'   => 1,
+            'accepted'  => 2,
+            'shipping'  => 3,
+            'shipped'   => 4,
+            'delivered' => 5,
+            'canceled'  => 6, // can jump to canceled if needed
+        ];
 
-        // update order status
+        // Update booking status
+        if ($newStatus === 'canceled') {
+            // allow cancellation at any stage
+        } else if ($statusOrder[$newStatus] == $statusOrder[$oldStatus]) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "The status is already '{$oldStatus}' ."
+            ]);
+        } else if ($statusOrder[$newStatus] < $statusOrder[$oldStatus]) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "Cannot change status from '{$oldStatus}' back to '{$newStatus}'."
+            ]);
+        }
+        if ($newStatus === 'canceled') {
+            // allow cancellation at any stage
+            $bookingModel->update($bookingId, ['status' => $newStatus]);
+        } else if ($statusOrder[$newStatus] < $statusOrder[$oldStatus]) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "Cannot move status from '{$oldStatus}' back to '{$newStatus}'."
+            ]);
+        }
+
         $bookingModel->update($bookingId, ['status' => $newStatus]);
 
-        // log history
+        // Log history
         $historyModel->insert([
-            'book_id'   => $bookingId,
+            'book_id'    => $bookingId,
             'old_status' => $oldStatus,
             'new_status' => $newStatus,
             'changed_by' => session()->get('user_id'), // optional
         ]);
+
+        // If status is accepted → send email
+        if ($newStatus === 'accepted') {
+            $email = \Config\Services::email();
+
+            $user = $userModel->find($booking['user_id']);
+            $userName = trim(($user['firstname'] ?? '') . ' ' . ($user['lastname'] ?? ''));
+
+            $data = [
+                'request'  => $booking,
+                'userName' => $userName ?: 'Customer'
+            ];
+
+            $message = view('emails/shipping_payment', $data);
+
+            $email->setTo($user['email']);
+            $email->setSubject('Your Request #' . $booking['id'] . ' is Waiting for Payment');
+            $email->setMessage($message);
+            $email->setMailType('html');
+            $email->send();
+        }
+        $users_warehouse = $usersWarehouseModel->where('user_id', $booking['user_id'])->where('is_default', 1)->first();
+
+        $ware_house_id  =  $users_warehouse['warehouse_id'];
+
+        // If status is shipped → create a package
+        if ($newStatus === 'shipped') {
+            $packageData = [
+                'virtual_address_id' => $ware_house_id,
+                'user_id'            => $booking['user_id'],
+                'retailer'           => $booking['courier_name'] ?? 'Unknown',
+                'tracking_number'    => 'PENDING-' . strtoupper(uniqid()),
+                'length'             => $booking['length'],
+                'width'              => $booking['width'],
+                'height'             => $booking['height'],
+                'weight'             => $booking['weight'],
+                'value'              => $booking['total_charge'] ?? 0,
+                'status'             => 'incoming',
+                'created_at'         => date('Y-m-d H:i:s')
+            ];
+
+            $packageModel->insert($packageData);
+        }
+
         // Get updated history
         $history = $historyModel
             ->where('book_id', $bookingId)
             ->orderBy('changed_at', 'DESC')
             ->findAll();
-        // if status is accepted send email
-        if ($newStatus == 'accepted') {
-            $email = \Config\Services::email();
 
-            // Prepare data for email
-            $shippingModel = new ShippingBookingModel();
-            $userModel = new UserModel();
-
-            // Fetch main request
-            $request = $shippingModel->find($bookingId);
-            $userName = $userModel->find($request['user_id'])['firstname'] . ' ' . $userModel->find($request['user_id'])['lastname'];
-            $data = [
-                'request' => $request, // the $request row
-                'userName' => $userName ?? 'Customer'
-            ];
-
-            $message = view('emails/shipping_payment', $data);
-
-            $email->setTo($userModel->find($request['user_id'])['email']);
-            $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Payment');
-            $email->setMessage($message);
-            $email->setMailType('html'); // Important
-
-            $email->send();
-            // if ($email->send()) {
-
-            //     echo 'sent';
-            // } else {
-            //     log_message('error', $email->printDebugger(['headers']));
-            //     echo 'failed';
-            // }
-        }
+        // Return JSON response for SweetAlert
         return $this->response->setJSON([
             'success' => true,
-            'message' => "Status updated to {$newStatus}",
+            'message' => $newStatus === 'shipped'
+                ? 'Status updated to "shipped" and package created successfully.'
+                : "Status updated to {$newStatus}.",
             'history' => $history
         ]);
     }
+
 
 
     public function updateInvoice($id)

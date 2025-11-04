@@ -48,12 +48,17 @@ $routes->post('/change-password', 'Auth::changePasswordPost');
 *                      admin routes                                *
 *******************************************************************/
 $routes->get('/dashboard', 'Admin::index',  ['filter' => 'authGuard:admin']);
+$routes->get('/test-cookie', 'Admin::testCookie');
 
 // warehouses
 $routes->group(
  '',
  ['filter' => 'role:admin', 'namespace' => 'App\Controllers'],
  function ($routes) {
+  //users
+  $routes->get('/users', 'Auth::index');
+  $routes->get('/users/profile/(:num)', 'Auth::userProfile/$1');
+
   // warehouse
   $routes->get('/warehouse', 'WarehouseController::index');
   $routes->get('/warehouse/create', 'WarehouseController::create');
@@ -73,8 +78,37 @@ $routes->group(
   $routes->get('admin/shopper/requests/edit/(:num)', 'Admin::edit/$1');
   $routes->get('admin/shopper/requests/view/(:num)', 'Admin::shopperView/$1');
   $routes->post('admin/shopper/requests/set_price', 'Admin::set_price');
+  $routes->post('admin/shopper-requests/mark-shipped', 'Shopper::markShipped');
+  $routes->get('admin/shopper-requests/get-items', 'Shopper::getItems');
  }
 );
+
+$routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
+ $routes->get('(:num)', 'PackageController::index/$1');
+ $routes->get('create', 'PackageController::create');
+ $routes->post('store', 'PackageController::store');
+ $routes->get('show/(:num)', 'PackageController::show/$1');
+ $routes->get('(:num)/edit', 'PackageController::edit/$1');
+ $routes->post('(:num)/update', 'PackageController::update/$1');
+ $routes->post('(:num)/delete', 'PackageController::delete/$1');
+ $routes->get('shipping-categories', 'PackageController::getShippingCategories');
+
+
+ $routes->post('(:num)/items/add', 'PackageController::addItem/$1');
+ $routes->post('items/update/(:num)', 'PackageController::updateItem/$1');
+ $routes->get('items/delete/(:num)', 'PackageController::deleteItem/$1');
+
+ $routes->post('(:num)/files/upload', 'PackageController::uploadFile/$1');
+ $routes->get('files/delete/(:num)', 'PackageController::deleteFile/$1');
+ $routes->post('shipping-data', 'PackageController::getShippingData');
+ // $routes->get('shipping-data', 'PackageController::getShippingData');
+ $routes->post('getRates', 'PackageController::getRates');
+ $routes->post('combine-request', 'CombineRepackController::submitRequest');
+});
+
+
+$routes->get('virtual-addresses', 'PackageController::getVirtualAddresses', ['filter' => 'role:admin,customer']);
+
 // faqs
 $routes->get('faqs', 'Admin\FaqController::faqs');
 $routes->get('customers/faqs', 'CustomersController::faqs');
@@ -150,9 +184,25 @@ $routes->group(
   $routes->get('cms/why-choose/edit/(:num)', 'Admin\WhyChoose::edit/$1');
   $routes->post('cms/why-choose/edit/(:num)', 'Admin\WhyChoose::update/$1');
   $routes->get('cms/why-choose/delete/(:num)', 'Admin\WhyChoose::delete/$1');
+  // combine requests
+  $routes->get('combine-requests', 'CombineRepackController::listRequests');
+  $routes->get('combine-requests/edit/(:num)', 'CombineRepackController::editRequest/$1');
+  $routes->post('combine-requests/update/(:num)', 'CombineRepackController::updateRequest/$1');
+  $routes->post('combine-requests/delete/(:num)', 'CombineRepackController::deleteRequest/$1');
  }
 
 );
+$routes->group('', ['filter' => 'role:admin,customer'], function ($routes) {
+ // user modal / bulk info
+ $routes->post('packages/bulk-info', 'DisposeReturnController::bulkInfo');
+ $routes->post('packages/dispose-return-submit', 'DisposeReturnController::submit');
+
+ // admin
+ $routes->get('admin/dispose-return', 'DisposeReturnController::adminIndex', ['filter' => 'role:admin']);
+ $routes->post('admin/dispose-return/process/(:num)', 'DisposeReturnController::process/$1', ['filter' => 'role:admin']);
+ $routes->post('admin/dispose-return/delete/(:num)', 'DisposeReturnController::delete/$1', ['filter' => 'role:admin']);
+});
+
 $routes->get('/how-it-works', 'HowItWorks::index');
 
 
@@ -162,6 +212,27 @@ $routes->get('/how-it-works', 'HowItWorks::index');
 $routes->get('/customer/dashboard', 'CustomersController::dashboard', ['filter' => 'authGuard:customer']);
 
 
+// warehouse requests
+$routes->group('warehouse-requests', function ($routes) {
+ $routes->get('', 'WarehouseRequestController::index');
+ $routes->get('create', 'WarehouseRequestController::create');
+ $routes->post('store', 'WarehouseRequestController::store');
+ $routes->get('edit/(:num)', 'WarehouseRequestController::edit/$1');
+ $routes->post('update/(:num)', 'WarehouseRequestController::update/$1');
+ $routes->get('delete/(:num)', 'WarehouseRequestController::delete/$1');
+ $routes->post('request', 'WarehouseRequestController::requestWarehouse');
+ $routes->get('my-requests', 'WarehouseRequestController::myRequests');
+ $routes->post('set-default', 'WarehouseRequestController::setDefault');
+});
+// shpping routes
+$routes->group(
+ '',
+ ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
+ function ($routes) {
+
+  $routes->get('warehouse-addresses', 'ProfileController::addresses');
+ }
+);
 $routes->group(
  'customer',
  ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
@@ -198,13 +269,14 @@ $routes->group('admin/w_pages/', function ($routes) {
  $routes->post('update/(:num)', 'Warehouse::update/$1');
 });
 
+$routes->get('download/page', 'Download::page');
+$routes->get('download/warehouse/(:num)', 'Download::warehouse/$1');
 
 $routes->group(
  'profile',
  ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
  function ($routes) {
   $routes->get('/', 'ProfileController::index');
-  $routes->get('warehouse-addresses', 'ProfileController::addresses');
   $routes->get('thank-you', 'ProfileController::thankYou');
   $routes->get('requests', 'ProfileController::myRequests');
   $routes->get('requests/edit/(:num)', 'ProfileController::edit/$1');

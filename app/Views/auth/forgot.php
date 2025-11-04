@@ -13,7 +13,7 @@
    <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
   <?php endif; ?>
 
-  <form method="post" action="<?= base_url('/forgot') ?>">
+  <form method="post" action="<?= base_url('/forgot') ?>" class="auth-form">
    <input type="email" name="email" class="form-control mb-3" placeholder="Your email" required>
    <button class="btn-auth w-100">Send Reset Link</button>
   </form>

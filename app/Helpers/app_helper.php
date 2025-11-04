@@ -32,6 +32,70 @@ if (!function_exists('warehousesMenu')) {
   }
 }
 
+if (!function_exists('getCountryCode')) {
+  function getCountryCode($countryName)
+  {
+    $path = APPPATH . 'Views/partials/countries.json';
+    if (!file_exists($path)) {
+      return strtoupper(substr($countryName, 0, 2));
+    }
+
+    $countries = json_decode(file_get_contents($path), true);
+    if (!$countries) {
+      return strtoupper(substr($countryName, 0, 2));
+    }
+
+    foreach ($countries as $c) {
+      if (strcasecmp($c['name'], $countryName) === 0) {
+        if ($c['code'] == "UK") {
+          $c['code'] = "GB";
+        }
+        return $c['code']; // e.g. 'JP'
+      }
+    }
+
+    // fallback: first two letters
+    return strtoupper(substr($countryName, 0, 2));
+  }
+}
+
+
+if (!function_exists('adminWarehousesMenu')) {
+  function adminWarehousesMenu(): string
+  {
+    $addressesModel = new \App\Models\VirtualAddressModel();
+    $addresses = $addressesModel->findAll();
+
+    $currentUrl = current_url(); // get current URL
+    $html = '';
+
+    foreach ($addresses as $adr) {
+      $code = strtolower($adr['code'] ?? 'us');
+
+      // Fix or map invalid country codes
+      $map = [
+        'uk' => 'gb', // show UK flag for 'uk'
+        'gp' => 'gb', // treat 'gp' as UK
+      ];
+
+      $flagCode = $map[$code] ?? $code;
+      $url = base_url('packages/' . $adr['id']); // no leading slash
+
+      // check if this submenu is active
+      $isActive = strpos($currentUrl, '/packages/' . $adr['id']) !== false;
+
+      $html .= '<li class="nav-item">
+                        <a class="nav-link ' . ($isActive ? 'active' : '') . '" href="' . $url . '">
+                            <i class="fi fi-' . $flagCode . '"></i> ' . esc($adr['country']) . '
+                        </a>
+                      </li>';
+    }
+
+    return $html;
+  }
+}
+
+
 
 if (!function_exists('statusBadge')) {
   function statusBadge(string $status): string
@@ -65,5 +129,15 @@ if (!function_exists("fullname")) {
     $user = $model->select(['firstname', 'lastname'])->where('id', $userId)->first();
     $fullname = $user['firstname'] . ' ' . $user['lastname'];
     return $fullname;
+  }
+}
+
+if (!function_exists("warehouse_name")) {
+  function warehouse_name($id = null)
+  {
+    $model = new \App\Models\VirtualAddressModel();
+    $wh = $model->select(['city', 'country', 'address_line'])->where('id', $id)->first();
+
+    return $wh;
   }
 }

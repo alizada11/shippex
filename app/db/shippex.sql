@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2025 at 07:25 PM
+-- Generation Time: Nov 04, 2025 at 04:16 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -54,7 +54,6 @@ CREATE TABLE `addresses` (
 
 INSERT INTO `addresses` (`id`, `user_id`, `type`, `first_name`, `last_name`, `street_address1`, `street_address2`, `city`, `state`, `zip_code`, `country`, `tax_id`, `phone_primary`, `phone_secondary`, `show_shipping_price`, `created_at`, `updated_at`, `is_default`) VALUES
 (1, 6, 'billing', 'Wade', 'English', '72 North Fabien Lane', 'Nisi odio aut voluptatem Eos animi dolore quisquam velit esse', 'Autem veniam officia natus voluptates dolorum ver', 'Enim quis excepteur recusandae Sit necessitatibu', '58423', 'Austria', 'Ullamco qui labore voluptatibu', '+1 (124) 826-4594', '+1 (124) 826-4594', 1, '2025-08-11 07:44:08', '2025-08-12 07:18:34', 1),
-(4, 6, 'shipping', 'Kellie', 'Clevelan', '338 West White Old Parkway', 'Non dolorem quis magni enim ut a', 'Soluta qui dolorem voluptate magnam dolor rerum re', 'Excepturi omnis eum in commodi', '59382', 'Iran', 'Officiis voluptatem nihil qui', '+1 (953) 954-5742', '+1 (953) 954-5742', 1, '2025-08-11 08:04:43', '2025-08-25 00:31:45', 0),
 (5, 6, 'shipping', 'asdf', 'asdf', 'street 9', '', 'NYC', 'NY', '10003', 'United States', '3123213', '+132132132', '2132132', 1, '2025-08-24 21:01:02', '2025-08-24 21:01:45', 1);
 
 -- --------------------------------------------------------
@@ -126,7 +125,56 @@ INSERT INTO `booking_status_history` (`id`, `book_id`, `old_status`, `new_status
 (30, 16, 'pending', 'accepted', 4, '2025-10-06 15:28:35'),
 (31, 16, 'accepted', 'pending', 4, '2025-10-06 15:29:15'),
 (32, 16, 'pending', 'accepted', 4, '2025-10-06 15:29:18'),
-(33, 23, 'pending', 'accepted', 4, '2025-10-11 17:59:07');
+(33, 23, 'pending', 'accepted', 4, '2025-10-11 17:59:07'),
+(34, 24, 'pending', 'accepted', 4, '2025-10-12 17:56:46'),
+(35, 23, 'shipping', 'shipped', 4, '2025-10-23 12:04:34'),
+(36, 23, 'shipped', 'delivered', 4, '2025-10-23 12:04:42'),
+(37, 23, 'delivered', 'accepted', 4, '2025-10-23 12:04:53'),
+(38, 24, 'accepted', 'delivered', 4, '2025-10-28 01:12:12'),
+(39, 24, 'delivered', 'delivered', 4, '2025-10-28 01:12:27'),
+(40, 24, 'delivered', 'delivered', 4, '2025-10-28 01:12:49'),
+(41, 24, 'delivered', 'shipped', 4, '2025-10-28 01:13:51'),
+(42, 24, 'shipped', 'shipped', 4, '2025-10-28 01:14:46'),
+(43, 24, 'shipped', 'shipped', 4, '2025-10-28 01:16:18'),
+(44, 23, 'accepted', 'shipped', 4, '2025-10-28 01:33:43'),
+(45, 23, 'shipped', 'shipped', 4, '2025-10-28 01:34:02'),
+(46, 23, 'shipped', 'shipping', 4, '2025-10-28 01:34:11'),
+(47, 23, 'shipping', 'shipped', 4, '2025-10-28 01:34:15'),
+(48, 23, 'shipped', 'shipping', 4, '2025-10-28 01:51:37'),
+(49, 23, 'shipping', 'shipped', 4, '2025-10-28 01:51:40'),
+(50, 23, 'shipped', 'delivered', 4, '2025-10-28 01:51:44'),
+(51, 23, 'delivered', 'delivered', 4, '2025-10-28 01:52:08'),
+(52, 23, 'delivered', 'delivered', 4, '2025-10-28 01:52:12'),
+(53, 25, 'pending', 'accepted', 4, '2025-11-03 02:24:30'),
+(54, 25, 'shipping', 'shipped', 4, '2025-11-03 02:27:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `combine_repack_requests`
+--
+
+CREATE TABLE `combine_repack_requests` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `package_ids` text NOT NULL,
+  `warehouse_id` int(11) NOT NULL,
+  `total_weight` float NOT NULL DEFAULT 0,
+  `total_length` float NOT NULL DEFAULT 0,
+  `total_width` float NOT NULL DEFAULT 0,
+  `total_height` float NOT NULL DEFAULT 0,
+  `status` enum('pending','processing','completed') NOT NULL DEFAULT 'pending',
+  `admin_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `combine_repack_requests`
+--
+
+INSERT INTO `combine_repack_requests` (`id`, `user_id`, `package_ids`, `warehouse_id`, `total_weight`, `total_length`, `total_width`, `total_height`, `status`, `admin_id`, `created_at`, `updated_at`) VALUES
+(4, 4, '[\"23\",\"3\",\"2\"]', 3, 30, 100, 101, 23, 'pending', NULL, '2025-11-04 01:49:40', '2025-11-04 01:49:40');
 
 -- --------------------------------------------------------
 
@@ -156,6 +204,33 @@ CREATE TABLE `delivered_today` (
 INSERT INTO `delivered_today` (`id`, `courier_logo`, `retailer_logo`, `icon`, `from_country`, `from_flag`, `to_country`, `to_flag`, `cost`, `weight`, `created_at`, `updated_at`) VALUES
 (1, 'uploads/delivered/1757685682_cbba571b103c03c354b7.png', 'uploads/delivered/1757685682_3b5b92bde3ec2f83bf96.webp', 'fas fa-mobile', 'United Kingdom', 'uploads/delivered/1757685682_ff3922158332e23d823f.png', 'Papua New Guinea', 'uploads/delivered/1757685682_565fa3bfb2f45de62272.png', '25$', '0.25KGs', '2025-09-12 14:01:22', '2025-09-12 14:01:22'),
 (2, 'uploads/delivered/1757687016_dd9078c29392ce19717d.png', 'uploads/delivered/1757687016_96565595a1c4330e8d23.webp', 'fas fa-book', 'Germany', 'uploads/delivered/1757687016_b5c16a1af93ed8891593.webp', 'Hungary', 'uploads/delivered/1757687016_9d64ac279324f137e2d1.png', '25$', '1 KGs', '2025-09-12 14:23:36', '2025-09-12 14:23:36');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dispose_return_requests`
+--
+
+CREATE TABLE `dispose_return_requests` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `package_id` int(11) NOT NULL,
+  `request_type` enum('dispose','return') NOT NULL,
+  `reason` text DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `admin_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `dispose_return_requests`
+--
+
+INSERT INTO `dispose_return_requests` (`id`, `user_id`, `package_id`, `request_type`, `reason`, `status`, `admin_id`, `created_at`, `updated_at`) VALUES
+(7, 4, 2, 'return', 'sfs', 'pending', NULL, '2025-11-04 03:06:13', '2025-11-04 03:06:13'),
+(8, 4, 3, 'dispose', 'sfsdd', 'pending', NULL, '2025-11-04 03:06:13', '2025-11-04 03:06:13'),
+(9, 4, 23, 'return', 'sdfsdf', 'pending', NULL, '2025-11-04 03:06:13', '2025-11-04 03:06:13');
 
 -- --------------------------------------------------------
 
@@ -257,7 +332,7 @@ CREATE TABLE `hero_section` (
 --
 
 INSERT INTO `hero_section` (`id`, `title`, `subtitle`, `description`, `button_text`, `button_link`, `background_image`, `created_at`, `updated_at`) VALUES
-(1, 'We Deliver', 'International Parcel Forwarding', 'Shop in the UK, US, Germany, Japan, or Turkey then ship worldwide. Immediately after Sign Up, use your new shopping addresses to access top brands and then ship to your home in as little as 2 days.', '🚚 START SHIPPING NOW', '#', 'images/shipment.jpg', NULL, NULL);
+(1, 'We Deliver', 'International Parcel Forwarding', 'Shop in the UK, US, Germany, Japan, or Turkey then ship worldwide. Immediately after Sign Up, use your new shopping addresses to access top brands and then ship to your home in as little as 2 days.', '🚚 START SHIPPING NOW', '/shipping/rates', 'images/shipment.jpg', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -407,7 +482,132 @@ INSERT INTO `migrations` (`id`, `version`, `class`, `group`, `namespace`, `time`
 (17, '2025-09-14-135234', 'App\\Database\\Migrations\\CreateHowItWorksSections', 'default', 'App', 1757858017, 16),
 (18, '2025-09-14-135301', 'App\\Database\\Migrations\\CreateHowItWorksSteps', 'default', 'App', 1757858017, 16),
 (19, '2025-09-14-135323', 'App\\Database\\Migrations\\CreateWhyChoose', 'default', 'App', 1757858017, 16),
-(20, '2025-10-12-103514', 'App\\Database\\Migrations\\CreateWarehousesTable', 'default', 'App', 1760265342, 17);
+(20, '2025-10-12-103514', 'App\\Database\\Migrations\\CreateWarehousesTable', 'default', 'App', 1760265342, 17),
+(21, '2025-10-24-215029', 'App\\Database\\Migrations\\CreateWarehouseRequestsTable', 'default', 'App', 1761342653, 18),
+(22, '2025-10-25-015833', 'App\\Database\\Migrations\\CreatePackagesTable', 'default', 'App', 1761357636, 19),
+(23, '2025-10-25-025753', 'App\\Database\\Migrations\\CreatePackageItemsTable', 'default', 'App', 1761395048, 20),
+(24, '2025-10-25-025850', 'App\\Database\\Migrations\\CreatePackageFilesTable', 'default', 'App', 1761395048, 20),
+(25, '2025-10-25-030057', 'App\\Database\\Migrations\\CreatePackageActionsTable', 'default', 'App', 1761395048, 20),
+(26, '2025-11-03-233529', '\\CreateCombineRepackRequests', 'default', 'App', 1762215169, 21);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `packages`
+--
+
+CREATE TABLE `packages` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `virtual_address_id` int(11) UNSIGNED NOT NULL,
+  `retailer` varchar(255) DEFAULT NULL,
+  `courier` varchar(255) DEFAULT NULL,
+  `tracking_number` varchar(255) DEFAULT NULL,
+  `status` enum('incoming','ready','missing','shipped','returned','disposed') NOT NULL DEFAULT 'incoming',
+  `weight` decimal(10,2) DEFAULT NULL,
+  `width` decimal(10,2) DEFAULT NULL,
+  `height` decimal(10,2) DEFAULT NULL,
+  `length` decimal(10,2) DEFAULT NULL,
+  `value` decimal(10,2) DEFAULT NULL,
+  `combined_from` int(11) DEFAULT NULL,
+  `handling` varchar(255) DEFAULT NULL,
+  `return_number` varchar(255) DEFAULT NULL,
+  `processed_by` varchar(255) DEFAULT NULL,
+  `received_at` datetime DEFAULT NULL,
+  `storage_days` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `packages`
+--
+
+INSERT INTO `packages` (`id`, `user_id`, `virtual_address_id`, `retailer`, `courier`, `tracking_number`, `status`, `weight`, `width`, `height`, `length`, `value`, `combined_from`, `handling`, `return_number`, `processed_by`, `received_at`, `storage_days`, `created_at`, `updated_at`) VALUES
+(2, 6, 3, 'eBay', NULL, 'PENDING-68fc557fc471e', 'incoming', '3.00', '2.00', '2.00', '2.00', '21.00', 0, NULL, NULL, NULL, NULL, 0, '2025-10-25 04:43:43', '2025-10-25 13:13:55'),
+(3, 6, 3, 'Amazon', NULL, 'PENDING-68fd0b06f2ee6', 'ready', '4.00', '10.00', '12.00', '10.00', '200.00', 0, NULL, NULL, NULL, NULL, 0, '2025-10-25 17:38:15', '2025-11-03 23:14:58'),
+(20, 6, 6, 'USPS', NULL, 'PENDING-69001D97B11A0', 'incoming', '2.50', '21.00', '20.00', '10.00', '41.50', 0, NULL, NULL, NULL, NULL, 0, '2025-10-28 01:34:15', '2025-11-03 19:50:24'),
+(21, 6, 6, 'USPS', NULL, 'PENDING-690021ACC0094', 'incoming', '2.00', '10.00', '12.00', '13.00', '41.50', 0, NULL, NULL, NULL, NULL, 0, '2025-10-28 01:51:40', '2025-11-03 19:47:33'),
+(22, 6, 5, 'Aut consectetur por', NULL, 'PENDING-690031AA2B448', 'incoming', '44.00', '62.00', '28.00', '72.00', '20.00', 0, NULL, NULL, NULL, NULL, 0, '2025-10-28 02:59:54', '2025-10-28 02:59:54'),
+(23, 4, 3, 'Fugiat enim dolorem', NULL, 'PENDING-690032AA5D1D3', 'shipped', '23.00', '89.00', '9.00', '88.00', '64.00', 0, NULL, NULL, NULL, NULL, 0, '2025-10-28 03:04:10', '2025-10-28 03:04:10'),
+(24, 9, 2, 'FedEx', NULL, 'PENDING-6908130DAAD91', 'incoming', '10.00', '12.00', '12.00', '10.00', '304.02', 0, NULL, NULL, NULL, NULL, 0, '2025-11-03 02:27:25', '2025-11-03 02:27:25'),
+(25, 6, 4, 'eBay', NULL, 'PENDING-69091B26AC240', 'incoming', '2.00', '12.00', '21.00', '10.00', '43.00', 0, NULL, NULL, NULL, NULL, 0, '2025-11-03 21:14:14', '2025-11-03 21:14:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `package_actions`
+--
+
+CREATE TABLE `package_actions` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `package_id` int(11) UNSIGNED NOT NULL,
+  `action` varchar(100) NOT NULL,
+  `notes` text DEFAULT NULL,
+  `performed_by` varchar(100) DEFAULT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `package_actions`
+--
+
+INSERT INTO `package_actions` (`id`, `package_id`, `action`, `notes`, `performed_by`, `created_at`) VALUES
+(1, 2, 'update', 'Package updated.', '4', '2025-10-25 13:00:06'),
+(2, 2, 'update', 'Package details updated', '4', '2025-10-25 13:13:40'),
+(3, 2, 'update', 'Package details updated', '4', '2025-10-25 13:13:55'),
+(4, 3, 'update', 'Package details updated', '4', '2025-10-25 23:48:03'),
+(5, 3, 'update', 'Package details updated', '4', '2025-10-26 00:12:45'),
+(6, 3, 'update', 'Package details updated', '6', '2025-11-03 19:40:34'),
+(7, 21, 'update', 'Package details updated', '6', '2025-11-03 19:45:55'),
+(8, 21, 'update', 'Package details updated', '6', '2025-11-03 19:47:33'),
+(9, 20, 'update', 'Package details updated', '6', '2025-11-03 19:50:24'),
+(10, 3, 'update', 'Package details updated', '6', '2025-11-03 21:04:51'),
+(11, 3, 'update', 'Package details updated', '4', '2025-11-03 23:14:58');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `package_files`
+--
+
+CREATE TABLE `package_files` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `package_id` int(11) UNSIGNED NOT NULL,
+  `file_type` enum('invoice','photo','label','other') NOT NULL DEFAULT 'other',
+  `file_path` varchar(255) NOT NULL,
+  `uploaded_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `package_files`
+--
+
+INSERT INTO `package_files` (`id`, `package_id`, `file_type`, `file_path`, `uploaded_at`) VALUES
+(1, 2, 'photo', 'uploads/packages/1761410696_e76599c59c7524bc7cdf.png', NULL),
+(2, 2, 'invoice', 'uploads/packages/1761411077_16bbdff2b799261bfad1.jpg', NULL),
+(4, 22, 'invoice', 'uploads/packages/1761620394_f0bf166ba3676f12f49f.png', NULL),
+(5, 23, 'invoice', 'uploads/packages/1761620650_bbf86804dbbb6dff77df.png', NULL),
+(6, 23, 'label', 'uploads/packages/1761620650_ae7a32aacf4022100478.jpg', NULL),
+(7, 23, 'other', 'uploads/packages/1761620650_3b22fa1dadac24d5ca9f.png', NULL),
+(8, 25, 'invoice', 'uploads/packages/1762204454_ce4e0c69c05bb49c64ec.png', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `package_items`
+--
+
+CREATE TABLE `package_items` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `package_id` int(11) UNSIGNED NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `hs_code` varchar(20) DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `value` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -452,7 +652,8 @@ INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
 (4, 'codewithja@gmail.com', 'b254c214e12a66c901d972402b532688ad494159f54ebf37ae5cc7a04be08c04', '2025-10-12 17:21:26'),
 (5, 'codewithja@gmail.com', 'ce27b9ac416e32d50694e7b47f4eb4c43f537e691024c0f9aa0f42a36603449e', '2025-10-12 17:22:05'),
 (6, 'codewithja@gmail.com', 'f9d97c5686dac6419383f5e56e1759fda146d1a71bad458d6281714bf423a150', '2025-10-12 17:22:30'),
-(7, 'codewithja@gmail.com', '0901e5a132d074d60edc1465bf33cfcd813052f433b1d567b6f461807186edb0', '2025-10-12 17:22:46');
+(7, 'codewithja@gmail.com', '0901e5a132d074d60edc1465bf33cfcd813052f433b1d567b6f461807186edb0', '2025-10-12 17:22:46'),
+(8, 'jawadalizada1@gmail.com', '458aaef472474bf1b875f418d4f7cae5d9336c0e0f10fea3323a1e8feb8f0df2', '2025-10-23 09:43:12');
 
 -- --------------------------------------------------------
 
@@ -565,7 +766,11 @@ INSERT INTO `shipping_bookings` (`id`, `user_id`, `origin_line_1`, `origin_city`
 (20, 4, 'Street 9', 'NYC', 'NY', '10003', 'US', 'Stree 9', 'NYC', 'NY', '07008', 'US', '1.00', 'accessory_no_battery', '20.00', '20.00', '20.00', 'FedEx', 'FedEx Ground® Economy', '4 - 4 days', 'pending', 'AED', NULL, NULL, '26.04', 'FedEx Ground® Economy (4 working days) No additional taxes to be paid at delivery', '2025-10-06 10:57:36', '2025-10-06 14:58:21', ''),
 (21, 4, 'street ', 'NYC', 'NY', '10003', 'US', 'Street 9', 'NYC', 'NY', '07008', 'US', '1.00', 'computers_laptops', '12.00', '10.00', '21.00', 'USPS', 'USPS - Ground Advantage Signature', '2 - 5 days', 'pending', 'AED', NULL, NULL, '36.18', 'USPS - Ground Advantage Signature (2-5 working days) No additional taxes to be paid at delivery', '2025-10-06 18:14:47', '2025-10-06 18:14:47', ''),
 (22, 4, 'street', 'NYC', 'NY', '10003', 'US', 'Stree ', 'NYC', 'NY', '07008', 'US', '2.00', 'computers_laptops', '12.00', '20.00', '21.00', 'USPS', 'USPS - Priority Mail', '1 - 3 days', 'pending', 'AED', NULL, NULL, '26.70', 'USPS - Priority Mail (1-3 working days) No additional taxes to be paid at delivery', '2025-10-11 17:50:00', '2025-10-11 17:50:00', ''),
-(23, 6, 'street ', 'NYC', 'NY', '10003', 'US', 'Street', 'NYC', 'NY', '07008', 'US', '2.00', 'computers_laptops', '20.00', '20.00', '20.00', 'USPS', 'USPS - Priority Mail Signature', '1 - 3 days', 'shipping', 'AED', '1760205532_05a5ecd26d3ee09b1bf6.jpg', 'paid', '41.50', 'USPS - Priority Mail Signature (1-3 working days) No additional taxes to be paid at delivery', '2025-10-11 17:56:17', '2025-10-11 18:00:27', '{\"id\":\"26K660229P687794D\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawadalizada1@gmail.com\",\"account_id\":\"F63Y7FCAJBAH6\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"Street 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"4LM53108K6364850F\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"1.94\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"39.56\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-11T18:00:27Z\",\"update_time\":\"2025-10-11T18:00:27Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"jawadalizada1@gmail.com\",\"payer_id\":\"F63Y7FCAJBAH6\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-11T17:59:33Z\",\"update_time\":\"2025-10-11T18:00:28Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"self\",\"method\":\"GET\"}]}');
+(23, 6, 'street ', 'NYC', 'NY', '10003', 'US', 'Street', 'NYC', 'NY', '07008', 'US', '2.00', 'computers_laptops', '20.00', '20.00', '20.00', 'USPS', 'USPS - Priority Mail Signature', '1 - 3 days', 'delivered', 'AED', '1760205532_05a5ecd26d3ee09b1bf6.jpg', 'paid', '41.50', 'USPS - Priority Mail Signature (1-3 working days) No additional taxes to be paid at delivery', '2025-10-11 17:56:17', '2025-10-28 01:52:12', '{\"id\":\"26K660229P687794D\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawadalizada1@gmail.com\",\"account_id\":\"F63Y7FCAJBAH6\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"Street 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"4LM53108K6364850F\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"41.50\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"1.94\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"39.56\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/4LM53108K6364850F\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-11T18:00:27Z\",\"update_time\":\"2025-10-11T18:00:27Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"jawadalizada1@gmail.com\",\"payer_id\":\"F63Y7FCAJBAH6\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-11T17:59:33Z\",\"update_time\":\"2025-10-11T18:00:28Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/26K660229P687794D\",\"rel\":\"self\",\"method\":\"GET\"}]}'),
+(24, 6, 'steet 9', 'NYC', 'NY', '10003', 'US', 'Street', 'NYC', 'NY', '07008', 'US', '2.00', 'cameras', '21.00', '21.00', '20.00', 'UPS', 'UPS® Ground Saver', '1 - 3 days', 'shipped', 'AED', '1760291787_c7726bf7fff523f33fd4.webp', NULL, '25.56', 'UPS® Ground Saver (1-3 working days) No additional taxes to be paid at delivery', '2025-10-12 17:40:38', '2025-10-28 01:16:18', ''),
+(25, 9, 'streeet 9', 'New York', 'NYC', '07008', 'US', 'Street 9', 'Schwedt ', 'Brandenburg', '16303', 'DE', '10.00', 'accessory_with_battery', '10.00', '12.00', '12.00', 'FedEx', 'FedEx® International Connect Plus', '2 - 5 days', 'shipped', 'AED', '1762136712_7f134b3edba077216029.png', 'paid', '304.02', 'FedEx® International Connect Plus (2-5 working days) Estimated  71.72 tax & duty due on delivery (Tax handling fees may apply)', '2025-11-03 02:22:42', '2025-11-03 02:27:25', '{\"id\":\"1KJ75321TT544804N\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawad@gmail.om\",\"account_id\":\"3NL5ECUH4GRHS\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"304.02\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"jawad alizada\"},\"address\":{\"address_line_1\":\"street\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"07008\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"3ME174836A042973L\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"304.02\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"304.02\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.10\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"292.92\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/3ME174836A042973L\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/3ME174836A042973L\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/1KJ75321TT544804N\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-11-03T02:26:32Z\",\"update_time\":\"2025-11-03T02:26:32Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"email_address\":\"jawad@gmail.om\",\"payer_id\":\"3NL5ECUH4GRHS\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-11-03T02:25:26Z\",\"update_time\":\"2025-11-03T02:26:32Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/1KJ75321TT544804N\",\"rel\":\"self\",\"method\":\"GET\"}]}'),
+(26, 6, 'Schwedter Allee 23', 'Schwedt', 'Brandenburg', '16303', 'Germa', 'Rastenfeld 151', 'Rastenfeld', 'Niederösterreich', '3532', 'Austr', '3.00', 'general', '2.00', '2.00', '2.00', 'FedEx', 'FedEx - International Priority', '1 - 6 days', 'pending', 'AED', NULL, NULL, '147.98', 'FedEx - International Priority (1-6 working days) No additional taxes to be paid at delivery', '2025-11-03 21:57:13', '2025-11-03 21:57:13', ''),
+(27, 6, 'Schwedter Allee 23', 'Schwedt', 'Brandenburg', '16303', 'Germa', '807B Kiamensi Rd', 'Delaware (DE)', 'DE', '19804', 'Unite', '4.00', 'general', '10.00', '10.00', '12.00', 'DHL', 'DHL - Express 12', '1 - 4 days', 'pending', 'AED', NULL, NULL, '482.91', 'DHL - Express 12 (1-4 working days) Estimated  22.25 tax & duty due on delivery (Tax handling fees may apply)', '2025-11-03 22:00:50', '2025-11-03 22:00:50', '');
 
 -- --------------------------------------------------------
 
@@ -592,9 +797,13 @@ CREATE TABLE `shopper_items` (
 INSERT INTO `shopper_items` (`id`, `request_id`, `name`, `url`, `size`, `color`, `instructions`, `quantity`, `created_at`) VALUES
 (2, 2, 'Jolie Ward', 'https://www.qyk.com.au', 'Neque repellendus C', 'Eaque eaque fugit n', 'Quas ex eos et possi', 442, NULL),
 (4, 3, 'Maxine Morse', 'https://www.befy.net', 'Praesentium nostrud ', 'Expedita perspiciati', 'Do nesciunt omnis o', 256, NULL),
-(5, 4, 'pen', 'https://www.pen.com', 'small', 'red', 'please gift wrap', 1, NULL),
+(5, 4, '2025 Most sold pen', 'https://www.amazon.com/jawad_store/2025-best-pen', 'medium', 'purple', 'Please wrap is as a gift, it is very important', 1, NULL),
 (7, 1, 'Joseph Guzman', 'https://www.loharykywepup.me.uk', 'Id sint ex occaecat ', 'Est sit commodi ven', 'Qui obcaecati quis q', 2, NULL),
-(8, 5, 'Macbook Pro', 'https://www.apple.com', '12', 'red', 'Please gift wrap', 1, NULL);
+(8, 5, 'Macbook Pro', 'https://www.apple.com', '12', 'red', 'Please gift wrap', 1, NULL),
+(9, 6, 'Book', 'https://www.amazom.com/book', 'medium', 'white', 'please gift wrap', 1, NULL),
+(10, 7, 'iPad', 'https://www.amazon.com/jawad_store/ipad', '2inch', 'black', 'Please gift wrap', 1, NULL),
+(11, 7, 'Samsung Tablet', 'https://www.amazon.com/jawad_store/table', '3inchs', 'Gray', 'Please gift wrap it is for birthday gitft.', 1, NULL),
+(12, 7, 'Shoes for sport', 'https://www.ebay.com/shoes_store/sport_shoes', '42', 'white', '', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -612,6 +821,7 @@ CREATE TABLE `shopper_requests` (
   `use_another_retailer` tinyint(1) NOT NULL DEFAULT 0,
   `delivery_description` varchar(255) DEFAULT NULL,
   `delivery_notes` text DEFAULT NULL,
+  `warehouse_id` int(10) UNSIGNED DEFAULT NULL,
   `is_saved` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL
@@ -621,12 +831,14 @@ CREATE TABLE `shopper_requests` (
 -- Dumping data for table `shopper_requests`
 --
 
-INSERT INTO `shopper_requests` (`id`, `user_id`, `status`, `payment_status`, `payment_info`, `price`, `use_another_retailer`, `delivery_description`, `delivery_notes`, `is_saved`, `created_at`, `updated_at`) VALUES
-(1, 6, 'saved', NULL, NULL, NULL, 0, 'Aspernatur Nam nostr', 'Facilis rerum perfer', 1, '2025-08-10 10:25:16', '2025-08-26 10:29:37'),
-(2, 6, 'wait_for_payment', NULL, NULL, 200, 1, 'Aut rerum aut non ex', 'Modi qui ex nobis ve', 0, '2025-08-11 09:09:27', '2025-10-06 13:19:17'),
-(3, 6, 'pending', NULL, NULL, NULL, 1, 'Quod dolorem aut rep', 'Excepturi architecto', 0, '2025-08-11 09:27:34', '2025-08-11 09:27:34'),
-(4, 6, 'processing', 'paid', '{\"id\":\"3RX37202MW237084A\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"mail@gmail.com\",\"account_id\":\"CQWTNAWBGSMMW\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"5HG29991A4375142Y\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.03\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"290.97\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T14:09:39Z\",\"update_time\":\"2025-10-06T14:09:39Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"mail@gmail.com\",\"payer_id\":\"CQWTNAWBGSMMW\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T14:08:42Z\",\"update_time\":\"2025-10-06T14:09:39Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"self\",\"method\":\"GET\"}]}', 302, 0, 'first class', 'send everything together', 0, '2025-08-24 23:08:31', '2025-10-06 14:09:39'),
-(5, 6, 'wait_for_payment', NULL, NULL, 900, 0, 'First class', 'Send everything together', 0, '2025-10-11 18:03:04', '2025-10-11 18:03:57');
+INSERT INTO `shopper_requests` (`id`, `user_id`, `status`, `payment_status`, `payment_info`, `price`, `use_another_retailer`, `delivery_description`, `delivery_notes`, `warehouse_id`, `is_saved`, `created_at`, `updated_at`) VALUES
+(1, 6, 'saved', NULL, NULL, NULL, 0, 'Aspernatur Nam nostr', 'Facilis rerum perfer', NULL, 1, '2025-08-10 10:25:16', '2025-08-26 10:29:37'),
+(2, 6, 'wait_for_payment', NULL, NULL, 200, 1, 'Aut rerum aut non ex', 'Modi qui ex nobis ve', NULL, 0, '2025-08-11 09:09:27', '2025-10-06 13:19:17'),
+(3, 6, 'completed', 'paid', '{\"id\":\"3RX37202MW237084A\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"mail@gmail.com\",\"account_id\":\"CQWTNAWBGSMMW\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"5HG29991A4375142Y\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.03\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"290.97\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T14:09:39Z\",\"update_time\":\"2025-10-06T14:09:39Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"mail@gmail.com\",\"payer_id\":\"CQWTNAWBGSMMW\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T14:08:42Z\",\"update_time\":\"2025-10-06T14:09:39Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"self\",\"method\":\"GET\"}]}', 190, 1, 'Quod dolorem aut rep', 'Excepturi architecto', 3, 0, '2025-08-11 09:27:34', '2025-08-11 09:27:34'),
+(4, 6, 'processing', NULL, '{\"id\":\"3RX37202MW237084A\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"mail@gmail.com\",\"account_id\":\"CQWTNAWBGSMMW\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"5HG29991A4375142Y\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"302.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"11.03\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"290.97\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/5HG29991A4375142Y\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-06T14:09:39Z\",\"update_time\":\"2025-10-06T14:09:39Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"mail@gmail.com\",\"payer_id\":\"CQWTNAWBGSMMW\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-06T14:08:42Z\",\"update_time\":\"2025-10-06T14:09:39Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/3RX37202MW237084A\",\"rel\":\"self\",\"method\":\"GET\"}]}', 302, 0, 'Your need to be very careful while packaging.', 'Please send everything together in one package', 3, 0, '2025-08-24 23:08:31', '2025-10-25 04:43:43'),
+(5, 6, 'completed', NULL, '{\"id\":\"8SW21349JT881523Y\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawad@gmail.com\",\"account_id\":\"DL3JPFVRQC9PQ\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"900.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"jawad alizada\"},\"address\":{\"address_line_1\":\"street 11\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"6PR17585G5344550A\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"900.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"900.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"31.90\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"868.10\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/6PR17585G5344550A\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/6PR17585G5344550A\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/8SW21349JT881523Y\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-25T17:36:54Z\",\"update_time\":\"2025-10-25T17:36:54Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"email_address\":\"jawad@gmail.com\",\"payer_id\":\"DL3JPFVRQC9PQ\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-25T17:34:42Z\",\"update_time\":\"2025-10-25T17:36:55Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/8SW21349JT881523Y\",\"rel\":\"self\",\"method\":\"GET\"}]}', 900, 0, 'First class', 'Send everything together', 6, 0, '2025-10-11 18:03:04', '2025-10-28 00:40:47'),
+(6, 6, 'completed', NULL, '{\"id\":\"5KT92739M0910054W\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawadalizada1@gmail.com\",\"account_id\":\"TJUCFXXM56VL4\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"35.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"Jawad Alizada\"},\"address\":{\"address_line_1\":\"Stree 9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"07008\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"7PM63236Y78198726\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"35.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"35.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"1.71\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"33.29\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/7PM63236Y78198726\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/7PM63236Y78198726\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/5KT92739M0910054W\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-25T23:33:07Z\",\"update_time\":\"2025-10-25T23:33:07Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"Jawad\",\"surname\":\"Alizada\"},\"email_address\":\"jawadalizada1@gmail.com\",\"payer_id\":\"TJUCFXXM56VL4\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-25T23:32:02Z\",\"update_time\":\"2025-10-25T23:33:07Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/5KT92739M0910054W\",\"rel\":\"self\",\"method\":\"GET\"}]}', 35, 0, 'First Class', 'Send', 6, 0, '2025-10-12 18:05:01', '2025-10-28 00:35:53'),
+(7, 6, 'completed', NULL, '{\"id\":\"6LL64428VY0401059\",\"intent\":\"CAPTURE\",\"status\":\"COMPLETED\",\"payment_source\":{\"paypal\":{\"email_address\":\"jawadalizada1@gmail.com\",\"account_id\":\"749ZEVWYZ3H9C\",\"account_status\":\"UNVERIFIED\",\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"address\":{\"country_code\":\"US\"}}},\"purchase_units\":[{\"reference_id\":\"default\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"1200.00\"},\"payee\":{\"email_address\":\"sb-5jor244198538@business.example.com\",\"merchant_id\":\"WQ9TKJCTBVXJC\"},\"soft_descriptor\":\"PAYPAL *TEST STORE\",\"shipping\":{\"name\":{\"full_name\":\"jawad alizada\"},\"address\":{\"address_line_1\":\"street  9\",\"address_line_2\":\"bldg\",\"admin_area_2\":\"NYC\",\"admin_area_1\":\"NY\",\"postal_code\":\"10003\",\"country_code\":\"US\"}},\"payments\":{\"captures\":[{\"id\":\"20F53291RJ6301100\",\"status\":\"COMPLETED\",\"amount\":{\"currency_code\":\"USD\",\"value\":\"1200.00\"},\"final_capture\":true,\"seller_protection\":{\"status\":\"ELIGIBLE\",\"dispute_categories\":[\"ITEM_NOT_RECEIVED\",\"UNAUTHORIZED_TRANSACTION\"]},\"seller_receivable_breakdown\":{\"gross_amount\":{\"currency_code\":\"USD\",\"value\":\"1200.00\"},\"paypal_fee\":{\"currency_code\":\"USD\",\"value\":\"42.37\"},\"net_amount\":{\"currency_code\":\"USD\",\"value\":\"1157.63\"}},\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/20F53291RJ6301100\",\"rel\":\"self\",\"method\":\"GET\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/payments\\/captures\\/20F53291RJ6301100\\/refund\",\"rel\":\"refund\",\"method\":\"POST\"},{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/6LL64428VY0401059\",\"rel\":\"up\",\"method\":\"GET\"}],\"create_time\":\"2025-10-25T23:23:18Z\",\"update_time\":\"2025-10-25T23:23:18Z\"}]}}],\"payer\":{\"name\":{\"given_name\":\"jawad\",\"surname\":\"alizada\"},\"email_address\":\"jawadalizada1@gmail.com\",\"payer_id\":\"749ZEVWYZ3H9C\",\"address\":{\"country_code\":\"US\"}},\"create_time\":\"2025-10-25T23:22:17Z\",\"update_time\":\"2025-10-25T23:23:18Z\",\"links\":[{\"href\":\"https:\\/\\/api.sandbox.paypal.com\\/v2\\/checkout\\/orders\\/6LL64428VY0401059\",\"rel\":\"self\",\"method\":\"GET\"}]}', 1200, 1, 'First class option', 'Send them seperately', 6, 0, '2025-10-25 22:59:57', '2025-10-28 00:29:38');
 
 -- --------------------------------------------------------
 
@@ -642,16 +854,19 @@ CREATE TABLE `users` (
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('admin','customer') NOT NULL DEFAULT 'customer',
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime DEFAULT NULL,
+  `remember_token` varchar(64) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `firstname`, `lastname`, `email`, `password`, `role`, `created_at`) VALUES
-(4, 'alizada11', 'Jawad', 'Alizada', 'jawad@mail.com', '$2y$10$5PNxcTmHjpyxSBBfcOIroeVRrAVfeU1i1rvEcSxEH7R5CUMKLoEbq', 'admin', '2025-08-09 20:14:23'),
-(6, 'alizada', 'jawad', 'alizada', 'codewithja@gmail.com', '$2y$10$kubmufR2g7S464phhtXHcOY823uNWCQJGzb/Of6x7/im.2/WMyO4e', 'customer', '2025-08-10 08:50:02');
+INSERT INTO `users` (`id`, `username`, `firstname`, `lastname`, `email`, `password`, `role`, `created_at`, `remember_token`) VALUES
+(4, 'alizada', 'Shippex', 'Admin', 'admin@shipeex.onlline', '$2y$10$iUN.DRkHTBF2u7vho3p6me/26sewOWjVj25jNv4JqxGlEuDJWvRwq', 'admin', '2025-08-09 20:14:23', NULL),
+(6, 'alizada', 'Shippex', 'Custoemer', 'customer@shippex.online', '$2y$10$2lRpr0jUJfAeQAej21wbReqf75zbyCOQnS/Cb6R8mu7r9B6ZGFPHG', 'customer', '2025-08-10 08:50:02', NULL),
+(7, 'alizada11', 'Jawad', 'Alizada', 'jawadalizada11@gmail.com', '$2y$10$PgVwUGrWfgIqRKnfXCJthesClYu7PEfdOsJU3f79lb0.9a6O5aU46', 'customer', '2025-10-23 09:37:18', NULL),
+(9, 'john', 'John', 'Deo', 'john@doe.com', '$2y$10$gUuqosQDZoychPufiWxNzu23VbM5tDr2/dJtMz5/esRcb3H0lfqMe', 'customer', '2025-11-03 02:16:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -660,15 +875,18 @@ INSERT INTO `users` (`id`, `username`, `firstname`, `lastname`, `email`, `passwo
 --
 
 CREATE TABLE `virtual_addresses` (
-  `id` int(11) NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
   `code` varchar(16) DEFAULT NULL,
   `country` varchar(100) NOT NULL,
   `city` varchar(255) DEFAULT NULL,
+  `address_line_1` varchar(255) DEFAULT NULL,
+  `address_line_2` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
   `address_line` text NOT NULL,
+  `map_link` varchar(255) DEFAULT NULL,
   `postal_code` varchar(20) NOT NULL,
   `phone` varchar(20) NOT NULL,
-  `is_default` tinyint(1) NOT NULL DEFAULT 1,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -677,12 +895,12 @@ CREATE TABLE `virtual_addresses` (
 -- Dumping data for table `virtual_addresses`
 --
 
-INSERT INTO `virtual_addresses` (`id`, `user_id`, `code`, `country`, `city`, `address_line`, `postal_code`, `phone`, `is_default`, `created_at`, `updated_at`) VALUES
-(2, 4, 'JP', 'Japan', 'Shibayama-machi, Sambu-gun', 'Address Line 1: Iwayama Imorido 114-7 IACT-S  \r\nAddress Line 2: Suite #BXA609  \r\nPrefecture: Chiba  \r\n', '289-1608', '000000000000', 1, '2025-08-12 10:59:48', '2025-10-02 12:17:27'),
-(3, 4, 'DE', 'Germany', 'Schwedt  ', 'Address Line 1: Schwetder Allee 23  \r\nAddress Line 2: Forward2Me 422245  \r\nState/County: Brandenburg  \r\n', '16303', '+48746601138', 1, '2025-08-12 11:16:32', '2025-10-02 12:16:06'),
-(4, 4, 'UK', 'United Kingdom', 'Preston  ', 'Address Line 1: 422245 York House  \r\nAddress Line 2: Green Lane West  \r\nCounty: Lancashire  \r\n', 'PR3 1NJ  ', '+441995606060', 1, '2025-08-15 10:02:24', '2025-10-02 12:15:05'),
-(5, 4, 'US', 'United States', 'Delaware (DE)  ', 'Address Line 1: 807B Kiamensi Rd  \r\nAddress Line 2: C-422245  \r\n', '19804  ', '+12083286027', 1, '2025-09-15 15:48:30', '2025-10-02 12:14:00'),
-(6, 4, 'AT', 'Austria', 'Rastenfeld  ', 'Address Line 1: Rastenfeld 151  \r\nAddress Line 2: Suite #BXA609  \r\n\r\n', '3532  ', '0000000000', 1, '2025-10-02 12:18:23', '2025-10-02 12:23:20');
+INSERT INTO `virtual_addresses` (`id`, `code`, `country`, `city`, `address_line_1`, `address_line_2`, `state`, `address_line`, `map_link`, `postal_code`, `phone`, `is_active`, `created_at`, `updated_at`) VALUES
+(2, 'JP', 'Japan', 'Shibayama-machi, Sambu-gun', 'Iwayama Imorido 114-7 IACT-S', 'Suite #BXA609', 'Chiba', 'Address Line 1: Iwayama Imorido 114-7 IACT-S  \r\nAddress Line 2: Suite #BXA609  \r\nPrefecture: Chiba  \r\n', 'https://maps.app.goo.gl/UXCcRmAAHgCpetKc9', '289-1608', '000000000000', 1, '2025-08-12 10:59:48', '2025-10-02 12:17:27'),
+(3, 'DE', 'Germany', 'Schwedt', 'Schwedter Allee 23', 'Forward2Me 422245', 'Brandenburg', 'Address Line 1: Schwetder Allee 23  \r\nAddress Line 2: Forward2Me 422245  \r\nState/County: Brandenburg  \r\n', NULL, '16303', '+48746601138', 1, '2025-08-12 11:16:32', '2025-10-02 12:16:06'),
+(4, 'GB', 'United Kingdom', 'Preston', '422245 York House', 'Green Lane West', 'Lancashire', 'Address Line 1: 422245 York House  \nAddress Line 2: Green Lane West  \nCounty: Lancashire  \n', NULL, 'PR3 1NJ', '+441995606060', 1, '2025-08-15 10:02:24', '2025-10-02 12:15:05'),
+(5, 'US', 'United States', 'Delaware (DE)', '807B Kiamensi Rd', 'C-422245', 'DE', 'Address Line 1: 807B Kiamensi Rd  \r\nAddress Line 2: C-422245  \r\n', NULL, '19804', '+12083286027', 1, '2025-09-15 15:48:30', '2025-10-02 12:14:00'),
+(6, 'AT', 'Austria', 'Rastenfeld', 'Rastenfeld 151', 'Suite #BXA609', 'Niederösterreich', 'Address Line 1: Rastenfeld 151  \r\nAddress Line 2: Suite #BXA609  \r\n\r\n', NULL, '3532', '0000000000', 1, '2025-10-02 12:18:23', '2025-10-25 22:20:36');
 
 -- --------------------------------------------------------
 
@@ -726,6 +944,36 @@ INSERT INTO `warehouses` (`id`, `country_code`, `country_name`, `banner_image`, 
 (4, 'DE', 'Germany', '1760274458_3e84e1a4ace47831844d.webp', '1760274458_d25498e0b327335df915.webp', 'Germany Ware Houses', 'Everything Germany has to offer is ready and waiting. Unlock German parcel forwarding with forward2me and shop online as if you lived there. Germany is home to some of Europe’s most respected brands, offering world-class quality, precision, and innovation across fashion, electronics, and home goods.', 'We are one of the leading international parcel forwarding services with years of experience shipping parcels worldwide. With our German forwarding address, you can shop from trusted retailers and popular marketplaces across the EU — from electronics and luxury goods to everyday essentials. Enjoy reliable delivery and fast international shipping from Germany to anywhere in the world.', 'Start Shipping', '/shipping/rates', 'German Brands We Reship', 'Your German forwarding address lets you shop from some of Europe’s most trusted and innovative brands. Unlock German Amazon.de international shipping or shop from Zalando, Otto, MediaMarkt, Saturn, Adidas, and Puma.\r\n<p>\r\nOur package forwarding service puts the best of Germany right at your fingertips. Buy from trending beauty and lifestyle brands like Nivea, Weleda, and Sebamed, or discover local artisans and unique sellers on Etsy Germany and eBay.de who don’t normally offer international shipping.\r\n\r\nWith German parcel forwarding, you can also get access to top tech retailers like Conrad, Cyberport, and Notebooksbilliger, or explore German fashion from Hugo Boss, Esprit, and s.Oliver.\r\n</p><p>\r\nWhatever you’re looking for, as an international shopper, you can now access German online stores and order to the UK, Europe, Asia, Australia, and beyond — quickly, safely, and affordably.\r\n</p>', '1760274966_c8f24e96f8c3264ff6b3.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use German Parcel Forwarding?', 'Our German parcel forwarding service lets you access a wide range of products from Germany that you might not find locally. By shopping online from Germany, you can explore top retailers, popular marketplaces, and unique local brands that deliver quality, innovation, and style. Whether you’re after cutting-edge technology, premium fashion, or specialty goods, we make it easy for international shoppers to get what they want.', 'Get a parcel forwarding address in Germany and shop at Amazon.de, Ebay.de, or from iconic German brands. Receive toys and games from Steiff and Ravensburger, books from Hugendubel, and the latest fashion from Görtz. All delivered quickly and reliably to your doorstep anywhere in the world.', 'Start Shopping Now', '/shopper', 1, '2025-10-12 11:55:48', '2025-10-12 13:21:49'),
 (5, 'JP', 'Japan', '1760278584_d65a8eb2b5dbb74661b7.webp', '1760278584_fb9346072b9b5b2324fc.webp', 'SHOP ONLINE IN JAPAN AND SHIP WORLDWIDE', 'Everything Japan has to offer is ready and waiting. Unlock Japanese parcel forwarding with forward2me and shop online as if you lived there. Japan is renowned for cutting-edge electronics, unique fashion, and high-quality lifestyle products.\r\n', 'We are one of the leading international parcel forwarding services, with years of experience shipping parcels worldwide. With our Japanese forwarding address, you can shop from trusted retailers and exclusive brands across Japan — all delivered safely to your doorstep.', 'Start Shopping Now', '/shopper', 'Japan Brands We Reship', 'Your Japanese forwarding address lets you shop from some of Japan’s most popular and trusted brands. Unlock Amazon Japan international shipping or shop from Uniqlo, Rakuten, Muji, Bic Camera, Yodobashi, and Don Quijote.\r\n<p>\r\nOur package forwarding service puts the best Japanese products at your fingertips. Buy trending beauty and lifestyle items from Shiseido, DHC, or discover unique Japanese sellers on Mercari Japan and Rakuten Ichiba.\r\n</p>\r\nWith Japanese parcel forwarding, you can also access electronics from Sony, Nintendo, or stock up on Japanese fashion and accessories from GU, Comme des Garçons, and Issey Miyake.\r\n<p>\r\nWhatever you’re after, as an international shopper, you can now access Japanese online stores and order to Europe, the US, Australia, and Asia — quickly, safely, and reliably.\r\n</p>', '1760278584_9903697b6a9d529c2b7d.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use Japanese Parcel Forwarding', 'Our Japanese parcel forwarding service lets you access a wide range of Japanese products that are otherwise hard to get internationally. From electronics to fashion to traditional goods, Japan’s online market is vast and unique.\r\n', 'Get a parcel forwarding address in Japan and shop at Amazon Japan, Rakuten, or from Japanese brands directly. Receive electronics from Sony and Nintendo, collectibles from Bandai, or fashion from Uniqlo and Comme des Garçons, all shipped securely to your country.', 'Start Shipping', '/shipping/rates', 1, '2025-10-12 11:55:48', '2025-10-12 14:16:24'),
 (6, 'UK', 'United Kingdom', '1760278409_3c417549b3128359a989.webp', '1760278409_5edd1ba83d9ea1221c91.webp', 'SHOP ONLINE IN UTED KINGDOM AND SHIP WORLDWIDE', 'Everything the UK has to offer is ready and waiting. Unlock UK parcel forwarding with forward2me and shop online as if you lived there. The UK is home to globally recognized brands and a diverse online market offering electronics, fashion, beauty, and more.', 'We are one of the leading international parcel forwarding services, with years of experience shipping parcels worldwide. With our UK forwarding address, you can shop from trusted retailers and popular marketplaces across Europe and beyond — all delivered safely to your doorstep.', 'Start Shoppint', '/shoppre', 'UK Brands We Reship', 'Your UK forwarding address lets you shop from some of the world’s most trusted brands. Unlock Amazon UK international shipping or shop from John Lewis, Marks & Spencer, Argos, Currys, Boots, and ASOS.\r\n<p>\r\nOur package forwarding service puts the best UK brands at your fingertips. Buy trending beauty and lifestyle products from The Body Shop, Charlotte Tilbury, or discover local independent sellers on Etsy UK and eBay UK.\r\n</p>\r\nWith UK parcel forwarding, you can also access top tech retailers like Apple UK and Game, or stock up on UK fashion from Topshop, H&M UK, or River Island.\r\n<p>\r\nWhatever you’re after, as an international shopper, you can now access UK online stores and order to Europe, Asia, Australia, and the US — quickly, safely, and reliably.\r\n</p>', '1760278409_d98d60bb0269176aa92c.webp', 'Numquam iste quae fu', 'Nihil consequat Ill', 'Why Use UK Parcel Forwarding', 'Our UK parcel forwarding service lets you access a wide variety of products from the UK that you may not find locally. By shopping online from the UK, you can explore top retailers, local specialists, and international brands that deliver quality and style.\r\n', 'Get a parcel forwarding address in the UK and shop at Amazon UK, eBay UK, or directly from UK brands. Receive toys and games from LEGO UK, books from Waterstones, and the latest fashion from Marks & Spencer and Topshop, all shipped securely to your country.', 'Start Shipping Now', '/shipping/rates', 1, '2025-10-12 11:55:48', '2025-10-12 14:13:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `warehouse_requests`
+--
+
+CREATE TABLE `warehouse_requests` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `warehouse_id` int(10) UNSIGNED NOT NULL,
+  `status` enum('pending','accepted','rejected') NOT NULL DEFAULT 'pending',
+  `is_default` tinyint(4) NOT NULL DEFAULT 0,
+  `rejectation_reason` text DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `warehouse_requests`
+--
+
+INSERT INTO `warehouse_requests` (`id`, `user_id`, `warehouse_id`, `status`, `is_default`, `rejectation_reason`, `created_at`, `updated_at`) VALUES
+(9, 6, 2, 'rejected', 0, 'asdasdf', '2025-10-24 23:34:05', '2025-10-25 23:14:37'),
+(11, 6, 3, 'accepted', 0, NULL, '2025-10-24 23:36:12', '2025-10-25 23:14:37'),
+(12, 6, 4, 'pending', 0, NULL, '2025-10-24 23:47:55', '2025-10-25 23:14:37'),
+(13, 6, 5, 'pending', 0, NULL, '2025-10-25 17:26:24', '2025-10-25 23:14:37'),
+(14, 6, 6, 'accepted', 1, NULL, '2025-10-25 23:13:29', '2025-10-25 23:14:37'),
+(15, 9, 2, 'accepted', 1, NULL, '2025-11-03 02:16:53', '2025-11-03 02:16:53'),
+(16, 9, 3, 'accepted', 0, NULL, '2025-11-03 02:16:56', '2025-11-03 02:16:56');
 
 -- --------------------------------------------------------
 
@@ -782,9 +1030,21 @@ ALTER TABLE `booking_status_history`
   ADD KEY `admin_fk` (`changed_by`);
 
 --
+-- Indexes for table `combine_repack_requests`
+--
+ALTER TABLE `combine_repack_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `delivered_today`
 --
 ALTER TABLE `delivered_today`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `dispose_return_requests`
+--
+ALTER TABLE `dispose_return_requests`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -837,6 +1097,35 @@ ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `packages`
+--
+ALTER TABLE `packages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `packages_user_id_foreign` (`user_id`),
+  ADD KEY `packages_virtual_address_id_foreign` (`virtual_address_id`);
+
+--
+-- Indexes for table `package_actions`
+--
+ALTER TABLE `package_actions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `package_actions_package_id_foreign` (`package_id`);
+
+--
+-- Indexes for table `package_files`
+--
+ALTER TABLE `package_files`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `package_files_package_id_foreign` (`package_id`);
+
+--
+-- Indexes for table `package_items`
+--
+ALTER TABLE `package_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `package_items_package_id_foreign` (`package_id`);
+
+--
 -- Indexes for table `pages`
 --
 ALTER TABLE `pages`
@@ -880,7 +1169,8 @@ ALTER TABLE `shopper_items`
 -- Indexes for table `shopper_requests`
 --
 ALTER TABLE `shopper_requests`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `warehouse_id_fk` (`warehouse_id`);
 
 --
 -- Indexes for table `users`
@@ -892,8 +1182,7 @@ ALTER TABLE `users`
 -- Indexes for table `virtual_addresses`
 --
 ALTER TABLE `virtual_addresses`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `virtual_addresses_user_id_foreign` (`user_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `warehouses`
@@ -901,6 +1190,14 @@ ALTER TABLE `virtual_addresses`
 ALTER TABLE `warehouses`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `country_code` (`country_code`);
+
+--
+-- Indexes for table `warehouse_requests`
+--
+ALTER TABLE `warehouse_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `warehouse_requests_user_id_foreign` (`user_id`),
+  ADD KEY `warehouser_request_warehouse_id_foreign` (`warehouse_id`);
 
 --
 -- Indexes for table `why_choose`
@@ -928,13 +1225,25 @@ ALTER TABLE `blog_categories`
 -- AUTO_INCREMENT for table `booking_status_history`
 --
 ALTER TABLE `booking_status_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
+-- AUTO_INCREMENT for table `combine_repack_requests`
+--
+ALTER TABLE `combine_repack_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `delivered_today`
 --
 ALTER TABLE `delivered_today`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `dispose_return_requests`
+--
+ALTER TABLE `dispose_return_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `faqs`
@@ -982,7 +1291,31 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `packages`
+--
+ALTER TABLE `packages`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `package_actions`
+--
+ALTER TABLE `package_actions`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `package_files`
+--
+ALTER TABLE `package_files`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `package_items`
+--
+ALTER TABLE `package_items`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pages`
@@ -994,7 +1327,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -1012,37 +1345,43 @@ ALTER TABLE `promo_cards`
 -- AUTO_INCREMENT for table `shipping_bookings`
 --
 ALTER TABLE `shipping_bookings`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `shopper_items`
 --
 ALTER TABLE `shopper_items`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `shopper_requests`
 --
 ALTER TABLE `shopper_requests`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `virtual_addresses`
 --
 ALTER TABLE `virtual_addresses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `warehouses`
 --
 ALTER TABLE `warehouses`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `warehouse_requests`
+--
+ALTER TABLE `warehouse_requests`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `why_choose`
@@ -1074,6 +1413,31 @@ ALTER TABLE `how_it_works_steps`
   ADD CONSTRAINT `how_it_works_steps_section_id_foreign` FOREIGN KEY (`section_id`) REFERENCES `how_it_works_sections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `packages`
+--
+ALTER TABLE `packages`
+  ADD CONSTRAINT `packages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `packages_virtual_address_id_foreign` FOREIGN KEY (`virtual_address_id`) REFERENCES `virtual_addresses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `package_actions`
+--
+ALTER TABLE `package_actions`
+  ADD CONSTRAINT `package_actions_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `package_files`
+--
+ALTER TABLE `package_files`
+  ADD CONSTRAINT `package_files_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `package_items`
+--
+ALTER TABLE `package_items`
+  ADD CONSTRAINT `package_items_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `posts`
 --
 ALTER TABLE `posts`
@@ -1092,10 +1456,17 @@ ALTER TABLE `shopper_items`
   ADD CONSTRAINT `shopper_items_request_id_foreign` FOREIGN KEY (`request_id`) REFERENCES `shopper_requests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `virtual_addresses`
+-- Constraints for table `shopper_requests`
 --
-ALTER TABLE `virtual_addresses`
-  ADD CONSTRAINT `virtual_addresses_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `shopper_requests`
+  ADD CONSTRAINT `warehouse_id_fk` FOREIGN KEY (`warehouse_id`) REFERENCES `virtual_addresses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `warehouse_requests`
+--
+ALTER TABLE `warehouse_requests`
+  ADD CONSTRAINT `warehouse_requests_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `warehouser_request_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `virtual_addresses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

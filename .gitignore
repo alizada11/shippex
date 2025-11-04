@@ -46,6 +46,10 @@ $RECYCLE.BIN/
 Vagrantfile
 
 #-------------------------
+# Dev Files
+#-------------------------
+files/*
+#-------------------------
 # Temporary Files
 #-------------------------
 writable/cache/*

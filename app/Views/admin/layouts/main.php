@@ -14,6 +14,7 @@
  <!-- Font Awesome -->
  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+ <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css" rel="stylesheet">
  <link rel="stylesheet" href="<?= base_url('assets/css/auth_style.css'); ?>">
  <?php if (!empty($defaultFont)): ?>
   <link href="https://fonts.googleapis.com/css2?family=<?= urlencode($defaultFont) ?>&display=swap" rel="stylesheet">
@@ -24,10 +25,12 @@
    }
   </style>
  <?php endif; ?>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
 <body>
+
  <?= view('partials/flash_message') ?>
  <div class="container-fluid">
   <div class="row">
@@ -46,13 +49,44 @@
         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
        </a>
       </li>
+      <?php
+      // Get current URL
+      $currentUrl = current_url();
+
+      // Check if the URL contains 'packages/' followed by a number
+      $isPackageActive = preg_match('#/packages/\d+#', $currentUrl);
+      ?>
+
+      <li class="nav-item">
+       <a class="nav-link <?= $isPackageActive ? 'active' : '' ?>"
+        data-bs-toggle="collapse"
+        href="#packageInbox"
+        role="button"
+        aria-expanded="<?= $isPackageActive ? 'true' : 'false' ?>"
+        aria-controls="packageInbox">
+        <i class="fas fa-box me-2"></i>Package Inbox
+        <i class="fas fa-chevron-down float-end mt-1 small"></i>
+       </a>
+       <div class="collapse ps-1 <?= $isPackageActive ? 'show' : '' ?>" id="packageInbox">
+        <ul class="nav flex-column">
+         <?= adminWarehousesMenu(); ?>
+        </ul>
+       </div>
+      </li>
+
+      <li class="nav-item">
+       <a class="nav-link <?= (strpos(current_url(), 'admin/combine-requests') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/combine-requests') ?>">
+        <i class="fas fa-boxes me-2"></i> Combine & Repack
+       </a>
+      </li>
+
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), '/shipping') !== false) ? 'active' : '' ?>" href="<?= base_url('shipping/requests') ?>">
         <i class="fas fa-users me-2"></i> Shipping Requests
        </a>
       </li>
       <li class="nav-item">
-       <a class="nav-link" href="<?= base_url('admin/shopper/requests') ?>">
+       <a class="nav-link <?= (strpos(current_url(), '/admin/shopper') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/shopper/requests') ?>" href="<?= base_url('admin/shopper/requests') ?>">
         <i class="fas fa-box me-2"></i> Shopper Requests
        </a>
       </li>
@@ -63,15 +97,11 @@
       </li>
 
       <li class="nav-item">
-       <a class="nav-link <?= (strpos(current_url(), '/users') !== false) ? 'active' : '' ?>" href="#">
+       <a class="nav-link <?= (strpos(current_url(), '/users') !== false) ? 'active' : '' ?>" href="<?= base_url('/users') ?>">
         <i class="fas fa-users me-2"></i> Users
        </a>
       </li>
-      <li class="nav-item">
-       <a class="nav-link <?= (strpos(current_url(), '/faqs') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/faqs') ?>">
-        <i class="fas fa-question me-2"></i> FAQs
-       </a>
-      </li>
+
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), '/fonts') !== false) ? 'active' : '' ?>" href="<?= site_url('/admin/fonts/select') ?>">
         <i class="fas fa-font me-2"></i> Font Settings
@@ -119,6 +149,7 @@
            <i class="fas fa-star me-2"></i> Promotion Card
           </a>
          </li>
+
         </ul>
        </div>
       </li>
@@ -133,7 +164,11 @@
        </a>
       </li>
 
-
+      <li class="nav-item">
+       <a class="nav-link <?= (strpos(current_url(), '/faqs') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/faqs') ?>">
+        <i class="fas fa-question-circle me-2"></i> FAQs
+       </a>
+      </li>
       <li class="nav-item">
        <a class="nav-link" href="<?= base_url('admin/how-it-works') ?>">
         <i class="fas fa-question me-2"></i> How it Works
@@ -146,7 +181,7 @@
    <!-- Main Content -->
 
    <main class="col-md-10 ms-sm-auto m-0 p-0">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top mb-4">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top mb-4 noprint">
      <div class="container-fluid">
       <div class="d-flex align-items-center">
        <button class="btn btn-sm d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCollapse">
@@ -154,7 +189,7 @@
        </button>
        <span class="navbar-brand mb-0 h6">
         <i class="fas fa-user-circle me-2 text-shippex-purple"></i>
-        Welcome, <?= esc(session()->get('role')) ?>
+        Welcome, <?= esc(session()->get('full_name'))  ?>
        </span>
       </div>
       <div class="ms-auto">
@@ -189,6 +224,7 @@
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
  <!-- Bootstrap JS -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="<?= base_url('js/download-helper.js'); ?>"></script>
  <script>
   // Mobile sidebar toggle
   document.addEventListener('DOMContentLoaded', function() {
@@ -206,6 +242,31 @@
      link.classList.add('active');
     }
    });
+  });
+ </script>
+
+ <script>
+  // Initialize download functionality
+  document.addEventListener('DOMContentLoaded', function() {
+   // Page download buttons
+   document.querySelectorAll('.download-page-btn').forEach(btn => {
+
+    btn.addEventListener('click', function() {
+     const filename = this.getAttribute('data-filename');
+     const title = this.getAttribute('data-title');
+
+     DownloadHelper.downloadPage({
+      filename: filename,
+      title: title,
+      format: 'pdf' // or 'pdf' when you implement PDF generation
+     });
+    });
+   });
+
+   // Global download trigger (you can use this anywhere)
+   window.downloadCurrentPage = function(options = {}) {
+    return DownloadHelper.downloadPage(options);
+   };
   });
  </script>
  <?= $this->renderSection('script') ?>

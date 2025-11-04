@@ -25,9 +25,8 @@
         <th>ID</th>
         <th> Item Name</th>
         <th>Weight</th>
-        <th>Height</th>
-        <th> Length</th>
-        <th> Width</th>
+        <th>Dimensions<small>(HxlxW)</small>
+        </th>
         <th>Total Charge</th>
         <th>User</th>
         <th>Delivery Time</th>
@@ -40,15 +39,13 @@
          <td><?= $req['id'] ?></td>
          <td><?= $req['category'] ?></td>
          <td><?= $req['weight'] ?> <small>kg</small></td>
-         <td><?= $req['height'] ?> <small>cm</small></td>
-         <td><?= $req['length'] ?> <small>cm</small></td>
-         <td><?= $req['width'] ?> <small>cm</small></td>
+         <td>(<?= $req['height'] . 'x' . $req['length'] . 'x' . $req['width'] ?>)<small>cm</small></td>
          <td class="fw-bold"><?= $req['currency'] . ' ' . $req['total_charge'] ?></td>
          <td><?= fullname($req['user_id']) ?></td>
          <td><span class="status-badge bg-success"><?= $req['delivery_time'] ?></span></td>
          <td>
           <div class="btn-group">
-           <a href="/shipping/details/<?= $req['id'] ?>" class="btn btn-sm btn-outline-primary btn-action"><i class="fas fa-edit"></i></a>
+           <a href="/shipping/details/<?= $req['id'] ?>" class="btn btn-sm btn-outline-primary btn-action"><i class="fas fa-eye"></i></a>
            <a href="/shipping/delete/<?= $req['id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-outline-danger btn-action"><i class="fas fa-trash"></i></a>
           </div>
          </td>

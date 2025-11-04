@@ -18,6 +18,7 @@ class ShopperRequestModel extends Model
   'payment_status',
   'payment_info',
   'price',
+  'warehouse_id',
   'updated_at'
  ];
  protected $useTimestamps = true;

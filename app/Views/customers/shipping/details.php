@@ -7,26 +7,195 @@
   <!-- Stats Overview -->
   <div class="row">
 
+    <?php
+    // Sample data - replace with your actual data
+    $shipment = [
+      'status' => $request['status'],
+      'created_at' => $request['created_at'],
+      'destination' => $request['origin_country'],
+      'tracking_number' => $request['id']
+    ];
+    // For debugging
 
+    // Calculate dynamic values
+    $progress = calculate_shipment_progress($shipment['status']);
+    $progress_message = get_progress_message($shipment['status']);
+    $progress_color = get_progress_color($shipment['status']);
+    $estimated_delivery = calculate_estimated_delivery(
+      $shipment['status'],
+      $shipment['created_at'],
+      $shipment['destination']
+    );
+    ?>
 
     <div class="container">
       <!-- Status Card -->
       <div class="card">
         <div class="card-body">
           <div class="row align-items-center">
-            <div class="col-md-8">
-              <h4 class="mb-1">Package Status: <?= statusBadge($request['status']) ?></h4>
-              <p class="mb-2">Estimated Delivery: <strong>Oct 28, 2023 by 5:00 PM</strong></p>
-              <div class="progress tracking-progress mb-2">
-                <div class="progress-bar bg-success" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="col-md-12">
+
+              <div class="d-flex justify-content-between ">
+                <h4 class="d-inline mb-1">Package Status: <?= statusBadge($request['status']) ?> </h4>
+                <div class="d-flex gap-3">
+                  <?php
+                  // Get payment info JSON from request
+                  $paymentTableHtml = '';
+                  if ($request['payment_status'] && $request['payment_status'] === 'paid') {
+
+                    // Decode JSON safely
+                    $paymentJson = html_entity_decode($request['payment_info']); // convert &quot; to "
+                    $payment = json_decode($paymentJson, true); // decode as associative array
+
+                    if ($payment && is_array($payment)) {
+                      ob_start(); // start output buffering to capture table HTML
+                  ?>
+                      <table class="table table-bordered table-sm">
+                        <tr>
+                          <th>Payment ID</th>
+                          <td><?= esc($payment['id'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Intent</th>
+                          <td><?= esc($payment['intent'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Status</th>
+                          <td><?= esc($payment['status'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Payer Name</th>
+                          <td>
+                            <?= esc($payment['payment_source']['paypal']['name']['given_name'] ?? '-') ?>
+                            <?= esc($payment['payment_source']['paypal']['name']['surname'] ?? '-') ?>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Payer Email</th>
+                          <td><?= esc($payment['payment_source']['paypal']['email_address'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Payer Account ID</th>
+                          <td><?= esc($payment['payment_source']['paypal']['account_id'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Account Status</th>
+                          <td><?= esc($payment['payment_source']['paypal']['account_status'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Country</th>
+                          <td><?= esc($payment['payment_source']['paypal']['address']['country_code'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Amount</th>
+                          <td>
+                            <?= esc($payment['purchase_units'][0]['amount']['currency_code'] ?? '-') ?>
+                            <?= esc($payment['purchase_units'][0]['amount']['value'] ?? '-') ?>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Payee Email</th>
+                          <td><?= esc($payment['purchase_units'][0]['payee']['email_address'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Merchant ID</th>
+                          <td><?= esc($payment['purchase_units'][0]['payee']['merchant_id'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                          <th>Soft Descriptor</th>
+                          <td><?= esc($payment['purchase_units'][0]['soft_descriptor'] ?? '-') ?></td>
+                        </tr>
+                      </table>
+                  <?php
+                      $paymentTableHtml = ob_get_clean();
+                    }
+                  }
+                  ?>
+
+                  <?php if (!empty($paymentTableHtml)): ?>
+                    <!-- Font Awesome info icon -->
+                    <p>
+                      <strong>Payment Status:</strong> <?= esc($request['payment_status']) ?>
+                      <i class="fas fa-info-circle text-info"
+                        data-bs-toggle="modal"
+                        data-bs-target="#paymentInfoModal"
+                        style="cursor: pointer;"
+                        title="Click to view payment details"></i>
+                    </p>
+
+
+                  <?php endif; ?>
+
+                  <a onclick="downloadCurrentPage({
+                      filename: 'shipping_request',
+                      title: 'Shipping request details',
+                      format: 'html'
+                  })"
+                    href=" #" class="">
+                    <i class="fas fa-print me-2"></i>
+                  </a>
+
+                </div>
+
               </div>
-              <p class="text-muted small mb-0">65% complete - Package is in transit to destination facility</p>
             </div>
+            <!-- Dynamic Progress Section -->
+
+            <div class="card-body">
+              <!-- Estimated Delivery -->
+              <div class="mb-3">
+                <p class="mb-2">
+                  <i class="fas fa-calendar-alt me-2 text-shippex-primary"></i>
+                  Estimated Delivery: <strong><?= $estimated_delivery ?></strong>
+                </p>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress tracking-progress mb-2" style="height: 8px;">
+                <div class="progress-bar <?= $progress_color ?> progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  style="width: <?= $progress ?>%"
+                  aria-valuenow="<?= $progress ?>"
+                  aria-valuemin="0"
+                  aria-valuemax="100">
+                </div>
+              </div>
+
+              <!-- Progress Text -->
+              <p class="text-muted small mb-0">
+                <i class="fas fa-info-circle me-1"></i>
+                <?= $progress ?>% complete - <?= $progress_message ?>
+              </p>
+
+              <!-- Current Status Badge -->
+              <div class="mt-3 d-flex gap-4">
+                <span class="badge <?= $progress_color ?> text-white">
+                  <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>
+                  <?= ucfirst($shipment['status']) ?>
+                </span>
+
+              </div>
+            </div>
+
+
 
           </div>
         </div>
       </div>
-
+      <!-- Modal -->
+      <div class="modal fade" id="paymentInfoModal" tabindex="-1" aria-labelledby="paymentInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="paymentInfoModalLabel">Payment Details</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <?= $paymentTableHtml ?>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="row">
         <!-- Left Column -->
         <div class="col-lg-8">
@@ -82,7 +251,8 @@
                 <div class="col-md-6">
                   <div class="detail-item">
                     <span class="detail-label">Category:</span>
-                    <span class="float-end"><?= $request['category'] ?></span>
+                    <span class="float-end" style="text-transform: capitalize;">
+                      <?= ucwords(str_replace('_', ', ', $request['category'])) ?></span>
                   </div>
                   <div class="detail-item">
                     <span class="detail-label">Description:</span>
@@ -206,7 +376,7 @@
           </div>
 
           <?php if ($request['status'] == "accepted"): ?>
-            <div class="card">
+            <div class="card noprint">
               <div class="card-header">
                 <i class="fas fa-pay-circle me-2"></i>Payment
               </div>

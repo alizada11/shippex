@@ -14,7 +14,7 @@
   <form method="post" action="<?= base_url('/login-post') ?>" class="auth-form">
    <div class="form-group">
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" required class="form-control" placeholder="john@example.com">
+    <input type="text" id="email" name="email" required class="form-control" placeholder="email@example.com">
    </div>
 
    <div class="form-group">
@@ -23,8 +23,8 @@
    </div>
 
    <div class="form-options">
-    <div class="form-check d-flex align-items-center gap-2">
-     <input type="checkbox" id="remember" class="form-check-input">
+    <div class=" d-flex align-items-center gap-2">
+     <input type="checkbox" name="remember" value="1" id="remember" class="remember-checkbox">
      <label for="remember" class="form-check-label">Remember me</label>
     </div>
     <a href="<?= base_url('/forgot') ?>" class="forgot-password">Forgot password?</a>

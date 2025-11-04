@@ -12,10 +12,20 @@ class Admin extends BaseController
 {
  public function index()
  {
+  // if (get_cookie('remember_token')) {
+  //  // Cookie exists
+  //  $token = get_cookie('remember_token');
+  //  echo "Cookie is set. Token: " . $token;
+  // } else {
+  //  // Cookie not set
+  //  echo "No cookie found.";
+  // }
+
+  // exit;
   $userId = session()->get('user_id'); // adjust if you're using a different session key
 
   $addressModel = new VirtualAddressModel();
-  $data['address'] = $addressModel->where('user_id', $userId)->where('is_default', 1)->first();
+  $data['address'] = $addressModel->where('is_active', 1)->first();
   $data['orders'] = 0;
   $data['users'] = 0;
   $data['addresses'] = $addressModel->countAllResults();

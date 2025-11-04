@@ -133,6 +133,7 @@
 <!-- Add these before your closing body tag -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="<?= base_url('assets/js/script.js'); ?>"></script>
+<script src="<?= base_url('js/download-helper.js'); ?>"></script>
 <script>
 
 </script>

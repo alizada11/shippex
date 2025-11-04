@@ -9,6 +9,7 @@ use App\Models\ShippingBookingModel;
 use App\Models\ShopperRequestModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\VirtualAddressModel;
+use App\Models\WarehouseRequestModel;
 
 class CustomersController extends BaseController
 {
@@ -16,21 +17,43 @@ class CustomersController extends BaseController
     {
         $userId = session()->get('user_id'); // adjust if you're using a different session key
 
+
         $addressModel = new VirtualAddressModel();
-        $address = $addressModel->findAll();
+        $v_address = $addressModel->findAll();
         $shopperRequests = new ShopperRequestModel();
-        $shopperRequests = $shopperRequests->where('user_id', session()->get('user_id'))->countAllResults();
+        $shopperRequests = $shopperRequests->where('user_id', $userId)->countAllResults();
         $addresses = new AddressModel();
-        $addresses = $addresses->where('user_id', session()->get('user_id'))->countAllResults();
+        $addresses = $addresses->where('user_id', $userId)->countAllResults();
+
+
 
         $booking = new ShippingBookingModel();
-        $booking = $booking->where('user_id', session()->get('user_id'))->countAllResults();
+        $booking = $booking->where('user_id', $userId)->countAllResults();
+
+        $warehouseRequestModel = new warehouseRequestModel();
+        $pending = $warehouseRequestModel->where('user_id', $userId)
+            ->where('status', 'pending')
+            ->findAll();
+        $pendingMap = [];
+        foreach ($pending as $req) {
+            $pendingMap[$req['warehouse_id']] = $req['created_at'];
+        }
+
+        $userRequests = $warehouseRequestModel
+            ->where('user_id', $userId)
+            ->findAll();
+        $requestMap = [];
+        foreach ($userRequests as $req) {
+            $requestMap[$req['warehouse_id']] = $req; // contains status, is_default, rejectation_reason
+        }
 
         return view('customers/dashboard', [
-            'address' => $address,
+            'address' => $v_address,
             'shopper_requests' => $shopperRequests,
             'addresses' => $addresses,
-            'shipping_requests' => $booking
+            'shipping_requests' => $booking,
+            'pendingMap' => $pendingMap,
+            'requestMap' => $requestMap
         ]);
     }
     public function requests()

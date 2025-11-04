@@ -16,12 +16,23 @@
  <?php endif; ?>
 
  <div class="card">
+  <div class="card-header">
+   <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+     <div class="page-title-section">
+      <h1 class="page-title"><i class="fas fa-warehouse me-2 text-white"></i>Shopper Request Form</h1>
+      <span class="page-subtitle mb-0 ">Request a buyer for your shopping if you are unable to shop globally.</span>
+     </div>
+
+    </div>
+   </div>
+  </div>
   <div class="card-body">
    <?= form_open('/shopper/submit', ['id' => 'shopper-add-form', 'class' => 'form-horizontal']) ?>
    <div class="items" data-items>
     <div class="item" data-item>
      <div class="form-group row mb-2">
-      <h5 class="col-12 text-primary">Item <span class="item-index">1</span></h5>
+      <h5 class="col-12 text-shippex-purple">Item <span class="item-index">1</span></h5>
      </div>
 
      <div class="form-group row mb-2">
@@ -72,7 +83,7 @@
 
    <div class="form-group row mb-2 border-top border-bottom py-2">
     <div class="col-12 col-md-4">
-     <button type="button" class="add-item btn btn-block btn-info">Add item</button>
+     <button type="button" class="add-item btn btn-shippex">Add item</button>
     </div>
    </div>
 
@@ -99,10 +110,10 @@
 
    <div class="row justify-content-between">
     <div class="col-sm-6 col-md-4">
-     <button type="submit" name="submit" value="submit" class="btn btn-block btn-secondary text-uppercase">Submit Request</button>
+     <button type="submit" name="submit" value="submit" class="btn btn-shippex text-uppercase">Submit Request</button>
     </div>
     <div class="col-sm-6 col-md-4 text-end">
-     <button type="submit" name="submit" value="save" class="btn btn-block btn-warning text-white text-uppercase">Save for later</button>
+     <button type="submit" name="submit" value="save" class="btn btn-shippex-orange text-uppercase">Save for later</button>
     </div>
    </div>
 
