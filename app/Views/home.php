@@ -192,10 +192,11 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
                 <select class="form-select" required name="category" id="category_slug">
                   <option value="" selected>--select category--</option>
                   <?php foreach ($categories as $cat): ?>
-                    <option data-hs-code="<?= $cat['hs_code'] ?>" value="<?= $cat['slug'] ?>">
-                      <?= $cat['name'] ?>
+                    <option data-hs-code="<?= esc($cat['hs_code']) ?>" value="<?= $cat['slug'] ?>">
+                      <?= esc($cat['name']) ?>
                     </option>
                   <?php endforeach; ?>
+
                   <div class="invalid-feedback">Please enter weight</div>
                 </select>
               </div>
@@ -577,7 +578,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
     $(document).on('change', '#category_slug', function() {
       let hsCode = $(this).find(':selected').data('hs-code');
       let slug = $(this).find(':selected').val();
-      $("#hs_code_input").val(slug); // update hidden input
+      $("#hs_code_input").val(hsCode); // update hidden input
     });
     // Handle form submission
     $("#shippingForm").on("submit", function(e) {
@@ -590,6 +591,11 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
       // Show loading indicator
       $("#resultsContainer").addClass('d-none');
       $("#errorContainer").addClass('d-none');
+
+      $(document).on('change', '#category_slug', function() {
+        let hsCode = $(this).find(':selected').data('hs-code');
+        $("#hs_code_input").val(hsCode);
+      });
 
       $.ajax({
         url: "<?= site_url('shipping/getRates') ?>",

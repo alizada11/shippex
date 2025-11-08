@@ -325,7 +325,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
     $(document).on('change', '#category_slug', function() {
       let hsCode = $(this).find(':selected').data('hs-code');
       let slug = $(this).find(':selected').val();
-      $("#hs_code_input").val(slug); // update hidden input
+      $("#hs_code_input").val(hsCode); // update hidden input
     });
     // Handle form submission
     $("#shippingForm").on("submit", function(e) {

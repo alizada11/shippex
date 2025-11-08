@@ -281,7 +281,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/../partials/countries.jso
   <!-- Results Section -->
   <div class="container">
     <div id="ratesResult" class="mt-3">
-      <div class="d-none" id="resultsContainer">
+      <div class="card shadow p-4 d-none" id="resultsContainer">
         <h4 class="fw-bold mb-4 text-center">Available Shipping Options</h4>
         <div class="table-responsive">
           <table class="table table-hover align-middle">
@@ -382,7 +382,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/../partials/countries.jso
     $(document).on('change', '#category_slug', function() {
       let hsCode = $(this).find(':selected').data('hs-code');
       let slug = $(this).find(':selected').val();
-      $("#hs_code_input").val(slug); // update hidden input
+      $("#hs_code_input").val(hsCode); // update hidden input
     });
     // Handle form submission
     $("#shippingForm").on("submit", function(e) {

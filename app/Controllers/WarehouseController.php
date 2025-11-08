@@ -131,21 +131,6 @@ class WarehouseController extends BaseController
   $data = json_decode($response->getBody(), true);
 
   // Extract categories
-  $categories = $data['item_categories'] ?? [];
-  $client = new \GuzzleHttp\Client();
-
-  $response = $client->request('GET', 'https://public-api.easyship.com/2024-09/item_categories', [
-   'headers' => [
-    'Authorization' => 'Bearer ' . trim($this->token),
-    'Content-Type'  => 'application/json',
-    'Accept'        => 'application/json; version=2024-09',
-   ],
-  ]);
-
-  // Decode JSON into associative array
-  $data = json_decode($response->getBody(), true);
-
-  // Extract categories
   $data['categories'] = $data['item_categories'] ?? [];
 
   $data['warehouse'] = $this->warehouseModel
@@ -155,7 +140,7 @@ class WarehouseController extends BaseController
   if (!$data['warehouse']) {
    throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
   }
-
+  $data['title'] = $countryCode . ' Warehouse';
   return view('warehouses/show', $data);
  }
 }

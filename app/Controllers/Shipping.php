@@ -201,6 +201,7 @@ class Shipping extends BaseController
 
         // Pass message to the view
         return view('shipping-rates', [
+            'title' => 'Calculator',
             'categories' => $categories,
             'error' => $errorMessage ?? null,
         ]);
