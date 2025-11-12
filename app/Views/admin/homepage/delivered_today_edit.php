@@ -7,9 +7,12 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
-    <div class="row align-items-center">
-     <h2>Edit Delivered Today Item</h2>
+   <div class="row align-items-center">
+    <div class="card-header border-0">
+
+     <h5>Edit Delivered Today Item</h5>
+    </div>
+    <div class="card-body">
 
      <form action="<?= site_url('admin/cms/delivered-today/update/' . $item['id']) ?>" method="post" enctype="multipart/form-data">
       <?= csrf_field() ?>
@@ -67,9 +70,11 @@
         <input type="text" name="weight" value="<?= esc($item['weight']) ?>" class="form-control">
        </div>
       </div>
-
-      <button class="btn btn-primary">Update</button>
-      <a href="<?= site_url('admin/cms/delivered-today') ?>" class="btn btn-secondary">Cancel</a>
+      <hr>
+      <div class="d-flex justify-content-between">
+       <button type="submit" class="btn btn-primary">Update</button>
+       <a href="<?= site_url('admin/cms/delivered-today') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
      </form>
     </div>
 

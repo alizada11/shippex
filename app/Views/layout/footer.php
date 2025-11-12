@@ -135,7 +135,23 @@
 <script src="<?= base_url('assets/js/script.js'); ?>"></script>
 <script src="<?= base_url('js/download-helper.js'); ?>"></script>
 <script>
+ document.addEventListener("DOMContentLoaded", function() {
+  // Select all dropdowns
+  var dropdowns = document.querySelectorAll('.nav-item.dropdown');
 
+  dropdowns.forEach(function(dropdown) {
+   dropdown.addEventListener('mouseenter', function() {
+    var toggle = dropdown.querySelector('.dropdown-toggle');
+    var menu = new bootstrap.Dropdown(toggle);
+    menu.show();
+   });
+   dropdown.addEventListener('mouseleave', function() {
+    var toggle = dropdown.querySelector('.dropdown-toggle');
+    var menu = bootstrap.Dropdown.getInstance(toggle);
+    if (menu) menu.hide();
+   });
+  });
+ });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <!-- Bootstrap JS -->

@@ -1,38 +1,40 @@
 <?= $this->extend('admin/layouts/main') ?>
 
 <?= $this->section('content') ?>
-<div class="container my-4">
+<div class="container">
 
-    <div class="card shadow-sm p-3">
-        <div class="card-headr">
-            <h2>Select Google Font</h2>
+    <div class="card  shadow-sm ">
+        <div class="card-header">
+            <h5>Select Google Font</h5>
 
         </div>
+        <div class="card-body">
+            <form method="post" action="<?= site_url('admin/fonts/save') ?>">
+                <label for="fontSelect" class="form-label">Choose a font:</label>
+                <select class="form-control" id="fontSelect" name="font_name" style="width: 100%;">
+                    <?php foreach ($fonts as $font): ?>
+                        <option value="<?= esc($font['family']) ?>">
+                            <?= esc($font['family']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
-        <form method="post" action="<?= site_url('admin/fonts/save') ?>">
-            <label for="fontSelect" class="form-label">Choose a font:</label>
-            <select class="form-control" id="fontSelect" name="font_name" style="width: 100%;">
-                <?php foreach ($fonts as $font): ?>
-                    <option value="<?= esc($font['family']) ?>">
-                        <?= esc($font['family']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <div class="my-4">
-                <h5>Live Preview</h5>
-                <div id="preview" class="border rounded p-3" style="font-size: 24px;">
-                    shippex shipping co
+                <div class="my-4">
+                    <h5>Live Preview</h5>
+                    <div id="preview" class="border rounded p-3" style="font-size: 24px;">
+                        shippex shipping co
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary">Save Font</button>
-        </form>
+                <button type="submit" class="btn btn-primary">Save Font</button>
+            </form>
+        </div>
+
     </div>
     <hr>
     <div class="card shadow-sm">
         <div class="card-header bg-gradient-info">
-            <h3 class="mb-0"><i class="fas fa-history mr-2"></i>Font History</h3>
+            <h5 class="mb-0"><i class="fas fa-history mr-2"></i> Font History</h5>
         </div>
         <div class="card-body px-0">
             <div class="table-responsive">

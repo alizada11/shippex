@@ -42,9 +42,10 @@
         <option value="coming_soon">Coming Soon</option>
        </select>
       </div>
-
-      <button type="submit" class="btn btn-success">Save Location</button>
-      <a href="<?= site_url('admin/locations') ?>" class="btn btn-secondary">Cancel</a>
+      <div class="d-flex justify-content-between">
+       <button type="submit" class="btn btn-primary">Save Location</button>
+       <a href="<?= site_url('admin/cms/locations') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
      </form>
 
 

@@ -9,6 +9,11 @@ $routes->group('admin/blog', ['namespace' => 'Modules\\Blog\\Controllers\\Admin'
  $routes->post('posts/(:num)/delete', 'PostController::destroy/$1');
  $routes->post('upload-image', 'PostController::uploadImage');
 });
+$routes->group('filter/posts', ['namespace' => 'Modules\\Blog\\Controllers\\Admin', 'filter' => 'authGuard:admin'], static function ($routes) {
+ $routes->get('all', 'PostController::index');
+ $routes->get('published', 'PostController::published');
+ $routes->get('draft', 'PostController::draft');
+});
 
 
 $routes->group('blog', ['namespace' => 'Modules\\Blog\\Controllers'], static function ($routes) {

@@ -7,9 +7,12 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
-    <div class="row align-items-center">
-     <h2><?= $item['id'] ?? 'Add New Item' ?></h2>
+   <div class="row align-items-center">
+    <div class="card-header">
+     <h5><?= isset($item['id']) ? 'Edit Item ' . $item['id'] : 'Add New Item' ?></h5>
+
+    </div>
+    <div class="card-body">
 
      <form method="post" enctype="multipart/form-data" action="<?= isset($item) ? site_url('/admin/cms/why-choose/edit/' . $item['id']) : site_url('/admin/cms/why-choose/create') ?>">
       <div class="mb-3">
@@ -34,9 +37,11 @@
        <label class="form-label">Order</label>
        <input type="number" name="order" class="form-control" value="<?= $item['order'] ?? 0 ?>">
       </div>
+      <div class="d-flex align-items-center justify-content-between">
 
-      <button type="submit" class="btn btn-success">Save</button>
-      <a href="<?= site_url('admin/why-choose') ?>" class="btn btn-secondary">Cancel</a>
+       <button type="submit" class="btn btn-primary">Save</button>
+       <a href="<?= site_url('admin/cms/why-choose') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
      </form>
     </div>
    </div>

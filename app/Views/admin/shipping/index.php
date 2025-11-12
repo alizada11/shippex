@@ -4,29 +4,23 @@
 
 
 <div class="container">
- <!-- Stats Overview -->
  <div class="row">
 
-
-
-
   <!-- Bookings Table -->
-  <div>
-   <div class="table-header">
-    <div class="p-3">
-     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Shipping Requests</h5>
-    </div>
+  <div class="card px-2 shadow-sm border-0">
+
+   <div class="card-header premium-header p-3 d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Shipping Requests</h5>
    </div>
-   <div class="card-body">
+   <div class="card-body p-0">
     <div class="table-responsive">
      <table class="table table-hover">
-      <thead>
+      <thead class="table-light">
        <tr>
         <th>ID</th>
         <th> Item Name</th>
         <th>Weight</th>
-        <th>Dimensions<small>(HxlxW)</small>
-        </th>
+        <th>Dimensions <small>(L×W×H cm)</small></th>
         <th>Total Charge</th>
         <th>User</th>
         <th>Delivery Time</th>
@@ -43,10 +37,13 @@
          <td class="fw-bold"><?= $req['currency'] . ' ' . $req['total_charge'] ?></td>
          <td><?= fullname($req['user_id']) ?></td>
          <td><span class="status-badge bg-success"><?= $req['delivery_time'] ?></span></td>
-         <td>
-          <div class="btn-group">
-           <a href="/shipping/details/<?= $req['id'] ?>" class="btn btn-sm btn-outline-primary btn-action"><i class="fas fa-eye"></i></a>
-           <a href="/shipping/delete/<?= $req['id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-outline-danger btn-action"><i class="fas fa-trash"></i></a>
+         <td class="actions-col">
+          <div class="action-buttons-table">
+           <a href="/shipping/details/<?= $req['id'] ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
+           <form class="delete-form" action="<?= base_url('shipping/delete/' . $req['id']) ?>" method="post" class="d-inline delete-form">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
+           </form>
           </div>
          </td>
         </tr>

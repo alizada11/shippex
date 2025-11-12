@@ -1,0 +1,1096 @@
+/* ---------------------------
+   Generic constants
+   --------------------------- */
+:root {
+  --border-radius: 12px;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+/* ---------------------------
+   Page / Container
+   --------------------------- */
+.premium-package-container {
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.premium-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #3a0d6b 100%);
+  color: white;
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+  border-radius: 0 0 15px 15px;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  opacity: 0.85;
+  margin-bottom: 0;
+}
+
+/* ---------------------------
+   Tables (package-table + generic table)
+   --------------------------- */
+.package-table-container,
+.table-container {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.package-table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1rem;
+}
+
+.package-table thead th {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 1rem 0.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.package-table tbody tr {
+  transition: var(--transition);
+}
+
+.package-table tbody tr:hover,
+.table tbody tr:hover {
+  background-color: rgba(77, 20, 140, 0.03);
+}
+
+.package-table tbody td,
+.table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* generic .table styles (keeps your other table rules) */
+.table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  padding: 1rem 0.75rem;
+  background: #f8f9fa;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+/* last-row fixes */
+.table tbody tr:last-child td,
+.rates-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------------------------
+   Selection / columns
+   --------------------------- */
+.select-col {
+  width: 50px;
+  text-align: center;
+}
+
+.table-container .table-header {
+  padding: 1rem 1.2rem;
+}
+
+/* ---------------------------
+   Retailer info (table)
+   --------------------------- */
+.retailer-info-table {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.retailer-logo-table {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary-color), #5e35b1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+}
+
+.retailer-details-table h6 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.tracking-number-table {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* ---------------------------
+   Status badges (consolidated)
+   --------------------------- */
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* color variants */
+.status-ready {
+  background-color: rgba(40, 167, 69, 0.15);
+  color: var(--shippex-success);
+}
+
+.status-incoming {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+.status-shipped {
+  background-color: rgba(23, 162, 184, 0.15);
+  color: #17a2b8;
+}
+
+/* alternative statuses used later in file (kept names + styles) */
+.status-arrived {
+  background: #c6f6d5;
+  color: #276749;
+}
+
+.status-stored {
+  background: #bee3f8;
+  color: #2c5aa0;
+}
+
+.status-pending {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+/* ---------------------------
+   Bulk Actions
+   --------------------------- */
+.bulk-actions-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 1.5rem;
+}
+
+.bulk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.bulk-header h5 {
+  margin: 0;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.selection-count {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bulk-action {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+/* variants */
+.bulk-action.ship-now {
+  border-color: var(--shippex-success);
+  color: var(--shippex-success);
+}
+
+.bulk-action.combine-repack {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.bulk-action.dispose {
+  border-color: var(--shippex-accent);
+  color: var(--shippex-accent);
+}
+
+.bulk-action.return {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+
+/* hover states (consolidated) */
+.bulk-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.bulk-action.ship-now:hover {
+  background: var(--shippex-success);
+}
+
+.bulk-action.combine-repack:hover {
+  background: var(--primary-color);
+}
+
+.bulk-action.dispose:hover {
+  background: var(--shippex-accent);
+}
+
+.bulk-action.return:hover {
+  background: #ffc107;
+}
+
+/* ---------------------------
+   Empty states (merged)
+   --------------------------- */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #a0aec0;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: rgba(77, 20, 140, 0.2);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--secondary-color);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ---------------------------
+   Responsive helpers
+   --------------------------- */
+@media (max-width: 768px) {
+  .premium-header {
+    padding: 1.5rem 0;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .package-table {
+    font-size: 0.9rem;
+  }
+
+  .retailer-info-table {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .bulk-actions {
+    flex-direction: column;
+  }
+
+  .action-buttons-table {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .destination-options {
+    grid-template-columns: 1fr !important;
+  }
+
+  .premium-modal-header {
+    padding: 1rem;
+  }
+
+  .premium-modal-body {
+    padding: 1rem;
+  }
+
+  .shipping-wizard {
+    padding: 1rem;
+  }
+
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+
+  .package-details-cell {
+    min-width: 150px;
+  }
+
+  .footer-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* ---------------------------
+   Premium Modal (base + scoped variants)
+   --------------------------- */
+.premium-modal {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.premium-modal-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #3a0d6b 100%);
+  color: white;
+  padding: 1rem 2rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.premium-modal-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00ff87, #60efff);
+}
+
+.premium-modal-header .modal-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+.premium-modal-header .modal-title-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.premium-modal-header .modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.premium-modal-header .modal-subtitle {
+  opacity: 0.9;
+  margin-bottom: 0;
+  font-size: 0.75rem;
+}
+
+/* Premium modal body/footer */
+
+.premium-modal-footer,
+.footer-content {
+  background: white;
+  padding: 0;
+}
+
+/* btn close used in multiple modals - keep consistent */
+.btn-close-modal {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* ---------------------------
+   Wizard Steps / Cards / Options
+   --------------------------- */
+.shipping-wizard {
+  padding: 1rem;
+}
+
+.wizard-step {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+/* Destination Options (grid + card-option) */
+.destination-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-option {
+  margin: 0;
+}
+
+.card-option .form-check-input {
+  display: none;
+}
+
+.card-option .form-check-label {
+  display: block;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+}
+
+.card-option .form-check-input:checked + .form-check-label {
+  border-color: var(--primary-color);
+  background: rgba(77, 20, 140, 0.05);
+  box-shadow: 0 4px 15px rgba(77, 20, 140, 0.1);
+}
+
+.card-option .form-check-label:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+/* Option content styles */
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.option-content i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  width: 40px;
+  height: 40px;
+  background: rgba(77, 20, 140, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option-content strong {
+  display: block;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.option-content p {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Destination section / address form */
+.destination-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.address-form-container {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+/* Form labels / controls */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(77, 20, 140, 0.1);
+}
+
+/* ---------------------------
+   Loading / Rates
+   --------------------------- */
+.loading-placeholder {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+.rates-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.rates-table {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.rates-table th {
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  padding: 1rem;
+  text-align: left;
+}
+
+.rates-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.rates-table tr:hover {
+  background: #f8f9fa;
+}
+
+.rate-price {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+.rate-delivery {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.book-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------------------
+   Packages grid + cards
+   --------------------------- */
+.section-actions {
+  margin-left: auto;
+}
+
+.packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.package-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.package-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.package-icon {
+  width: 32px;
+  height: 32px;
+  background: #f7fafc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+}
+
+.package-info {
+  flex: 1;
+}
+
+.package-id {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #2d3748;
+}
+
+.package-details {
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.remove-package {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.remove-package:hover {
+  color: #e53e3e;
+  background: #fed7d7;
+}
+
+/* ---------------------------
+   Combined preview (3D box)
+   --------------------------- */
+.preview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.preview-visual {
+  flex: 0 0 120px;
+}
+
+.package-3d-preview {
+  perspective: 1000px;
+  height: 120px;
+}
+
+.package-box {
+  width: 80px;
+  height: 60px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-15deg) rotateY(15deg);
+  margin: 0 auto;
+}
+
+.box-face {
+  position: absolute;
+  border: 1px solid #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* face sizing */
+.box-face.front,
+.box-face.back {
+  width: 80px;
+  height: 60px;
+}
+
+.box-face.front {
+  transform: translateZ(20px);
+}
+
+.box-face.back {
+  transform: translateZ(-20px) rotateY(180deg);
+}
+
+.box-face.left,
+.box-face.right {
+  width: 40px;
+  height: 60px;
+}
+
+.box-face.left {
+  transform: translateX(-40px) rotateY(-90deg);
+}
+
+.box-face.right {
+  transform: translateX(40px) rotateY(90deg);
+}
+
+.box-face.top,
+.box-face.bottom {
+  width: 80px;
+  height: 40px;
+}
+
+.box-face.top {
+  transform: translateY(-30px) rotateX(90deg);
+}
+
+.box-face.bottom {
+  transform: translateY(30px) rotateX(-90deg);
+}
+
+/* ---------------------------
+   Preview details / dimensions
+   --------------------------- */
+.preview-details {
+  flex: 1;
+}
+
+.dimensions-display {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.dimension-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f7fafc;
+  border-radius: 6px;
+}
+
+.dimension-label {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.dimension-value {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.volume-display {
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.volume-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.volume-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.volume-value {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+/* ---------------------------
+   Dimensions form controls
+   --------------------------- */
+.dimensions-config-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.dimension-input {
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+}
+
+.dimension-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ---------------------------
+   Footer / actions / badges
+   --------------------------- */
+.premium-modal-footer {
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  padding: 1rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.cost-estimate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.estimate-label {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.estimate-value {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-outline-secondary {
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-outline-secondary:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  color: #000;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f6ad55 0%, #fc8181 100%);
+  color: white;
+}
+
+.btn-warning:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 173, 85, 0.3);
+}
+
+.btn-outline-primary {
+  border: 1px solid #667eea;
+  color: #667eea;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* generic .btn + .btn-outline-secondary duplicates removed above */
+
+/* ---------------------------
+   Badges & utilities
+   --------------------------- */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  border-radius: 6px;
+}
+
+.selected-count .count-badge {
+  background: #f7fafc;
+  color: #4a5568;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ---------------------------
+   Scrollbar (packages-grid)
+   --------------------------- */
+.packages-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.packages-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.packages-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.packages-grid::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* ---------------------------
+   Alerts / summary
+   --------------------------- */
+.package-validation-alert {
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert.alert-info {
+  margin-bottom: 0;
+}
+
+.summary-alert {
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------------------------
+   Misc / Form sizes
+   --------------------------- */
+.form-select-sm,
+.form-control-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.action-select {
+  min-width: 120px;
+}
+
+.reason-input {
+  min-width: 200px;
+}
+
+/* ---------------------------
+   Loading rows / spinner
+   --------------------------- */
+.loading-row td {
+  border-bottom: none !important;
+}
+
+.loading-spinner {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* ---------------------------
+   Small utilities / text
+   --------------------------- */
+.package-details-cell {
+  min-width: 200px;
+}
+
+.package-meta {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.retailer-name {
+  color: #4a5568;
+}
+
+.tracking-number {
+  color: #667eea;
+  font-family: monospace;
+}
+
+/* ---------------------------
+   Animation helper
+   --------------------------- */
+.card-hover:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* End of consolidated CSS */

@@ -230,14 +230,18 @@
 .auth-form label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #4a5568;
+  font-weight: 600;
+  color: #2e3542;
   font-size: 0.9rem;
 }
 .auth-form .form-check-label {
   margin-bottom: 0 !important;
 }
-
+.auth-card .hint {
+  color: #999;
+  opacity: 0.8;
+  font-size: 12px;
+}
 .auth-form .form-control {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -245,6 +249,20 @@
   border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.3s ease;
+}
+.auth-header h4 {
+  letter-spacing: -1.5px;
+  font-weight: 700;
+}
+.auth-header h2 {
+  letter-spacing: -1px;
+  font-weight: 700;
+}
+.auth-form input::placeholder,
+textarea::placeholder {
+  color: #999;
+  opacity: 0.5;
+  font-size: 12px;
 }
 
 .auth-form .form-control:focus {
@@ -349,7 +367,35 @@
   line-height: 1.6;
   margin-bottom: 25px;
 }
+.btn-secondary {
+  padding: 0.625rem 1.25rem;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.btn-outline-primary,
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background-color: var(--secondary-color);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
 
+.btn-primary:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
 .btn-fiverr {
   background-color: var(--primary-color);
   color: white;
@@ -1121,5 +1167,19 @@ select:focus {
 }
 .bg-shippex-orange {
   background-color: var(--secondary-color) !important;
+}
+.nav-link:focus-visible {
+  box-shadow: none !important;
+}
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+  margin: 0;
+  border-radius: 0px;
+}
+.dropdown-item:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+.dropdown-item:active {
+  background-color: #4e148c6c;
 }
 @import url('media-queries.css');

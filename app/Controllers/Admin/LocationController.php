@@ -16,7 +16,8 @@ class LocationController extends BaseController
 
  public function create()
  {
-  return view('admin/homepage/locations_create');
+  $title = 'Create a Location';
+  return view('admin/homepage/locations_create', compact('title'));
  }
 
  public function store()
@@ -96,6 +97,6 @@ class LocationController extends BaseController
  {
   $model = new LocationModel();
   $model->delete($id);
-  return redirect()->to('/admin/cms/locations');
+  return redirect()->to('/admin/cms/locations')->with('success', 'Location deleted successfully');
  }
 }

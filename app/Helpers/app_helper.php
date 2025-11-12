@@ -24,7 +24,7 @@ if (!function_exists('warehousesMenu')) {
 
     foreach ($addresses as $adr) {
       $url = base_url('warehouse/' . $adr['code']); // no leading slash
-      $html .= '<li><a class="dropdown-item py-2" href="' . $url . '">'
+      $html .= '<li><a class="dropdown-item py-3" href="' . $url . '">'
         . esc($adr['code']) . ' Warehouse</a></li>';
     }
 
@@ -79,17 +79,23 @@ if (!function_exists('adminWarehousesMenu')) {
       ];
 
       $flagCode = $map[$code] ?? $code;
-      $url = base_url('packages/' . $adr['id']); // no leading slash
+      $id = $adr['id'];
+      $url = base_url('packages/' . $id);
 
-      // check if this submenu is active
-      $isActive = strpos($currentUrl, '/packages/' . $adr['id']) !== false;
+      // Check if current URL matches any of the related routes
+      $isActive =
+        strpos($currentUrl, '/packages/' . $id) !== false ||
+        strpos($currentUrl, '/packages/create/' . $id) !== false ||
+        strpos($currentUrl, '/packages/' . $id . '/edit') !== false;
 
-      $html .= '<li class="nav-item">
-                        <a class="nav-link ' . ($isActive ? 'active' : '') . '" href="' . $url . '">
-                            <i class="fi fi-' . $flagCode . '"></i> ' . esc($adr['country']) . '
-                        </a>
-                      </li>';
+      $html .= '
+        <li class="nav-item">
+            <a class="nav-link ' . ($isActive ? 'active' : '') . '" href="' . $url . '">
+                <i class="fi fi-' . $flagCode . '"></i> ' . esc($adr['country']) . '
+            </a>
+        </li>';
     }
+
 
     return $html;
   }

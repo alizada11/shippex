@@ -9,8 +9,6 @@ if ($role === 'admin') {
   $this->extend('customers/layouts/main');
 }
 ?>
-<?= $this->extend('admin/layouts/main') ?>
-
 <?= $this->section('content') ?>
 <div class="premium-admin-container">
   <!-- Premium Header Section -->
@@ -25,199 +23,188 @@ if ($role === 'admin') {
         </div>
         <div class="header-actions">
           <a href="<?= base_url('packages/' . $package['virtual_address_id']) ?>" class="btn btn-outline-light me-2">
-            <i class="fas fa-arrow-left me-2"></i> Back to Packages
+            <i class="fas fa-boxes me-2"></i> Packages
           </a>
-          <a href="<?= base_url('packages/show/' . $package['id']) ?>" class="text-white btn btn-outline-shippex-orange">
-            <i class="fas fa-eye me-2 "></i> View Package
+          <a href="<?= base_url('packages/show/' . $package['id']) ?>" class=" btn btn-shippex-orange">
+            <i class="fas fa-arrow-left me-2 "></i> Back
           </a>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Files Card -->
+  <div class="premium-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fas fa-paperclip me-2"></i>Attached Files
+      </h3>
+      <div class="card-actions">
+        <span class="badge bg-shippex-purple"><?= count($files) ?> files</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <?php if (empty($files)): ?>
+        <div class="empty-state small">
+          <div class="empty-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h5>No Files Attached</h5>
+          <p>This package doesn't have any files attached yet.</p>
+        </div>
+      <?php else: ?>
+        <div class="row">
+          <?php foreach ($files as $file): ?>
+            <div class="col-md-6 mb-3">
+              <div class="file-card">
+                <div class="file-icon">
+                  <?php
+                  $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
+                  $iconClass = 'fas fa-file';
+                  if (in_array($fileExtension, ['pdf'])) {
+                    $iconClass = 'fas fa-file-pdf text-danger';
+                  } elseif (in_array($fileExtension, ['doc', 'docx'])) {
+                    $iconClass = 'fas fa-file-word text-primary';
+                  } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
+                    $iconClass = 'fas fa-file-excel text-success';
+                  } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $iconClass = 'fas fa-file-image text-warning';
+                  }
+                  ?>
+                  <i class="<?= $iconClass ?>"></i>
+                </div>
+                <div class="file-info">
+                  <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
+                  <div class="file-path"><?= esc(basename($file['file_path'])) ?></div>
+                </div>
+                <div class="file-actions">
+                  <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
+                    <i class="fas fa-download"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+      <!-- Upload File Form -->
+      <div class="upload-section mt-4 pt-4 border-top">
+        <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Upload New File</h5>
+
+        <form action="<?= base_url('packages/' . $package['id'] . '/files/upload') ?>" method="post" enctype="multipart/form-data">
+          <?= csrf_field() ?>
+          <input type="hidden" name="package_id" value="<?= $package['id'] ?>">
+
+          <div class="row g-3 align-items-start">
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">File Type</label>
+              <select name="file_type" class="form-select">
+                <option value="invoice">Invoice</option>
+                <option value="photo">Photo</option>
+                <option value="label">Label</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Select File <span class="text-danger">*</span></label>
+              <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif">
+              <small class="form-text text-muted">Supported formats: PDF, DOC, XLS, JPG, PNG, GIF</small>
+            </div>
+
+            <div class="col-md-3 mt-5">
+              <button type="submit" class="btn btn-shippex w-100">
+                <i class="fas fa-upload me-2"></i> Upload File
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
   <!-- Content Section -->
   <div class="container py-4">
     <form action="<?= base_url('packages/' . $package['id'] . '/update') ?>" method="post" enctype="multipart/form-data">
       <?= csrf_field() ?>
 
-      <!-- Package Information Card -->
+      <!-- Package Information -->
       <div class="premium-card mb-4">
         <div class="card-header">
-          <h3 class="card-title">
-            <i class="fas fa-info-circle me-2"></i>Package Information
-          </h3>
+          <h3 class="card-title"><i class="fas fa-info-circle me-2"></i>Edit Package Information</h3>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Retailer <span class="text-danger">*</span></label>
-                <div class="input-group">
+              <!-- Retailer -->
+              <label class="form-label fw-semibold">Retailer <span class="text-danger">*</span></label>
+              <input type="text" name="retailer" class="form-control" value="<?= esc($package['retailer']) ?>" required>
 
-                  <input type="text" class="form-control" name="retailer" value="<?= esc($package['retailer']) ?>" required>
-                </div>
-              </div>
+              <!-- Status (Admin only) -->
+              <?php if ($role == 'admin') { ?>
+                <label class="form-label fw-semibold mt-3">Status</label>
+                <select name="status" class="form-select">
+                  <option value="incoming" <?= $package['status'] === 'incoming' ? 'selected' : '' ?>>Incoming</option>
+                  <option value="ready" <?= $package['status'] === 'ready' ? 'selected' : '' ?>>Ready</option>
+                  <option value="shipped" <?= $package['status'] === 'shipped' ? 'selected' : '' ?>>Shipped</option>
+                  <option value="returned" <?= $package['status'] === 'returned' ? 'selected' : '' ?>>Returned</option>
+                </select>
+              <?php } else { ?>
+                <input type="hidden" name="status" value="<?= esc($package['status']) ?>">
+              <?php } ?>
 
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Tracking Number <span class="text-danger">*</span></label>
-                <div class="input-group">
+              <!-- User Selection (Admin only) -->
+              <?php if ($role == 'admin') { ?>
+                <label for="userSelect" class="form-label fw-semibold mt-3">Choose a user:</label>
+                <select class="form-control" id="userSelect" name="user_id" style="width: 100%;">
+                  <option value="">Select a user</option>
+                  <?php foreach ($users as $user): ?>
+                    <option value="<?= esc($user['id']) ?>" <?= $package['user_id'] == $user['id'] ? 'selected' : '' ?>>
+                      <?= esc($user['firstname'] . ' ' . $user['lastname']) . ' | ' . $user['id'] ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+                <div id="userPreview" class="mt-2 text-muted">Selected user will appear here</div>
+              <?php } else { ?>
+                <input type="hidden" name="user_id" value="<?= $session->get('user_id') ?>">
+              <?php } ?>
 
-                  <input type="text" class="form-control" name="tracking_number" value="<?= esc($package['tracking_number']) ?>" required>
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Value ($) <span class="text-danger">*</span></label>
-                <div class="input-group">
-
-                  <input type="number" step="0.01" class="form-control" name="value" value="<?= esc($package['value']) ?>" required>
-                </div>
-              </div>
+              <!-- Tracking Number -->
+              <label class="mt-3 form-label fw-semibold">Tracking Number <span class="text-danger">*</span></label>
+              <input type="text" name="tracking_number" class="form-control" value="<?= esc($package['tracking_number']) ?>" required>
             </div>
 
             <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Weight (Kg) <span class="text-danger">*</span></label>
-                <div class="input-group">
+              <!-- Warehouse -->
+              <input type="hidden" name="warehouse_id" value="<?= esc($package['virtual_address_id']) ?>">
 
-                  <input type="number" step="0.01" class="form-control" name="weight" value="<?= esc($package['weight']) ?>" required>
-                </div>
-              </div>
+              <!-- Weight -->
+              <label class="form-label fw-semibold">Weight (Kg)</label>
+              <input type="number" step="0.01" name="weight" class="form-control" value="<?= esc($package['weight']) ?>">
 
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Dimensions (L × W × H)</label>
-                <div class="input-group">
 
-                  <input type="text" class="form-control" name="width" value="<?= esc($package['width']) ?>" placeholder="Width">
-                  <input type="text" class="form-control" name="height" value="<?= esc($package['height']) ?>" placeholder="Height">
-                  <input type="text" class="form-control" name="length" value="<?= esc($package['length']) ?>" placeholder="Length">
-                </div>
-
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
-                <div class="input-group">
-
-                  <select name="status" class="form-select" required>
-                    <option value="incoming" <?= $package['status'] === 'incoming' ? 'selected' : '' ?>>Incoming</option>
-                    <option value="ready" <?= $package['status'] === 'ready' ? 'selected' : '' ?>>Ready</option>
-                    <option value="shipped" <?= $package['status'] === 'shipped' ? 'selected' : '' ?>>Shipped</option>
-                    <option value="returned" <?= $package['status'] === 'returned' ? 'selected' : '' ?>> Returned</option>
-                  </select>
-                </div>
+              <!-- Dimensions -->
+              <label class="form-label fw-semibold mt-3">Dimensions (L × W × H)</label>
+              <div class="d-flex gap-2">
+                <input type="number" name="length" class="form-control" placeholder="Length" value="<?= esc($package['length']) ?>">
+                <input type="number" name="width" class="form-control" placeholder="Width" value="<?= esc($package['width']) ?>">
+                <input type="number" name="height" class="form-control" placeholder="Height" value="<?= esc($package['height']) ?>">
               </div>
             </div>
           </div>
-
-          <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-            <a href="<?= base_url('packages/' . $package['virtual_address_id']) ?>" class="btn btn-outline-secondary me-3">
-              <i class="fas fa-times me-2"></i> Cancel
-            </a>
-            <button type="submit" class="btn btn-shippex">
-              <i class="fas fa-save me-2"></i> Save Changes
-            </button>
-          </div>
         </div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <a href="<?= base_url('packages/' . $package['virtual_address_id']) ?>" class="btn btn-outline-secondary me-2">Cancel</a>
+        <button type="submit" class="btn btn-shippex"><i class="fas fa-save me-2"></i>Save Changes</button>
       </div>
     </form>
 
-    <!-- Package Items Card -->
 
-
-    <!-- Files Card -->
-    <div class="premium-card">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="fas fa-paperclip me-2"></i>Attached Files
-        </h3>
-        <div class="card-actions">
-          <span class="badge bg-shippex-purple"><?= count($files) ?> files</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <?php if (empty($files)): ?>
-          <div class="empty-state small">
-            <div class="empty-icon">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <h5>No Files Attached</h5>
-            <p>This package doesn't have any files attached yet.</p>
-          </div>
-        <?php else: ?>
-          <div class="row">
-            <?php foreach ($files as $file): ?>
-              <div class="col-md-6 mb-3">
-                <div class="file-card">
-                  <div class="file-icon">
-                    <?php
-                    $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
-                    $iconClass = 'fas fa-file';
-                    if (in_array($fileExtension, ['pdf'])) {
-                      $iconClass = 'fas fa-file-pdf text-danger';
-                    } elseif (in_array($fileExtension, ['doc', 'docx'])) {
-                      $iconClass = 'fas fa-file-word text-primary';
-                    } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
-                      $iconClass = 'fas fa-file-excel text-success';
-                    } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                      $iconClass = 'fas fa-file-image text-warning';
-                    }
-                    ?>
-                    <i class="<?= $iconClass ?>"></i>
-                  </div>
-                  <div class="file-info">
-                    <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
-                    <div class="file-path"><?= esc(basename($file['file_path'])) ?></div>
-                  </div>
-                  <div class="file-actions">
-                    <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
-                      <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
-                      <i class="fas fa-download"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
-
-        <!-- Upload File Form -->
-        <div class="upload-section mt-4 pt-4 border-top">
-          <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Upload New File</h5>
-
-          <form action="<?= base_url('packages/' . $package['id'] . '/files/upload') ?>" method="post" enctype="multipart/form-data">
-            <?= csrf_field() ?>
-            <input type="hidden" name="package_id" value="<?= $package['id'] ?>">
-
-            <div class="row g-3 align-items-start">
-              <div class="col-md-3">
-                <label class="form-label fw-semibold">File Type</label>
-                <select name="file_type" class="form-select">
-                  <option value="invoice">Invoice</option>
-                  <option value="photo">Photo</option>
-                  <option value="label">Label</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Select File <span class="text-danger">*</span></label>
-                <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif">
-                <small class="form-text text-muted">Supported formats: PDF, DOC, XLS, JPG, PNG, GIF</small>
-              </div>
-
-              <div class="col-md-3 mt-5">
-                <button type="submit" class="btn btn-shippex w-100">
-                  <i class="fas fa-upload me-2"></i> Upload File
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 

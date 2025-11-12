@@ -30,7 +30,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
           <div class="row">
             <div class="col-12">
               <!-- Show on md+ -->
-              <img alt="Image" class="img-fluid d-none d-md-inline-block"
+              <img alt="Image" class="img-fluid d-none d-lg-inline-block"
                 src="<?= base_url('images/Header-logos-horizontal-ship-white.webp') ?>">
 
               <!-- Show on lg and smaller (hide xl) -->
@@ -59,7 +59,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
           <div class="row">
             <div class="col-12 text-end">
               <!-- Show on md+ -->
-              <img alt="Image" class="img-fluid d-none d-md-inline-block"
+              <img alt="Image" class="img-fluid d-none d-lg-inline-block"
                 src="<?= base_url('images/Header-logos-horizontal-pay-white-2.webp') ?>">
 
               <!-- Show on lg and smaller (hide xl) -->
@@ -262,28 +262,9 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
   </div>
 </section>
 <!-- Results Section -->
-<div class="container">
+<div class="container" style="position: relative;">
   <div id="ratesResult" class="mt-3">
-    <div class="d-none" id="resultsContainer">
-      <h4 class="fw-bold mb-4 text-center">Available Shipping Options</h4>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th scope="col">Courier</th>
-              <th scope="col">Service</th>
-              <th scope="col">Delivery Time</th>
-              <th scope="col">Price</th>
-              <th scope="col">Description</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody id="ratesTableBody">
-            <!-- Rates will be inserted here -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+
 
     <div class="d-none" id="errorContainer">
       <div class="alert alert-danger" role="alert">
@@ -292,7 +273,16 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
 
       </div>
     </div>
+
+    <!-- Loader for booking -->
+    <div id="bookingLoader" class="d-none text-center my-3" style="position: absolute; top:50%; left:50%; z-index:99999;">
+      <div class="spinner-border text-info" role="status">
+        <span class="visually-hidden">Booking...</span>
+      </div>
+      <p class="mt-2">Processing your booking...</p>
+    </div>
   </div>
+  <div id="rateContainer" class="mt-3"></div>
 </div>
 <!-- How it works -->
 <section id="how-it-works" class="how-it-works py-5">
@@ -558,6 +548,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
     padding: .85rem 1.05rem
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function() {
     // Form validation
@@ -606,35 +597,102 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
           if (res.rates && res.rates.length > 0) {
             let html = '';
             res.rates.forEach(function(rate) {
-              html += `
-              <tr>
-                <td id='curier'>${rate.courier_service?.umbrella_name || '-'}</td>
-                <td id='service_name'>${rate.courier_service?.name || '-'}</td>
-                <td id='delivery_time'>${rate.min_delivery_time} - ${rate.max_delivery_time} days</td>
-                <td id='currency' data-total='${rate.total_charge}' class="text-end fw-bold">${rate.currency} ${rate.total_charge}</td>
-                <td id='full_description' class="text-end text-muted">${rate.full_description}</td>
-                <td class="text-end">
-                  <a class="btn btn-sm btn-outline-primary book-btn" 
-                  href="javascript:void(0);" 
-                  data-courier="${rate.courier_service?.umbrella_name}" 
-                  data-service="${rate.courier_service?.name}" 
-                  data-delivery="${rate.min_delivery_time} - ${rate.max_delivery_time} days" 
-                  data-description="${rate.full_description}" 
-                  data-currency="${rate.currency}" 
-                  data-charge="${rate.total_charge}">
-                  Book
-                </a>
+              const svgPlaceholder = "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2245%22%20height%3D%2245%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%232b6cb0%22%20stroke-width%3D%221.5%22%3E%3Crect%20x%3D%222%22%20y%3D%227%22%20width%3D%2220%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23e6f2ff%22%20/%3E%3Cpath%20d%3D%22M12%203v4%22/%3E%3Cpath%20d%3D%22M7%207l5%204%205-4%22/%3E%3C/svg%3E";
 
-                </td>
-              </tr>
-            `;
+              // Tracking rating
+              let trackingIcons = '';
+              for (let i = 0; i < 5; i++) {
+                trackingIcons += `<span style="color:${i < rate.tracking_rating ? '#00c853' : '#ccc'};">●</span>`;
+              }
+
+              // Service options with simple icons
+              let serviceOptions = '';
+
+              if (rate.available_handover_options && rate.available_handover_options.length > 0) {
+                serviceOptions = rate.available_handover_options.map(opt => {
+                  let icon = '';
+                  let label = opt.replace(/_/g, ' '); // replace underscores with spaces
+                  label = label.charAt(0).toUpperCase() + label.slice(1); // capitalize first letter
+
+                  if (opt === 'dropoff') icon = '📦'; // dropoff icon
+                  if (opt === 'paid_pickup') icon = '🏠'; // pickup icon
+
+                  // each option in a new line
+                  return `<div>${icon} ${label}</div>`;
+                }).join('');
+              } else {
+                serviceOptions = '-';
+              }
+
+
+              html += `
+                <div class="card shadow-sm mb-3 p-3 rounded-3">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <img src="${rate.courier_service?.logo || svgPlaceholder}" 
+                          alt="logo" class="me-3" width="45" height="45">
+                      <div>
+                        <h6 class="mb-0 fw-bold">${rate.courier_service?.umbrella_name || '-'}</h6>
+                        <small class="text-muted">${rate.courier_service?.name || '-'}</small>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <h5 class="mb-0 fw-bold">${rate.currency} ${rate.total_charge.toFixed(2)}</h5>
+                    </div>
+                  </div>
+
+                  <hr class="my-2">
+
+                  <div class="row align-items-center text-muted small">
+                    <div class="col-md-2 col-6">
+                      <strong>Delivery Time:</strong><br>
+                      ${rate.min_delivery_time} - ${rate.max_delivery_time} working days
+                    </div>
+                    <div class="col-md-1 col-6">
+                      <strong>Tracking:</strong><br>
+                      ${trackingIcons}
+                    </div>
+                    <div class="col-md-2 col-6">
+                      <strong>Remarks:</strong><br>
+                      ${rate.courier_remarks || '—'}
+                    </div>
+                    <div class="col-md-2 col-6">
+                      <strong>Import Tax & Duty:</strong><br>
+                      Tax: ${rate.estimated_import_tax || 0}, Duty: ${rate.estimated_import_duty || 0}
+                    </div>
+                    <div class="col-md-2 col-6">
+                      <strong>Rating :</strong><br>
+                      ${rate.tracking_rating}/5 <i class="fas fa-star" style="color:yellow"></i>
+                    </div>
+                    <div class="col-md-2 col-6">
+                      <strong>Service Options:</strong><br>
+                      ${serviceOptions}
+                    </div>
+                    <div class="col-md-1 col-12 text-end mt-2 mt-md-0">
+                      <a class="btn btn-sm btn-outline-primary book-btn"
+                        href="javascript:void(0);" 
+                        data-courier="${rate.courier_service?.umbrella_name}" 
+                        data-service="${rate.courier_service?.name}" 
+                        data-delivery="${rate.min_delivery_time} - ${rate.max_delivery_time} days" 
+                        data-description="${rate.full_description}" 
+                        data-currency="${rate.currency}" 
+                        data-charge="${rate.total_charge}">
+                        Book
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              `;
             });
 
-            $("#ratesTableBody").html(html);
+            $("#rateContainer").html(html);
             $("#resultsContainer").removeClass('d-none');
+
           } else {
             showError("No shipping rates available for your destination.");
           }
+
+
         },
         error: function(xhr) {
           console.log(xhr);
@@ -649,6 +707,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
           $("button[type='submit'] .spinner-border").addClass('d-none');
         }
       });
+
     });
 
     function showError(message) {
@@ -690,21 +749,51 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
         value: $("#hs_code_input").val()
       });
 
-      console.log(payload);
+      // Show loader
+      $("#bookingLoader").removeClass("d-none");
+      $(".book-btn").prop("disabled", true); // disable all booking buttons
+
       $.post("<?= site_url('shipping/book') ?>", payload, function(res) {
+        // Hide loader before showing SweetAlert
+        $("#bookingLoader").addClass("d-none");
+        $(".book-btn").prop("disabled", false);
+
         if (res.status === "success") {
-          $("#bookingToast .toast-body").html("✅ Booking confirmed! ID: <b>" + res.booking_id + "</b>");
-          var toastEl = document.getElementById('bookingToast');
-          var toast = new bootstrap.Toast(toastEl);
-          toast.show();
-          // reload page after 5 seconds (5000 ms)
-          setTimeout(function() {
-            location.reload();
-          }, 3000);
+          Swal.fire({
+            icon: 'success',
+            title: 'Booking Confirmed!',
+            html: `✅ Your booking has been confirmed.<br><b>Booking ID:</b> ${res.booking_id}`,
+            showConfirmButton: false,
+            timer: 7000,
+            timerProgressBar: true,
+            didClose: () => {
+              let redirectUrl = '';
+              if (res.role === 'customer') {
+                redirectUrl = "<?= site_url('customer/shipping/details/') ?>" + res.booking_id;
+              } else {
+                redirectUrl = "<?= site_url('shipping/details/') ?>" + res.booking_id;
+              }
+              window.location.href = redirectUrl;
+            }
+          });
         } else {
-          showError(res.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Booking Failed',
+            html: res.message || 'Something went wrong while booking.',
+            confirmButtonColor: '#d33'
+          });
         }
-      }, "json");
+      }, "json").fail(function() {
+        $("#bookingLoader").addClass("d-none");
+        $(".book-btn").prop("disabled", false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An unexpected error occurred while booking.',
+          confirmButtonColor: '#d33'
+        });
+      });
 
     });
 

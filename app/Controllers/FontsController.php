@@ -15,7 +15,7 @@ class FontsController extends BaseController
   $data['fonts'] = json_decode($fontsJson, true)['items'] ?? [];
   $fontModel = new \App\Models\FontModel();
   $data['selected_fonts'] = $fontModel->findAll();
-
+  $data['title'] = 'Fonts Setting';
   return view('admin/settings/select_font', $data);
  }
 
@@ -34,6 +34,7 @@ class FontsController extends BaseController
   $fontModel->insert(['font_name' => $fontName, 'is_default' => 1]);
   $data['message'] = 'Font upddatedd!';
   $data['selected_fonts'] = $fontModel->findAll();
+  $data['title'] = 'Fonts';
   return view('admin/settings/select_font', $data);
  }
  public function make_default($id)
@@ -51,6 +52,7 @@ class FontsController extends BaseController
   $data['latest_font'] = $fontModel
    ->orderBy('id', 'DESC')
    ->first();
+  $data['title'] = 'Fonts';
   return view('admin/settings/select_font', $data);
  }
 }

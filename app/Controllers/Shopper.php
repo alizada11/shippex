@@ -39,7 +39,9 @@ class Shopper extends Controller
   public function index()
   {
     // show the form
-    echo view('shopper/form');
+    $data['title'] = 'Shopper Request';
+
+    return view('shopper/form', $data);
   }
 
   public function submit()
@@ -137,7 +139,7 @@ class Shopper extends Controller
       ->orderBy('created_at', 'DESC')
       ->paginate(12);
     $data['pager'] = $requestModel->pager;
-
+    $data['title'] = 'Shopper Requests';
     return view('shopper/list', $data);
   }
 
@@ -155,8 +157,29 @@ class Shopper extends Controller
 
     return view('shopper/edit', [
       'request' => $request,
-      'items'   => $items
+      'items'   => $items,
+      'title' => 'Edit Request'
     ]);
+  }
+
+  public function delete($id)
+  {
+    $requestModel = new \App\Models\ShopperRequestModel();
+    $itemModel = new \App\Models\ShopperItemModel();
+
+    // Check if request exists
+    $request = $requestModel->find($id);
+    if (! $request) {
+      return redirect()->back()->with('error', 'Shopper request not found.');
+    }
+
+    // Delete all related items first
+    $itemModel->where('request_id', $id)->delete();
+
+    // Then delete the main request
+    $requestModel->delete($id);
+
+    return redirect()->to('/shopper/requests')->with('success', 'Shopper request deleted successfully.');
   }
 
   public function update($id)
@@ -166,31 +189,48 @@ class Shopper extends Controller
 
     $data = $this->request->getPost();
 
-    // Update request details
+    // ✅ Validation rules (simple and effective)
+    $rules = [
+      'name.*' => 'required|min_length[2]',
+      'url.*'  => 'required|valid_url',
+      'quantity.*' => 'required|integer|greater_than_equal_to[1]',
+      'delivery_description' => 'required|in_list[Economy,Express]',
+      'delivery_notes' => 'permit_empty|min_length[2]',
+    ];
+
+    if (! $this->validate($rules)) {
+      return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    $isSaved = $data['submit'] === 'save';
+
+    // ✅ Update main request
     $requestModel->update($id, [
-      'delivery_description'   => $data['delivery_description'],
-      'delivery_notes'         => $data['delivery_notes'],
-      'use_another_retailer'   => isset($data['use_another_retailer']) ? 'yes' : 'no',
+      'is_saved'             => $isSaved ? 1 : 0,
+      'status'               => $isSaved ? 'saved' : 'pending',
+      'delivery_description' => $data['delivery_description'],
+      'delivery_notes'       => $data['delivery_notes'] ?? null,
+      'use_another_retailer' => isset($data['use_another_retailer']) ? 'yes' : 'no',
     ]);
 
-    // Delete old items
+    // ✅ Replace old items
     $itemModel->where('request_id', $id)->delete();
 
-    // Insert new items
-    foreach ($data['name'] as $index => $name) {
+    foreach ($data['name'] as $i => $name) {
       $itemModel->insert([
         'request_id'   => $id,
         'name'         => $name,
-        'url'          => $data['url'][$index],
-        'size'         => $data['size'][$index],
-        'color'        => $data['color'][$index],
-        'instructions' => $data['instructions'][$index],
-        'quantity'     => $data['quantity'][$index],
+        'url'          => $data['url'][$i],
+        'size'         => $data['size'][$i] ?? null,
+        'color'        => $data['color'][$i] ?? null,
+        'instructions' => $data['instructions'][$i] ?? null,
+        'quantity'     => $data['quantity'][$i],
       ]);
     }
 
     return redirect()->to('/shopper/requests')->with('success', 'Request updated successfully.');
   }
+
   public function view($id)
   {
     $userId = session()->get('user_id'); // adjust if you're using a different session key
@@ -219,6 +259,7 @@ class Shopper extends Controller
     return view('shopper/view', [
       'request' => $request,
       'items'   => $items,
+      'title' => 'Request Details',
       'default_wh' => $user_default_warehouse
     ]);
   }

@@ -16,19 +16,24 @@ class FaqController extends BaseController
  public function faqs()
  {
   $data['faqs'] = $this->faqModel->orderBy('id', 'ASC')->findAll();
+  $data['title'] = 'FAQs List';
   return view('faq', $data);
  }
  // List all FAQs
  public function index()
  {
-  $data['faqs'] = $this->faqModel->orderBy('id', 'ASC')->findAll();
+  helper('app');
+  $data['faqs'] = $this->faqModel->orderBy('id', 'DESC')->paginate(12);
+  $data['pager'] = $this->faqModel->pager;
+  $data['title'] = 'FAQs List';
   return view('admin/faq/index', $data);
  }
 
  // Show create form
  public function create()
  {
-  return view('admin/faq/create');
+  $title = 'Creat FAQ';
+  return view('admin/faq/create', compact('title'));
  }
 
  // Store new FAQ

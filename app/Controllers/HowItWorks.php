@@ -26,12 +26,13 @@ class HowItWorks extends BaseController
   $data['sections'] = $this->sectionModel->orderBy('id', 'ASC')->first();
   $data['steps']    = $this->stepModel->orderBy('id', 'ASC')->findAll();
   $data['why']      = $this->whyModel->orderBy('id', 'ASC')->findAll();
-
+  $data['title'] = 'How it works';
   return view('how_it_works_index', $data);
  }
 
  public function admin_index()
  {
+  $data['title'] = 'How it works';
   $data['section'] = $this->sectionModel->orderBy('id', 'ASC')->first();
   $data['steps']    = $this->stepModel->orderBy('id', 'ASC')->findAll();
   $data['why']      = $this->whyModel->orderBy('id', 'ASC')->findAll();
@@ -60,13 +61,14 @@ class HowItWorks extends BaseController
    'button_link' => $this->request->getPost('button_link')
   ]);
 
-  return redirect()->to('/admin/how-it-works');
+  return redirect()->to('/admin/how-it-works')->with('success', 'Item Created Successfully!');;
  }
 
  // Edit section form
  public function edit($id)
  {
   $data['section'] = $this->sectionModel->find($id);
+  $data['title'] = 'Update Info';
   return view('admin/how_it_works/edit', $data);
  }
 
@@ -91,13 +93,13 @@ class HowItWorks extends BaseController
    'button_link' => $this->request->getPost('button_link'),
   ]);
 
-  return redirect()->to('/admin/how-it-works');
+  return redirect()->to('/admin/how-it-works')->with('success', 'Information Updated Successfully!');;
  }
 
  // Delete
  public function delete($id)
  {
   $this->sectionModel->delete($id);
-  return redirect()->to('/admin/how-it-works');
+  return redirect()->to('/admin/how-it-works')->with('success', 'Item Deleted Successfully!');;
  }
 }

@@ -40,3 +40,23 @@
     margin-top: 20px;
   }
 }
+/* iPads Portrait */
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1366px) and (orientation: portrait) {
+  .hero-section {
+    min-height: 50vh;
+  }
+  .hero-wrap {
+    grid-template-columns: 1fr !important;
+  }
+  .stat-card {
+    flex-direction: column;
+  }
+}
+/* iPads Landscape */
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1366px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 60vh;
+  }
+}

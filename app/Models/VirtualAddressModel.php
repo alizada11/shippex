@@ -11,11 +11,14 @@ class VirtualAddressModel extends Model
  protected $allowedFields = [
   'country',
   'address_line',
+  'address_line_1',
+  'address_line_2',
   'postal_code',
   'phone',
   'city',
   'code',
-  'is_active'
+  'is_active',
+  'map_link'
  ];
  protected $useTimestamps = true;
 }

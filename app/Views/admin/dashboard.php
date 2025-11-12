@@ -35,9 +35,9 @@
   <span>Recent Users</span>
   <a class="link text-white" href="<?= base_url('/') ?>">View All</a>
  </div>
- <div class="card-body">
+ <div class="card-body table-responsive">
   <table class="table table-hover">
-   <thead>
+   <thead class="table-light">
     <tr>
      <th>Name</th>
      <th>Email</th>

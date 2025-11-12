@@ -7,16 +7,16 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
-    <div class="row align-items-center">
+   <div class="row align-items-center">
 
-     <div class="d-flex mb-3 justify-content-between mb-3">
-      <h2 class="mb-0">Why Choose Us</h2>
-      <a href="<?= site_url('admin/cms/why-choose/create') ?>" class="btn btn-primary">Add Item</a>
-     </div>
+    <div class="card-header d-flex align-items-center justify-content-between ">
+     <h5 class="mb-0">Why Choose Us</h5>
+     <a href="<?= site_url('admin/cms/why-choose/create') ?>" class="btn btn-shippex-orange"><i class="fas fa-plus"></i> Add Item</a>
+    </div>
+    <div class="card-body p-0 table-responsive">
 
      <table class="table table-bordered">
-      <thead>
+      <thead class="table-light">
        <tr>
         <th>Order</th>
         <th>Title</th>
@@ -36,9 +36,18 @@
           <?php endif; ?>
          </td>
          <td><?= esc($item['description']) ?></td>
-         <td class="d-flex gap-1 justify-content-between">
-          <a href="<?= site_url('admin/cms/why-choose/edit/' . $item['id']) ?>" class="btn btn-sm btn-warning">Edit</a>
-          <a href="<?= site_url('admin/cms/why-choose/delete/' . $item['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+
+         <td class="actions-col">
+          <div class="action-buttons-table">
+           <a href="<?= site_url('admin/cms/why-choose/edit/' . $item['id']) ?>" class="btn btn-action view">
+            <i class="fas fa-eye "></i>
+           </a>
+
+           <form action="<?= site_url('admin/cms/why-choose/delete/' . $item['id']) ?>" class="delete-form" method="post">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
+           </form>
+          </div>
          </td>
         </tr>
        <?php endforeach; ?>

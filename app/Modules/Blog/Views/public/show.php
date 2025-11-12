@@ -83,9 +83,9 @@
      <div class="card-header bg-shippex-purple text-white rounded-top-3 py-3">
       <h5 class="mb-0"><i class="fas fa-fire me-2"></i>Latest Posts</h5>
      </div>
-     <div class="card-body p-3">
+     <div class="card-body p-1">
       <?php foreach ($latest as $last): ?>
-       <div class="card border-0 mb-3">
+       <div class="card border-0 mb-3 p-0">
         <div class="row g-0">
          <?php if (!empty($last->thumbnail)): ?>
           <div class="col-4">
@@ -111,6 +111,7 @@
          <?php endif; ?>
         </div>
        </div>
+       <hr class="mt-2 mb-2">
       <?php endforeach; ?>
      </div>
     </div>

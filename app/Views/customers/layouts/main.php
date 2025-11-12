@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title><?= isset($title) ? esc($title) : ' ' ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap 5 CDN -->
@@ -12,6 +12,8 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css" rel="stylesheet">
+  <?= $this->renderSection('styles') ?>
+
   <?php if (!empty($defaultFont)): ?>
     <link href="https://fonts.googleapis.com/css2?family=<?= urlencode($defaultFont) ?>&display=swap" rel="stylesheet">
 
@@ -24,7 +26,25 @@
   <?php endif; ?>
   <link rel="stylesheet" href="<?= base_url('assets/css/auth_style.css') ?>">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Mobile sidebar toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      var sidebarCollapse = document.getElementById('sidebarCollapse');
+      var sidebar = document.querySelector('.sidebar');
 
+      // Clone sidebar content for mobile
+      var sidebarContent = sidebar.innerHTML;
+      document.querySelector('.offcanvas-body .sidebar').innerHTML = sidebarContent;
+
+      // Activate current nav item
+      var currentPath = window.location.pathname;
+      document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
 </head>
 
 <body>
@@ -33,14 +53,14 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
-      <nav class="col-md-2 d-none d-md-block sidebar">
+      <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar">
         <div class="sidebar-header">
           <div class="d-flex align-items-center justify-content-center">
             <a href="<?= base_url('/') ?>"><img src="<?= base_url('images/logo.png') ?>" alt="Shippex Logo" height="50" class="me-2"></a>
             <span class="fs-5 text-white"> Dashboard</span>
           </div>
         </div>
-        <div class="position-sticky pt-3">
+        <div class="position-sticky pt-1">
 
           <ul class="nav flex-column">
             <li class="nav-item">
@@ -71,6 +91,16 @@
               </div>
             </li>
             <li class="nav-item">
+              <a class="nav-link <?= (strpos(current_url(), 'admin/combine-requests') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/combine-requests') ?>">
+                <i class="fas fa-boxes me-2"></i> Combine & Repack
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <?= (strpos(current_url(), 'admin/dispose-return') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/dispose-return') ?>">
+                <i class="fas fa-trash me-2"></i> Disposal/Return Requests
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/customer/shipping') !== false) ? 'active' : '' ?>" href="<?= base_url('customer/shipping/requests') ?>"><i class="fas fa-truck-fast me-2"></i> Shipment History</a>
             </li>
             <li class="nav-item">
@@ -92,9 +122,7 @@
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/warehouse-requests') !== false) ? 'active' : '' ?>" href="<?= site_url('/warehouse-requests/my-requests') ?>"><i class="fas fa-warehouse me-2"></i> My Warehouses</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link <?= (strpos(current_url(), '/warehouse-addresses') !== false) ? 'active' : '' ?>" href="<?= site_url('/warehouse-addresses') ?>"><i class="fas fa-warehouse me-2"></i> Warehouses</a>
-            </li>
+
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/profile') !== false) ? 'active' : '' ?> <?= (strpos(current_url(), '/addresses') !== false) ? 'active' : '' ?>" data-bs-toggle="collapse" href="#proffile" role="button" aria-expanded="false" aria-controls="proffile">
                 <i class="fas fa-user me-2"></i> Profile
@@ -117,23 +145,59 @@
             <li class="nav-item">
               <a class="nav-link" href="<?= base_url('customers/faqs') ?>"><i class="fas fa-question-circle me-2"></i> FAQ</a>
             </li>
-
+            <li class="nav-item">
+              <a class="nav-link btn btn-sm btn-shippex-orange d-block d-md-none" href="<?= base_url('logout'); ?>">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
           </ul>
         </div>
       </nav>
 
       <!-- Main Content -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 content">
-        <nav class="noprint navbar navbar-expand-lg navbar-light bg-light mb-4">
+      <main class="col-md-10 ms-sm-auto m-0 p-0">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top mb-4 noprint">
           <div class="container-fluid">
-            <a class="navbar-brand" style="text-transform: capitalize;" href="#">Welcome, <?= session()->get('full_name') ?></a>
-            <div class="ms-auto">
-              <a class="btn btn-outline-danger btn-sm" href="<?= base_url('logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <div class="d-flex align-items-center">
+              <button class="btn btn-sm d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCollapse">
+                <i class="fas fa-bars"></i>
+              </button>
+              <span class="d-none d-md-inline navbar-brand mb-0 h6">
+                <i class="fas fa-user-circle me-2 text-shippex-purple"></i>
+                Welcome, <?= esc(session()->get('full_name'))  ?>
+              </span>
+              <span class="d-block d-md-none navbar-brand mb-0 h6">
+                <i class="fas fa-user-circle me-2 text-shippex-purple"></i>
+                Welcome
+              </span>
+            </div>
+            <div class="ms-lg-auto ms-md-auto">
+              <a class="btn btn-sm btn-shippex" href="<?= base_url('/'); ?>">
+                <i class="fas fa-eye me-1"></i> Back to Site
+              </a>
+              <a class="btn btn-sm btn-shippex-orange d-none d-md-inline" href="<?= base_url('logout'); ?>">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
             </div>
           </div>
         </nav>
-        <?= $this->renderSection('content') ?>
+        <div class="content">
+
+          <?= $this->renderSection('content') ?>
+        </div>
       </main>
+    </div>
+  </div>
+  <!-- Mobile Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarCollapse">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Shippex Admin Panel</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="sidebar">
+        <!-- Same sidebar content as desktop -->
+      </div>
     </div>
   </div>
   <!-- jquery -->

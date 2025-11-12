@@ -16,6 +16,7 @@ class BlogController extends BaseController
   $data['posts'] = $model->published()->orderBy('created_at', 'DESC')->paginate(10);
   $data['title'] = 'Blog';
   $data['pager'] = $model->pager;
+
   return view('Modules\Blog\Views\public\index', $data);
  }
 

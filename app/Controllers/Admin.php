@@ -34,7 +34,7 @@ class Admin extends BaseController
   $bookings = new ShippingBookingModel();
   $data['orders']  = $bookings->countAllResults();
 
-
+  $data['title'] = 'Dashboard';
   return view('admin/dashboard', $data);
  }
 
@@ -42,13 +42,15 @@ class Admin extends BaseController
  // shopper methods
  public function shopperRequests()
  {
-  $userId = session()->get('user_id');
-  $requestModel = new \App\Models\ShopperRequestModel();
+  helper('app');
 
-  $data['requests'] = $requestModel
 
-   ->orderBy('created_at', 'DESC')
-   ->findAll();
+
+  $requestModel = new ShopperRequestModel();
+
+  $data['requests'] = $requestModel->orderBy('created_at', 'DESC')->paginate(12);
+  $data['title'] = 'Shopper Requests';
+  $data['pager'] = $requestModel->pager;
 
   return view('admin/shopper/list', $data);
  }
@@ -68,7 +70,8 @@ class Admin extends BaseController
 
   return view('admin/shopper/view', [
    'request' => $request,
-   'items'   => $items
+   'items'   => $items,
+   'title' => 'Request Details'
   ]);
  }
 

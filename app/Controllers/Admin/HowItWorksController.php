@@ -11,13 +11,14 @@ class HowItWorksController extends BaseController
  {
   $model = new HowItWorksModel();
   $steps = $model->orderBy('step_number')->findAll();
-
-  return view('admin/homepage/how_it_works_index', compact('steps'));
+  $title = 'How it work';
+  return view('admin/homepage/how_it_works_index', compact('steps', 'title'));
  }
 
  public function create()
  {
-  return view('admin/homepage/how_it_works_create');
+  $data['title'] = 'Create Step';
+  return view('admin/homepage/how_it_works_create', $data);
  }
 
  public function store()
@@ -46,10 +47,11 @@ class HowItWorksController extends BaseController
 
  public function edit($id)
  {
+
   $model = new HowItWorksModel();
   $step = $model->find($id);
-
-  return view('admin/homepage/how_it_works_edit', compact('step'));
+  $title = 'Edit Step';
+  return view('admin/homepage/how_it_works_edit', compact('step', 'title'));
  }
 
  public function update($id)
@@ -77,6 +79,7 @@ class HowItWorksController extends BaseController
 
  public function delete($id)
  {
+
   $model = new HowItWorksModel();
   $model->delete($id);
 

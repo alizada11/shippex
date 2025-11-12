@@ -7,9 +7,9 @@
  <div class="card-header d-flex justify-content-between">
   <span>Recent Users</span>
  </div>
- <div class="card-body">
+ <div class="card-body table-responsive">
   <table class="table table-hover">
-   <thead>
+   <thead class="table-light">
     <tr>
      <th>Name</th>
      <th>Email</th>
@@ -31,6 +31,9 @@
 
    </tbody>
   </table>
+  <div class="row mt-4">
+   <?= $pager->links('default', 'bootstrap_full') ?>
+  </div>
  </div>
 </div>
 

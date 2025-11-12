@@ -72,25 +72,26 @@ class PackageController extends BaseController
     $data['files'] = $fileModel->getFilesByPackage($id);
     $data['actions'] = $actionModel->getHistory($id);
     $data['virtual_address_id'] = $id;
-
+    $data['title'] = 'Packages';
     // Render the same layout for everyone
     return view('admin/packages/index', $data);
   }
 
 
-  public function create()
+  public function create($id)
   {
     $session = session();
     $role = $session->get('role');
-    if ($role !== 'admin') {
-      return redirect()->back()->with('error', 'You does not have permission to create a package!');
-    }
+    // if ($role !== 'admin') {
+    //   return redirect()->back()->with('error', 'You does not have permission to create a package!');
+    // }
     $addressModel = new VirtualAddressModel();
     $userModel = new UserModel();
 
     $data['users'] = $userModel->findAll();
     $data['warehouses'] = $addressModel->findAll();
-
+    $data['virtual_address_id'] = $id;
+    $data['title'] = 'Create a Package';
     return view('admin/packages/create', $data);
   }
 
@@ -99,9 +100,9 @@ class PackageController extends BaseController
 
     $session = session();
     $role = $session->get('role');
-    if ($role !== 'admin') {
-      return redirect()->back()->with('error', 'You does not have permission to create a package!');
-    }
+    // if ($role !== 'admin') {
+    //   return redirect()->back()->with('error', 'You does not have permission to create a package!');
+    // }
     $packageModel = new PackageModel();
     $itemModel = new PackageItemModel();
     $fileModel = new PackageFileModel();
@@ -123,12 +124,14 @@ class PackageController extends BaseController
       'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
       'user_id' => $this->request->getPost('user_id'),
       'virtual_address_id' => $this->request->getPost('warehouse_id'),
-      'weight' => $this->request->getPost('weight'),
-      'value' => $this->request->getPost('value'),
-      'length' => $this->request->getPost('length'),
-      'width' => $this->request->getPost('width'),
-      'height' => $this->request->getPost('height'),
+      'weight' => $this->request->getPost('weight') ?: '',
+      'value'  => $this->request->getPost('value') ?: '',
+      'length' => $this->request->getPost('length') ?: '',
+      'width'  => $this->request->getPost('width') ?: '',
+      'height' => $this->request->getPost('height') ?: '',
       'status' => $this->request->getPost('status'),
+      'tracking_number' => $this->request->getPost('tracking_number'),
+      'storage_days' => 30,
       'created_at' => date('Y-m-d H:i:s'),
       'updated_at' => date('Y-m-d H:i:s')
     ];
@@ -207,7 +210,7 @@ class PackageController extends BaseController
     $data['items'] = $itemModel->getByPackage($id);
     $data['files'] = $fileModel->getFilesByPackage($id);
     $data['actions'] = $actionModel->getHistory($id);
-
+    $data['title'] = 'Package Details';
     return view('admin/packages/show', $data);
   }
 
@@ -218,11 +221,14 @@ class PackageController extends BaseController
     $addressModel = new VirtualAddressModel();
     $itemModel = new PackageItemModel();
     $fileModel = new PackageFileModel();
+    $userModel = new UserModel();
     $data['package'] = $packageModel->find($id);
     $data['warehouses'] = $warehouseModel->findAll();
     $data['addresses'] = $addressModel->findAll();
     $data['items'] = $itemModel->where('package_id', $id)->findAll();
     $data['files'] = $fileModel->where('package_id', $id)->findAll();
+    $data['users'] = $userModel->findAll();
+    $data['title'] = 'Edit Package';
 
     return view('admin/packages/edit', $data);
   }

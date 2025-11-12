@@ -2,18 +2,8 @@
 
 <?= $this->section('content') ?>
 <?= csrf_field() ?>
-<div class="container py-4">
- <?php if (session()->getFlashdata('success')): ?>
-  <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
- <?php endif; ?>
- <?php if (session()->getFlashdata('error')): ?>
-  <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
- <?php endif; ?>
- <?php if (isset($errors) && is_array($errors)): ?>
-  <div class="alert alert-danger">
-   <ul><?php foreach ($errors as $e) echo "<li>$e</li>"; ?></ul>
-  </div>
- <?php endif; ?>
+<div class="container">
+
 
  <div class="card">
   <div class="card-header">
@@ -89,10 +79,22 @@
 
    <div class="form-group row mb-2">
     <label class="col-sm-4 col-md-3 col-form-label">Shipping Option</label>
-    <div class="col-sm-8 col-md-9">
-     <input name="delivery_description" class="form-control" placeholder="e.g. 'First Class'">
+    <div class="col-sm-8 col-md-9 d-flex align-items-center gap-3">
+     <div class="form-check">
+      <input class="form-check-input" type="radio" required name="delivery_description" id="option_economy" value="Economy" checked>
+      <label class="form-check-label" for="option_economy">
+       Economy
+      </label>
+     </div>
+     <div class="form-check">
+      <input class="form-check-input" type="radio" required name="delivery_description" id="option_express" value="Express">
+      <label class="form-check-label" for="option_express">
+       Express
+      </label>
+     </div>
     </div>
    </div>
+
 
    <div class="form-group row mb-2">
     <label class="col-sm-4 col-md-3 col-form-label">Shipping Preference</label>

@@ -28,6 +28,7 @@ use CodeIgniter\Database\BaseUtils;
 </head>
 
 <body>
+
   <!-- Loader -->
   <div id="preloader">
     <div class="loader-container">
@@ -70,10 +71,10 @@ use CodeIgniter\Database\BaseUtils;
           <?php
           if (!session()->get('logged_in')):
           ?>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="btn nav-link  bg-shippex-purple text-white mx-2" href="<?= base_url('register'); ?>">Sign Up</a>
-            </li>
-            <li class="nav-item"><a class="nav-link" href="<?= base_url('login'); ?>">Login</a></li>
+            </li> -->
+            <li class="nav-item ms-4"><a class="nav-link" href="<?= base_url('login'); ?>"><i class="fas fa-lock"></i> Login</a></li>
           <?php else: ?>
             <li class="nav-item"><a class="nav-link" href="<?= base_url('dashboard'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard
               </a></li>

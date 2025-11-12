@@ -12,7 +12,7 @@
    </h1>
    <p class="text-muted mb-0">Manage your global warehouse locations and pages</p>
   </div>
-  <a href="<?= site_url('admin/w_pages/create') ?>" class="btn-shippex-primary">
+  <a href="<?= site_url('admin/w_pages/create') ?>" class="btn-shippex-orange">
    <i class="fas fa-plus"></i>
    Add New Warehouse
   </a>
@@ -45,14 +45,17 @@
        </small>
       </div>
       <div class="warehouse-actions">
-       <a href="<?= site_url('admin/w_pages/edit/' . $w['id']) ?>" class="btn-action btn-edit">
+       <a href="<?= site_url('admin/w_pages/edit/' . $w['id']) ?>" class="btn-action edit">
         <i class="fas fa-edit"></i>
-        Edit Page
+
        </a>
-       <a href="<?= base_url('warehouse/' . $w['country_code']) ?>" class="btn-action btn-view">
+       <a href="<?= base_url('warehouse/' . $w['country_code']) ?>" class="btn-action view">
         <i class="fas fa-eye"></i>
-        View
        </a>
+       <form class="delete-form" action="<?= site_url('admin/w_pages/delete/' . $w['id']) ?>" method="post" class="d-inline delete-form">
+        <?= csrf_field() ?>
+        <button type="submit" class="btn btn-action delete "><i class="fas fa-trash"></i></button>
+       </form>
       </div>
      </div>
     </div>
@@ -204,41 +207,8 @@
   justify-content: flex-end;
  }
 
- .btn-action {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
- }
 
- .btn-edit {
-  background: var(--shippex-primary);
-  color: white;
-  border: none;
- }
 
- .btn-edit:hover {
-  background: #0d5bb8;
-  color: white;
-  transform: translateY(-1px);
- }
-
- .btn-view {
-  background: #f1f3f4;
-  color: var(--shippex-dark);
-  border: none;
- }
-
- .btn-view:hover {
-  background: #e8eaed;
-  color: var(--shippex-dark);
-  transform: translateY(-1px);
- }
 
  .empty-state {
   text-align: center;

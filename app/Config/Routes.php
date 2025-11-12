@@ -65,7 +65,7 @@ $routes->group(
   $routes->post('/warehouse/store', 'WarehouseController::store');
   $routes->get('/warehouse/edit/(:num)', 'WarehouseController::edit/$1');
   $routes->post('/warehouse/update/(:num)', 'WarehouseController::update/$1');
-  $routes->get('/warehouse/delete/(:num)', 'WarehouseController::delete/$1');
+  $routes->post('/warehouse/delete/(:num)', 'WarehouseController::delete/$1');
 
   // Shipping reques
   $routes->get('/shipping/requests', 'Shipping::requests');
@@ -85,7 +85,7 @@ $routes->group(
 
 $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
  $routes->get('(:num)', 'PackageController::index/$1');
- $routes->get('create', 'PackageController::create');
+ $routes->get('create/(:num)', 'PackageController::create/$1');
  $routes->post('store', 'PackageController::store');
  $routes->get('show/(:num)', 'PackageController::show/$1');
  $routes->get('(:num)/edit', 'PackageController::edit/$1');
@@ -118,7 +118,7 @@ $routes->group('admin/faqs', ['filter' => 'role:admin', 'namespace' => 'App\Cont
  $routes->post('store', 'FaqController::store');
  $routes->get('edit/(:num)', 'FaqController::edit/$1');
  $routes->post('update/(:num)', 'FaqController::update/$1');
- $routes->get('delete/(:num)', 'FaqController::delete/$1');
+ $routes->post('delete/(:num)', 'FaqController::delete/$1');
 });
 $routes->group(
  'admin',
@@ -137,21 +137,21 @@ $routes->group(
   $routes->post('cms/how-it-works/store', 'Admin\HowItWorksController::store');
   $routes->get('cms/how-it-works/edit/(:num)', 'Admin\HowItWorksController::edit/$1');
   $routes->post('cms/how-it-works/update/(:num)', 'Admin\HowItWorksController::update/$1');
-  $routes->get('cms/how-it-works/delete/(:num)', 'Admin\HowItWorksController::delete/$1');
+  $routes->post('cms/how-it-works/delete/(:num)', 'Admin\HowItWorksController::delete/$1');
   // home locations
   $routes->get('cms/locations', 'Admin\LocationController::index');
   $routes->get('cms/locations/create', 'Admin\LocationController::create');
   $routes->post('cms/locations/store', 'Admin\LocationController::store');
   $routes->get('cms/locations/edit/(:num)', 'Admin\LocationController::edit/$1');
   $routes->post('cms/locations/update/(:num)', 'Admin\LocationController::update/$1');
-  $routes->get('cms/locations/delete/(:num)', 'Admin\LocationController::delete/$1');
+  $routes->post('cms/locations/delete/(:num)', 'Admin\LocationController::delete/$1');
   // Deliverred today
   $routes->get('cms/delivered-today', 'Admin\DeliveredToday::index');
   $routes->get('cms/delivered-today/create', 'Admin\DeliveredToday::create');
   $routes->post('cms/delivered-today/store', 'Admin\DeliveredToday::store');
   $routes->get('cms/delivered-today/edit/(:num)', 'Admin\DeliveredToday::edit/$1');
   $routes->post('cms/delivered-today/update/(:num)', 'Admin\DeliveredToday::update/$1');
-  $routes->get('cms/delivered-today/delete/(:num)', 'Admin\DeliveredToday::delete/$1');
+  $routes->post('cms/delivered-today/delete/(:num)', 'Admin\DeliveredToday::delete/$1');
 
   // promotions
   $routes->get('cms/promo-cards', 'Admin\PromoCards::index');
@@ -159,7 +159,7 @@ $routes->group(
   $routes->post('cms/promo-cards/store', 'Admin\PromoCards::store');
   $routes->get('cms/promo-cards/edit/(:num)', 'Admin\PromoCards::edit/$1');
   $routes->post('cms/promo-cards/update/(:num)', 'Admin\PromoCards::update/$1');
-  $routes->get('cms/promo-cards/delete/(:num)', 'Admin\PromoCards::delete/$1');
+  $routes->post('cms/promo-cards/delete/(:num)', 'Admin\PromoCards::delete/$1');
   // how it works
 
   $routes->get('how-it-works', 'HowItWorks::admin_index');
@@ -167,7 +167,7 @@ $routes->group(
   $routes->post('how-it-works/store', 'HowItWorks::store');
   $routes->get('how-it-works/edit/(:num)', 'HowItWorks::edit/$1');
   $routes->post('how-it-works/update/(:num)', 'HowItWorks::update/$1');
-  $routes->get('how-it-works/delete/(:num)', 'HowItWorks::delete/$1');
+  $routes->post('how-it-works/delete/(:num)', 'HowItWorks::delete/$1');
 
   // Steps routes
   $routes->get('cms/steps', 'Admin\Steps::index');
@@ -175,7 +175,7 @@ $routes->group(
   $routes->post('cms/steps/create', 'Admin\Steps::store');
   $routes->get('cms/steps/edit/(:num)', 'Admin\Steps::edit/$1');
   $routes->post('cms/steps/edit/(:num)', 'Admin\Steps::update/$1');
-  $routes->get('cms/steps/delete/(:num)', 'Admin\Steps::delete/$1');
+  $routes->post('cms/steps/delete/(:num)', 'Admin\Steps::delete/$1');
 
   // Why Choose Us routes
   $routes->get('cms/why-choose', 'Admin\WhyChoose::index');
@@ -183,12 +183,7 @@ $routes->group(
   $routes->post('cms/why-choose/create', 'Admin\WhyChoose::store');
   $routes->get('cms/why-choose/edit/(:num)', 'Admin\WhyChoose::edit/$1');
   $routes->post('cms/why-choose/edit/(:num)', 'Admin\WhyChoose::update/$1');
-  $routes->get('cms/why-choose/delete/(:num)', 'Admin\WhyChoose::delete/$1');
-  // combine requests
-  $routes->get('combine-requests', 'CombineRepackController::listRequests');
-  $routes->get('combine-requests/edit/(:num)', 'CombineRepackController::editRequest/$1');
-  $routes->post('combine-requests/update/(:num)', 'CombineRepackController::updateRequest/$1');
-  $routes->post('combine-requests/delete/(:num)', 'CombineRepackController::deleteRequest/$1');
+  $routes->post('cms/why-choose/delete/(:num)', 'Admin\WhyChoose::delete/$1');
  }
 
 );
@@ -197,10 +192,17 @@ $routes->group('', ['filter' => 'role:admin,customer'], function ($routes) {
  $routes->post('packages/bulk-info', 'DisposeReturnController::bulkInfo');
  $routes->post('packages/dispose-return-submit', 'DisposeReturnController::submit');
 
- // admin
- $routes->get('admin/dispose-return', 'DisposeReturnController::adminIndex', ['filter' => 'role:admin']);
- $routes->post('admin/dispose-return/process/(:num)', 'DisposeReturnController::process/$1', ['filter' => 'role:admin']);
- $routes->post('admin/dispose-return/delete/(:num)', 'DisposeReturnController::delete/$1', ['filter' => 'role:admin']);
+ // Return Disposal Requests
+ $routes->get('admin/dispose-return', 'DisposeReturnController::adminIndex');
+ $routes->post('adm in/dispose-return/process/(:num)', 'DisposeReturnController::process/$1');
+ $routes->post('admin/dispose_return/delete/(:num)', 'DisposeReturnController::delete/$1');
+ $routes->get('admin/dispose_return/edit/(:num)', 'DisposeReturnController::edit/$1');
+ $routes->post('admin/dispose_return/process/(:num)', 'DisposeReturnController::update/$1');
+ // combine requests
+ $routes->get('admin/combine-requests', 'CombineRepackController::listRequests');
+ $routes->get('admin/combine-requests/edit/(:num)', 'CombineRepackController::editRequest/$1');
+ $routes->post('admin/combine-requests/update/(:num)', 'CombineRepackController::updateRequest/$1');
+ $routes->post('admin/combine-requests/delete/(:num)', 'CombineRepackController::deleteRequest/$1');
 });
 
 $routes->get('/how-it-works', 'HowItWorks::index');
@@ -239,7 +241,7 @@ $routes->group(
  function ($routes) {
   $routes->get('shipping/requests', 'CustomersController::requests');
   $routes->get('shipping/details/(:num)', 'CustomersController::details/$1');
-  $routes->get('shipping/delete/(:num)', 'CustomersController::destroy/$1');
+  $routes->post('shipping/delete/(:num)', 'CustomersController::destroy/$1');
  }
 );
 $routes->group(
@@ -251,6 +253,7 @@ $routes->group(
   $routes->get('thank-you', 'Shopper::thankYou');
   $routes->get('requests', 'Shopper::myRequests');
   $routes->get('requests/edit/(:num)', 'Shopper::edit/$1');
+  $routes->post('requests/delete/(:num)', 'Shopper::delete/$1');
   $routes->get('requests/view/(:num)', 'Shopper::view/$1');
   $routes->post('requests/update/(:num)', 'Shopper::update/$1');
   $routes->get('/shopper/view/(:num)', 'Shopper::view/$1');
@@ -267,6 +270,7 @@ $routes->group('admin/w_pages/', function ($routes) {
  $routes->post('store', 'Warehouse::store');
  $routes->get('edit/(:num)', 'Warehouse::edit/$1');
  $routes->post('update/(:num)', 'Warehouse::update/$1');
+ $routes->post('delete/(:num)', 'Warehouse::delete/$1');
 });
 
 $routes->get('download/page', 'Download::page');

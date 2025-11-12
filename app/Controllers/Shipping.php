@@ -111,13 +111,13 @@ class Shipping extends BaseController
         if (!$session->has('user_id')) {
             return $this->response->setJSON([
                 'status'  => 'error',
-
                 'message' => 'Please login first, to book it.&nbsp; <a class="btn bg-shippex-purple text-white" href="' . base_url('/login') . '">Login</a>'
             ]);
         } else {
             $user_id = session()->get('user_id');
         }
         $request = service('request');
+
 
         $data = [
             // Origin
@@ -159,7 +159,8 @@ class Shipping extends BaseController
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Booking saved successfully',
-                'booking_id' => $id
+                'booking_id' => $id,
+                'role' => session()->get('role')
             ]);
         } else {
             return $this->response->setStatusCode(500)->setJSON([
@@ -215,6 +216,7 @@ class Shipping extends BaseController
 
         $data['requests'] = $model->orderBy('created_at', 'DESC')->paginate(12);
         $data['pager'] = $model->pager;
+        $data['title'] = 'Shipping Requests';
         return view('admin/shipping/index', $data);
     }
 
@@ -229,6 +231,7 @@ class Shipping extends BaseController
             ->where('book_id', $id)
             ->orderBy('changed_at', 'AESC')
             ->findAll();
+        $data['title'] = 'Shipping Req Details';
         return view('admin/shipping/details', $data);
     }
 

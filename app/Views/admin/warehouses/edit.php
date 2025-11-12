@@ -1,7 +1,7 @@
 <?= $this->extend('admin/layouts/main') ?>
 
 <?= $this->section('content') ?>
-<div class="container py-4">
+<div class="container">
   <div class="card border-0 shadow-sm">
     <div class="card-header bg-shippex-purple text-white">
       <h3 class="mb-0"><i class="fas fa-warehouse me-2"></i>Edit Warehouse Address</h3>
@@ -9,80 +9,94 @@
 
     <div class="card-body">
       <form action="/warehouse/update/<?= $address['id'] ?>" method="post" class="simple-form">
+        <?= csrf_field() ?>
         <div class="row g-3">
-
 
           <!-- Country -->
           <div class="col-md-6">
             <label class="form-label text-shippex-purple fw-bold"> Country</label>
 
             <?php
-            // Load countries list
             $countries = json_decode(file_get_contents(dirname(__DIR__, 3) . '/views/partials/countries.json'), true);
-
-            // Determine selected country (if available)
-            $selectedCountry = isset($address['country']) && !empty($address['country']) ? $address['country'] : '';
+            $selectedCountry = old('country', $address['country'] ?? '');
             ?>
 
             <select id="country" name="country" class="form-control form-control-lg" required>
               <option value="">-- Select Country --</option>
               <?php foreach ($countries as $ct): ?>
                 <option value="<?= esc($ct['name']) ?>"
+                  data-code="<?= esc($ct['code']) ?>"
                   <?= $ct['name'] === $selectedCountry ? 'selected' : '' ?>>
                   <?= esc($ct['name']) ?>
                 </option>
               <?php endforeach; ?>
             </select>
+
+            <!-- Hidden field for country code -->
+            <input type="hidden" name="code" id="country_code" value="<?= old('code', $address['code'] ?? '') ?>">
           </div>
+
           <!-- City -->
           <div class="col-md-6">
-            <label class="form-label text-shippex-purple fw-bold">City</label>
+            <label class="form-label text-shippex-purple fw-bold"> City</label>
             <input type="text" name="city" class="form-control form-control-lg"
-              value="<?= esc($address['city']) ?>" required>
+              value="<?= old('city', $address['city'] ?? '') ?>" required>
           </div>
 
-          <!-- Address Line -->
-          <div class="col-12">
-            <label class="form-label text-shippex-purple fw-bold">Address Line</label>
-            <textarea name="address_line" class="form-control form-control-lg" rows="3" required><?= esc($address['address_line']) ?></textarea>
+          <!-- State -->
+          <div class="col-md-6">
+            <label class="form-label text-shippex-purple fw-bold"> State</label>
+            <input type="text" name="state" class="form-control form-control-lg"
+              value="<?= old('state', $address['state'] ?? '') ?>" required>
           </div>
-
-
-
           <!-- Postal Code -->
           <div class="col-md-6">
             <label class="form-label text-shippex-purple fw-bold">Postal Code</label>
             <input type="text" name="postal_code" class="form-control form-control-lg"
-              value="<?= esc($address['postal_code']) ?>" required>
-          </div>
-          <!-- Phone -->
-          <div class="col-12">
-            <label class="form-label text-shippex-purple fw-bold">Phone</label>
-            <input type="text" name="phone" class="form-control form-control-lg"
-              value="<?= esc($address['phone']) ?>" required>
+              value="<?= old('postal_code', $address['postal_code'] ?? '') ?>" required>
           </div>
 
+          <!-- Address Line 1 -->
+          <div class="col-6">
+            <label class="form-label text-shippex-purple fw-bold">Address Line 1</label>
+            <textarea name="address_line_1" class="form-control form-control-lg" rows="2" required><?= old('address_line_1', $address['address_line_1'] ?? '') ?></textarea>
+          </div>
+
+          <!-- Address Line 2 -->
+          <div class="col-6">
+            <label class="form-label text-shippex-purple fw-bold">Address Line 2</label>
+            <textarea name="address_line_2" class="form-control form-control-lg" rows="2"><?= old('address_line_2', $address['address_line_2'] ?? '') ?></textarea>
+          </div>
+
+
+
+          <!-- Phone -->
+          <div class="col-md-6">
+            <label class="form-label text-shippex-purple fw-bold">Phone</label>
+            <input type="text" name="phone" class="form-control form-control-lg"
+              value="<?= old('phone', $address['phone'] ?? '') ?>">
+          </div>
+          <!-- Map -->
+          <div class="col-md-6">
+            <label class="form-label text-shippex-purple fw-bold">Map Link</label>
+            <input type="text" name="map_link" class="form-control form-control-lg"
+              value="<?= old('map_link', $address['map_link'] ?? '') ?>">
+          </div>
           <!-- Default Checkbox -->
           <div class="col-12 mt-2">
             <div class="form-check">
-              <input type="checkbox" name="is_active" id="isDefault" value="0"
-                class="form-check-input" <?= $address['is_active'] ? 'checked' : '' ?>>
-              <label class="form-check-label text-shippex-purple fw-bold" for="isDefault">
-                Is Active
-              </label>
+              <input type="checkbox" name="is_active" id="isDefault" value="1" class="form-check-input"
+                <?= old('is_active', $address['is_active'] ?? 1) ? 'checked' : '' ?>>
+              <label class="form-check-label text-shippex-purple fw-bold" for="isDefault">Is Active</label>
             </div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Submit Button -->
           <div class="col-12 mt-4">
-            <div class="d-flex justify-content-between">
-              <a href="/warehouse" class="btn btn-outline-shippex-purple">
-                <i class="fas fa-arrow-left me-2"></i>Cancel
-              </a>
-              <button type="submit" class="btn btn-shippex-orange">
-                <i class="fas fa-save me-2"></i>Update Warehouse
-              </button>
-            </div>
+            <button type="submit" class="btn btn-shippex-orange btn-lg w-100">
+              <i class="fas fa-save me-2"></i>
+              <?= isset($address) ? 'Update Warehouse Address' : 'Save Warehouse Address' ?>
+            </button>
           </div>
         </div>
       </form>

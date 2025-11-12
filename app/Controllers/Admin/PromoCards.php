@@ -33,6 +33,7 @@ class PromoCards extends BaseController
    'button_text' => 'required|max_length[100]',
    'button_url' => 'required|valid_url',
    'image' => 'uploaded[image]|is_image[image]|max_size[image,2048]',
+   'background' => 'uploaded[background]|is_image[background]|max_size[background,2048]',
   ]);
 
   if (!$validation) {

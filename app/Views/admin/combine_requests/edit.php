@@ -1,30 +1,39 @@
-<?= $this->extend('admin/layouts/main') ?>
+<?php
+$session = session();
+$role = $session->get('role');
 
+// Dynamically pick layout based on role
+if ($role === 'admin') {
+ $this->extend('admin/layouts/main');
+} else {
+ $this->extend('customers/layouts/main');
+}
+?>
 <?= $this->section('content') ?>
-<div class="premium-admin-container ">
+<div class="card ">
  <!-- Page Header -->
- <div class="premium-header">
+ <div class="card-header mb-4">
   <div class="container">
    <div class="d-flex justify-content-between align-items-center">
-    <div class="page-title-section">
-     <h1 class="page-title">
+    <div class="">
+     <h3 class="page-title">
       <i class="fas fa-edit me-2"></i>Combine Package Request
-     </h1>
+     </h3>
 
     </div>
     <div class="header-actions">
-     <a href="<?= base_url('admin/combine-requests') ?>" class="text-white btn btn-outline-shippex-orange">
+     <a href="<?= base_url('admin/combine-requests') ?>" class="btn btn-shippex-orange">
       <i class="fas fa-arrow-left me-2"></i>Back to Requests
      </a>
     </div>
    </div>
   </div>
  </div>
- <div class="row">
+ <div class="row card-body">
   <!-- Package Details Card -->
   <div class="col-lg-8 mb-4">
    <div class="premium-card shadow-sm border-0">
-    <div class="card-header bg-primary text-white py-3">
+    <div class="card-header">
      <h5 class="card-title mb-0">Package Details</h5>
     </div>
     <div class="card-body">
@@ -43,10 +52,18 @@
          <tr>
           <td>
            <div class="d-flex align-items-center">
-            <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-2">
-             <i class="fas fa-user text-primary"></i>
-            </div>
-            <span><?= fullname($pack['user_id']) ?></span>
+            <?php
+            $session = session();
+            $role = $session->get('role');
+            ?>
+            <a class="d-flex align-items-center"
+             href="<?= $role === 'customer' ? base_url('profile/') : base_url('users/profile/' . $pack['user_id']) ?>">
+
+             <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center me-2">
+              <i class="fas fa-user text-primary"></i>
+             </div>
+             <span><?= fullname($pack['user_id']) ?></span>
+            </a>
            </div>
           </td>
           <td>
@@ -73,7 +90,7 @@
   <!-- Combined Package Form -->
   <div class="col-lg-4 mb-4">
    <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white py-3">
+    <div class="card-header">
      <h5 class="card-title mb-0">Combined Package</h5>
     </div>
     <div class="card-body">

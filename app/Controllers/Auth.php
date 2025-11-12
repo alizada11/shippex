@@ -10,10 +10,11 @@ class Auth extends BaseController
 
     public function index()
     {
-
+        helper('app');
+        $model = new UserModel();
         $data['title'] = 'Users List';
-        $data['users'] = (new UserModel())->findAll(5);
-
+        $data['users'] = $model->orderBy('created_at', 'DESC')->paginate(12);
+        $data['pager'] = $model->pager;
 
         return view('admin/users/index', $data);
     }
@@ -24,7 +25,7 @@ class Auth extends BaseController
 
 
         $data['profile'] = $userModel->where('id', $id)->first();
-
+        $data['title'] = 'User Profile';
         return view('admin/users/profile', $data);
     }
     public function login()
@@ -191,24 +192,70 @@ class Auth extends BaseController
         $db = \Config\Database::connect();
         $reset = $db->table('password_resets')->where('token', $token)->get()->getRow();
 
+        // Check if token is valid or expired
         if (!$reset || strtotime($reset->created_at) < strtotime('-1 hour')) {
             return redirect()->to('/forgot')->with('error', 'Token expired or invalid.');
         }
 
+        // Validate passwords
+        $validation = \Config\Services::validation();
+
+        $rules = [
+            'password' => [
+                'label' => 'New Password',
+                'rules' => 'required|min_length[8]|max_length[50]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+$/]',
+                'errors' => [
+                    'required' => 'Please enter a new password.',
+                    'min_length' => 'Password must be at least 8 characters.',
+                    'regex_match' => 'Password must contain an uppercase letter, lowercase letter, number, and special character.'
+                ]
+            ],
+            'confirm_password' => [
+                'label' => 'Confirm Password',
+                'rules' => 'required|matches[password]',
+                'errors' => [
+                    'required' => 'Please confirm your new password.',
+                    'matches' => 'Passwords do not match.'
+                ]
+            ]
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        // If validation passes, hash and update
         $newPass = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         $db->table('users')->where('email', $reset->email)->update(['password' => $newPass]);
+
+        // Remove reset token
         $db->table('password_resets')->where('email', $reset->email)->delete();
 
         return redirect()->to('/login')->with('success', 'Password reset successfully.');
     }
+
     public function changePassword()
     {
-        return view('auth/change_password');
+        $session = session();
+
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return redirect()->to('/login')->with('error', 'Please log in to access this page.');
+        }
+
+        $data['title'] = 'Change Password';
+        return view('auth/change_password', $data);
     }
+
 
     public function changePasswordPost()
     {
+
         $session = session();
+        // Check if user is logged in
+        if (!$session->has('user_id')) {
+            return redirect()->to('/login')->with('error', 'Please log in to access this page.');
+        }
         $userId = $session->get('user_id');
         $model = new \App\Models\UserModel();
         $user = $model->find($userId);

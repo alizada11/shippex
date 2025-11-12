@@ -15,6 +15,23 @@ class PostController extends BaseController
     $model = new PostModel();
     $data['posts'] = $model->orderBy('created_at', 'DESC')->paginate(20);
     $data['pager'] = $model->pager;
+    $data['title'] = 'Blog Posts';
+    return view('Modules\\Blog\\Views\\admin\\posts\\index', $data);
+  }
+  public function published()
+  {
+    $model = new PostModel();
+    $data['posts'] = $model->where('status', 'published')->orderBy('created_at', 'DESC')->paginate(20);
+    $data['pager'] = $model->pager;
+    $data['title'] = 'Published Posts';
+    return view('Modules\\Blog\\Views\\admin\\posts\\index', $data);
+  }
+  public function draft()
+  {
+    $model = new PostModel();
+    $data['posts'] = $model->where('status', 'draft')->orderBy('created_at', 'DESC')->paginate(20);
+    $data['pager'] = $model->pager;
+    $data['title'] = 'Draft Posts';
     return view('Modules\\Blog\\Views\\admin\\posts\\index', $data);
   }
 
@@ -22,7 +39,7 @@ class PostController extends BaseController
   public function create()
   {
     $categories = (new CategoryModel())->findAll();
-    return view('Modules\\Blog\\Views\\admin\\posts\\form', ['post' => null, 'categories' => $categories]);
+    return view('Modules\\Blog\\Views\\admin\\posts\\form', ['post' => null, 'title' => 'Create Post', 'categories' => $categories]);
   }
 
 
@@ -75,7 +92,7 @@ class PostController extends BaseController
     $categories = (new CategoryModel())->findAll();
     $post = (new PostModel())->find($id);
     if (!$post) return redirect()->to('/admin/blog/posts');
-    return view('Modules\\Blog\\Views\\admin\\posts\\form', ['post' => $post, 'categories' => $categories]);
+    return view('Modules\\Blog\\Views\\admin\\posts\\form', ['post' => $post, 'title' => 'Edit Post', 'categories' => $categories]);
   }
 
 

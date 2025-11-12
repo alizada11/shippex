@@ -18,6 +18,7 @@ class Warehouse extends Controller
  public function index()
  {
   $data['warehouses'] = $this->warehouseModel->findAll();
+  $data['title'] = 'Warehouses';
   return view('admin/warehouse_pages/index', $data);
  }
 
@@ -72,6 +73,19 @@ class Warehouse extends Controller
  {
   $data['warehouse'] = $this->warehouseModel->find($id);
   return view('admin/warehouse_pages/edit', $data);
+ }
+ public function delete($id)
+ {
+
+  $wh = $this->warehouseModel->where('id', $id)->first();
+
+  if (!$wh) {
+   return redirect()->to('/admin/w_pages')->with('error', 'Warehouse not found.');
+  }
+
+  $this->warehouseModel->delete($id);
+
+  return redirect()->to('/admin/w_pages')->with('success', 'Warehouse deleted successfully');
  }
 
  public function update($id)

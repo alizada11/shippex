@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\WhyChooseModel;
+use FontLib\Table\Type\cmap;
 
 class WhyChoose extends BaseController
 {
@@ -17,12 +18,14 @@ class WhyChoose extends BaseController
  public function index()
  {
   $data['items'] = $this->whyModel->orderBy('order', 'ASC')->findAll();
+  $data['title'] = 'List';
   return view('admin/why_choose/index', $data);
  }
 
  public function create()
  {
-  return view('admin/why_choose/form');
+  $title = 'Create Item';
+  return view('admin/why_choose/form', compact('title'));
  }
 
  public function store()
@@ -38,12 +41,13 @@ class WhyChoose extends BaseController
    'order'       => $this->request->getPost('order')
   ]);
 
-  return redirect()->to('/admin/cms/why-choose');
+  return redirect()->to('/admin/cms/why-choose')->with('success', 'Item Created Successfully!');;
  }
 
  public function edit($id)
  {
   $data['item'] = $this->whyModel->find($id);
+  $data['title'] = 'Edit Item';
   return view('admin/why_choose/form', $data);
  }
 
@@ -61,12 +65,12 @@ class WhyChoose extends BaseController
    'order'       => $this->request->getPost('order')
   ]);
 
-  return redirect()->to('/admin/cms/why-choose');
+  return redirect()->to('/admin/cms/why-choose')->with('success', 'Information Updated Successfully!');;
  }
 
  public function delete($id)
  {
   $this->whyModel->delete($id);
-  return redirect()->to('/admin/why-choose');
+  return redirect()->to('/admin/cms/why-choose')->with('success', 'Item Deleted Successfully!');;
  }
 }

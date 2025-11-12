@@ -7,49 +7,53 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
+   <div class="card-body p-0">
     <div class="row align-items-center">
-     <h2>How It Works Abolfazl</h2>
-     <a href="<?= site_url('admin/cms/how-it-works/create') ?>" class="btn btn-primary mb-3">Add Step</a>
-
-     <table class="table table-bordered">
-      <thead>
-       <tr>
-        <th>#</th>
-        <th>Subtitle</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Icon</th>
-        <th>Actions</th>
-       </tr>
-      </thead>
-      <tbody>
-       <?php foreach ($steps as $step): ?>
+     <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>How It Works </h5>
+      <a href="<?= site_url('admin/cms/how-it-works/create') ?>" class="btn btn-shippex-orange">Add Step</a>
+     </div>
+     <div class="table-responsive">
+      <table class="table table-bordered">
+       <thead class="table-light">
         <tr>
-         <td><?= esc($step['id']) ?></td>
-         <td><?= esc($step['subtitle']) ?></td>
-         <td><?= esc($step['title']) ?></td>
-         <td><?= esc($step['description']) ?></td>
-         <td>
-          <?php if ($step['icon']): ?>
-           <img src="<?= base_url($step['icon']) ?>" width="40">
-          <?php endif; ?>
-         </td>
-         <td>
-          <a href="<?= site_url('admin/cms/how-it-works/edit/' . $step['id']) ?>" class="btn btn-sm btn-warning">Edit</a>
-          <a href="<?= site_url('admin/cms/how-it-works/delete/' . $step['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this step?')">Delete</a>
-         </td>
+         <th>#</th>
+         <th>Subtitle</th>
+         <th>Title</th>
+         <th>Description</th>
+         <th>Icon</th>
+         <th>Actions</th>
         </tr>
-       <?php endforeach; ?>
-      </tbody>
-     </table>
-
-
-
+       </thead>
+       <tbody>
+        <?php foreach ($steps as $step): ?>
+         <tr>
+          <td><?= esc($step['id']) ?></td>
+          <td><?= esc($step['subtitle']) ?></td>
+          <td><?= esc($step['title']) ?></td>
+          <td><?= esc($step['description']) ?></td>
+          <td>
+           <?php if ($step['icon']): ?>
+            <img src="<?= base_url($step['icon']) ?>" width="40">
+           <?php endif; ?>
+          </td>
+          <td class="actions-col">
+           <div class="action-buttons-table">
+            <a href="<?= site_url('admin/cms/how-it-works/edit/' . $step['id']) ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
+            <form class="delete-form" action="<?= site_url('admin/cms/how-it-works/delete/' . $step['id']) ?>" method="post" class="d-inline delete-form">
+             <?= csrf_field() ?>
+             <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
+            </form>
+           </div>
+          </td>
+         </tr>
+        <?php endforeach; ?>
+       </tbody>
+      </table>
+     </div>
     </div>
    </div>
   </div>
  </div>
-</div>
 
-<?= $this->endSection() ?>
+ <?= $this->endSection() ?>

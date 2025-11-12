@@ -64,10 +64,22 @@ if ($role === 'admin') {
           <div class="stat-icon warning">
             <i class="fas fa-calendar-day"></i>
           </div>
+          <?php
+          $createdAt = new DateTime($package['created_at']);
+          $now = new DateTime();
+
+          // how many days have passed since creation
+          $daysPassed = $createdAt->diff($now)->days;
+
+          // calculate remaining days (can be negative)
+          $remainingDays = $package['storage_days'] - $daysPassed;
+          ?>
           <div class="stat-content">
-            <h3><?= esc($package['storage_days']) ?></h3>
+            <h3><?= esc($remainingDays) ?></h3>
             <p>Storage Days</p>
           </div>
+
+
         </div>
       </div>
       <div class="col-md-3">
@@ -249,30 +261,7 @@ if ($role === 'admin') {
           </div>
         </div>
 
-        <!-- Quick Actions Card -->
-        <div class="premium-card mt-4">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-bolt me-2"></i>Quick Actions
-            </h3>
-          </div>
-          <div class="card-body">
-            <div class="d-grid gap-2">
-              <button class="btn btn-shippex">
-                <i class="fas fa-shipping-fast me-2"></i>Process for Shipping
-              </button>
-              <button class="btn btn-outline-shippex-purple">
-                <i class="fas fa-print me-2"></i>Print Label
-              </button>
-              <button class="btn btn-outline-shippex-orange">
-                <i class="fas fa-envelope me-2"></i>Notify Customer
-              </button>
-              <button class="btn btn-outline-secondary">
-                <i class="fas fa-archive me-2"></i>Archive Package
-              </button>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
   </div>

@@ -53,7 +53,8 @@ class CustomersController extends BaseController
             'addresses' => $addresses,
             'shipping_requests' => $booking,
             'pendingMap' => $pendingMap,
-            'requestMap' => $requestMap
+            'requestMap' => $requestMap,
+            'title' => 'Customer Dashboard'
         ]);
     }
     public function requests()
@@ -63,6 +64,7 @@ class CustomersController extends BaseController
 
         $data['requests'] = $model->where('user_id', session()->get('user_id'))->orderBy('created_at', 'DESC')->paginate(12);
         $data['pager'] = $model->pager;
+        $data['title'] = "Shipment Requests";
         return view('customers/shipping/index', $data);
     }
 
@@ -77,6 +79,7 @@ class CustomersController extends BaseController
             ->where('book_id', $id)
             ->orderBy('changed_at', 'AESC')
             ->findAll();
+        $data['title'] = 'Shipping Details';
         return view('customers/shipping/details', $data);
     }
 
@@ -98,6 +101,7 @@ class CustomersController extends BaseController
     {
         $faqModel = new FaqModel();
         $data['faqs'] = $faqModel->orderBy('id', 'ASC')->findAll();
+        $data['title'] = 'FAQs';
         return view('customers/faq', $data);
     }
 }

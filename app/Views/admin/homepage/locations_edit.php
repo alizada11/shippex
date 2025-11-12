@@ -48,9 +48,12 @@
         <option value="coming_soon" <?= $location['status'] === 'coming_soon' ? 'selected' : '' ?>>Coming Soon</option>
        </select>
       </div>
+      <hr>
+      <div class="d-flex justify-content-between">
+       <button type="submit" class="btn btn-primary">Update Location</button>
+       <a href="<?= site_url('admin/cms/locations') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
 
-      <button type="submit" class="btn btn-primary">Update Location</button>
-      <a href="<?= site_url('admin/locations') ?>" class="btn btn-secondary">Cancel</a>
      </form>
 
 

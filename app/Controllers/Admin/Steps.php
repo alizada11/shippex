@@ -17,12 +17,14 @@ class Steps extends BaseController
  public function index()
  {
   $data['steps'] = $this->stepModel->orderBy('order', 'ASC')->findAll();
+  $data['title'] = 'Steps List';
   return view('admin/steps/index', $data);
  }
 
  public function create()
  {
-  return view('admin/steps/form');
+  $title = 'Create Steps';
+  return view('admin/steps/form', compact('title'));
  }
 
  public function store()
@@ -39,12 +41,13 @@ class Steps extends BaseController
    'section_id' => 1
   ]);
 
-  return redirect()->to('/admin/cms/steps');
+  return redirect()->to('/admin/cms/steps')->with('success', 'Step Created Successfully!');;
  }
 
  public function edit($id)
  {
   $data['step'] = $this->stepModel->find($id);
+  $data['title'] = 'Edit Step';
   return view('admin/steps/form', $data);
  }
 
@@ -63,12 +66,12 @@ class Steps extends BaseController
    'section_id' => 1
   ]);
 
-  return redirect()->to('/admin/cms/steps');
+  return redirect()->to('/admin/cms/steps')->with('success', 'Step Updated Successfully!');;
  }
 
  public function delete($id)
  {
   $this->stepModel->delete($id);
-  return redirect()->to('/admin/how-it-works');
+  return redirect()->to('/admin/cms/steps')->with('success', 'Step Deleted Successfully!');
  }
 }

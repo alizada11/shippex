@@ -20,6 +20,7 @@ class AddressController extends BaseController
         $data['shippingAddresses'] = $this->addressModel->where('user_id', $userId)->where('type', 'shipping')->findAll();
         $data['billingAddresses'] = $this->addressModel->where('user_id', $userId)->where('type', 'billing')->findAll();
         // dd($data);
+        $data['title'] = 'My Addresses';
         return view('customers/addresses/index', $data);
     }
 
@@ -27,8 +28,8 @@ class AddressController extends BaseController
     public function create()
     {
         helper('form');
-
-        return view('customers/addresses/form');
+        $data['title'] = 'Create Address';
+        return view('customers/addresses/form', $data);
     }
 
     // Store new address
@@ -51,13 +52,13 @@ class AddressController extends BaseController
     {
         helper('form');
         $userId = session()->get('user_id');
-        $address = $this->addressModel->where('id', $id)->where('user_id', $userId)->first();
+        $data['address'] = $this->addressModel->where('id', $id)->where('user_id', $userId)->first();
 
-        if (!$address) {
+        if (!$data['address']) {
             return redirect()->to('/addresses')->with('error', 'Address not found.');
         }
-
-        return view('customers/addresses/form', compact('address'));
+        $data['title'] = 'Edit Address';
+        return view('customers/addresses/form', $data);
     }
 
     // Update address

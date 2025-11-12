@@ -1,7 +1,7 @@
 <?= $this->extend('customers/layouts/main') ?>
 
 <?= $this->section('content') ?>
-<div class="container py-4">
+<div class="container ">
  <div class="card shadow-sm">
   <div class="card-header bg-shippex-purple text-white d-flex justify-content-between align-items-center">
    <h3 class="mb-0">Shipping Requests</h3>
@@ -34,16 +34,22 @@
         <td class="text-nowrap">
          <?= date('M d, Y H:i', strtotime($req['created_at'])) ?>
         </td>
-        <td class="text-nowrap">
-         <?php if ($req['is_saved'] == 1): ?>
-          <a href="<?= site_url('shopper/requests/edit/' . $req['id']) ?>" class="btn btn-sm btn-outline-primary">
-           <i class="fas fa-edit"></i> Edit
-          </a>
-         <?php else: ?>
-          <a href="<?= site_url('shopper/requests/view/' . $req['id']) ?>" class="btn btn-sm btn-outline-secondary">
-           <i class="fas fa-eye"></i> View
-          </a>
-         <?php endif; ?>
+        <td class="actions-col">
+         <div class="action-buttons-table">
+          <?php if ($req['is_saved'] == 1): ?>
+           <a href="<?= site_url('shopper/requests/edit/' . $req['id']) ?>" class="btn btn-action view">
+            <i class="fas fa-edit"></i>
+           </a>
+          <?php else: ?>
+           <a href="<?= site_url('shopper/requests/view/' . $req['id']) ?>" class="btn btn-action view">
+            <i class="fas fa-eye"></i>
+           </a>
+           <form class="delete-form" action="<?= site_url('shopper/requests/delete/' . $req['id']) ?>" method="post" class="d-inline delete-form">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-action delete "><i class="fas fa-trash"></i></button>
+           </form>
+          <?php endif; ?>
+         </div>
         </td>
        </tr>
       <?php endforeach; ?>

@@ -27,101 +27,6 @@ if ($role === 'admin') {
   <form action="<?= base_url('packages/store') ?>" method="post" enctype="multipart/form-data">
    <?= csrf_field() ?>
 
-   <!-- Package Information -->
-   <div class="premium-card mb-4">
-    <div class="card-header">
-     <h3 class="card-title"><i class="fas fa-info-circle me-2"></i>Package Information</h3>
-    </div>
-    <div class="card-body">
-     <div class="row">
-      <div class="col-md-6">
-       <label class="form-label fw-semibold">Retailer <span class="text-danger">*</span></label>
-       <input type="text" name="retailer" class="form-control" required>
-
-
-       <label class="form-label fw-semibold mt-3">Value ($) <span class="text-danger">*</span></label>
-       <input type="number" step="0.01" name="value" class="form-control">
-       <label class="form-label fw-semibold mt-3">Status</label>
-       <select name="status" class="form-select">
-        <option value="incoming">Incoming</option>
-        <option value="ready">Ready</option>
-        <option value="shipped">Shipped</option>
-        <option value="returned">Returned</option>
-       </select>
-       <label for="userSelect" class="form-label fw-semibold mt-3">Choose a user:</label>
-       <select class="form-control" id="userSelect" name="user_id" style="width: 100%;">
-        <option value="">Select a user</option>
-        <?php foreach ($users as $user): ?>
-         <option value="<?= esc($user['id']) ?>">
-          <?= esc($user['firstname'] . ' ' . $user['lastname']) . ' | ' . $user['id'] ?>
-         </option>
-        <?php endforeach; ?>
-       </select>
-       <div id="userPreview" class="mt-2 text-muted">Selected user will appear here</div>
-
-      </div>
-
-      <div class="col-md-6">
-       <label class="form-label fw-semibold mt-3">Select Warehouse</label>
-       <select name="warehouse_id" class="form-select">
-        <?php foreach ($warehouses as $wh): ?>
-         <option value="<?= $wh['id']; ?>"><?= $wh['city'] . ', ' . $wh['country'] . ' ' . $wh['postal_code'] ?></option>
-
-        <?php endforeach; ?>
-       </select>
-
-       <label class="form-label fw-semibold">Weight (Kg)</label>
-       <input type="number" step="0.01" name="weight" class="form-control">
-
-       <label class="form-label fw-semibold mt-3">Dimensions (L × W × H)</label>
-       <div class="d-flex gap-2">
-        <input type="number" name="length" class="form-control" placeholder="Length">
-        <input type="number" name="width" class="form-control" placeholder="Width">
-        <input type="number" name="height" class="form-control" placeholder="Height">
-       </div>
-
-
-      </div>
-     </div>
-    </div>
-   </div>
-
-   <!-- Package Items -->
-   <!-- <div class="premium-card mb-4">
-    <div class="card-header">
-     <h3 class="card-title"><i class="fas fa-boxes me-2"></i>Package Items</h3>
-    </div>
-    <div class="card-body">
-     <div id="itemsContainer">
-      <div class="item-row mb-3 border p-3 rounded">
-       <div class="row g-2">
-        <div class="col-md-2">
-         <input type="number" name="items[0][quantity]" class="form-control" placeholder="Qty" required>
-        </div>
-        <div class="col-md-2">
-         <input type="text" name="items[0][description]" class="form-control" placeholder="Description">
-        </div>
-        <div class="col-md-2">
-         <input type="text" name="items[0][hs_code]" class="form-control" placeholder="HS Code">
-        </div>
-        <div class="col-md-2">
-         <input type="number" step="0.01" name="items[0][weight]" class="form-control" placeholder="Weight">
-        </div>
-        <div class="col-md-2">
-         <input type="number" step="0.01" name="items[0][value]" class="form-control" placeholder="Value">
-        </div>
-        <div class="col-md-2 text-end">
-         <button type="button" class="btn btn-danger btn-sm remove-item"><i class="fas fa-trash"></i></button>
-        </div>
-       </div>
-      </div>
-     </div>
-     <button type="button" id="addItemBtn" class="btn btn-outline-shippex-purple mt-2">
-      <i class="fas fa-plus me-2"></i>Add Item
-     </button>
-    </div>
-   </div> -->
-
    <!-- Package Files -->
    <div class="premium-card mb-4">
     <div class="card-header">
@@ -153,6 +58,67 @@ if ($role === 'admin') {
      </button>
     </div>
    </div>
+   <!-- Package Information -->
+   <div class="premium-card mb-4">
+    <div class="card-header">
+     <h3 class="card-title"><i class="fas fa-info-circle me-2"></i>Package Information</h3>
+    </div>
+    <div class="card-body">
+     <div class="row">
+      <div class="col-md-6">
+       <label class="form-label fw-semibold">Retailer <span class="text-danger">*</span></label>
+       <input type="text" name="retailer" class="form-control" required>
+
+       <?php if ($role == 'admin') { ?>
+        <label class="form-label fw-semibold mt-3">Status</label>
+        <select name="status" class="form-select">
+         <option value="incoming">Incoming</option>
+         <option value="ready">Ready</option>
+         <option value="shipped">Shipped</option>
+         <option value="returned">Returned</option>
+        </select>
+       <?php } else { ?>
+        <input type="hidden" name="status" value="incoming">
+       <?php } ?>
+       <?php if ($role == 'admin') { ?>
+        <label for="userSelect" class="form-label fw-semibold mt-3">Choose a user:</label>
+        <select class="form-control" id="userSelect" name="user_id" style="width: 100%;">
+         <option value="">Select a user</option>
+         <?php foreach ($users as $user): ?>
+          <option value="<?= esc($user['id']) ?>">
+           <?= esc($user['firstname'] . ' ' . $user['lastname']) . ' | ' . $user['id'] ?>
+          </option>
+         <?php endforeach; ?>
+        </select>
+        <div id="userPreview" class="mt-2 text-muted">Selected user will appear here</div>
+       <?php } else { ?>
+        <input type="hidden" name="user_id" value="<?= $session->get('user_id') ?>">
+       <?php } ?>
+       <label class="mt-3 form-label fw-semibold">Tracking Number <span class="text-danger">*</span></label>
+       <input type="number" name="tracking_number" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+       <input type="hidden" name="warehouse_id" value="<?= $virtual_address_id ?>">
+
+       <label class="form-label fw-semibold">Weight (Kg)</label>
+       <input type="number" step="0.01" name="weight" class="form-control">
+
+       <label class="form-label fw-semibold mt-3">Dimensions (L × W × H)</label>
+       <div class="d-flex gap-2">
+        <input type="number" name="length" class="form-control" placeholder="Length">
+        <input type="number" name="width" class="form-control" placeholder="Width">
+        <input type="number" name="height" class="form-control" placeholder="Height">
+       </div>
+
+
+      </div>
+     </div>
+    </div>
+   </div>
+
+
+
 
    <div class="d-flex justify-content-end">
     <a href="<?= base_url('packages') ?>" class="btn btn-outline-secondary me-2">Cancel</a>
@@ -496,25 +462,6 @@ if ($role === 'admin') {
  }
 </style>
 <script>
- // let itemIndex = 1;
- // document.getElementById('addItemBtn').addEventListener('click', function() {
- //  const container = document.getElementById('itemsContainer');
- //  const newRow = container.children[0].cloneNode(true);
- //  newRow.querySelectorAll('input').forEach(input => input.value = '');
- //  newRow.querySelectorAll('input').forEach((input, idx) => {
- //   const name = input.name.replace(/\d+/, itemIndex);
- //   input.name = name;
- //  });
- //  container.appendChild(newRow);
- //  itemIndex++;
- // });
-
- // document.getElementById('itemsContainer').addEventListener('click', function(e) {
- //  if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
- //   e.target.closest('.item-row').remove();
- //  }
- // });
-
  let fileIndex = 1;
  document.getElementById('addFileBtn').addEventListener('click', function() {
   const container = document.getElementById('filesContainer');

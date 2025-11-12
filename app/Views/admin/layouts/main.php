@@ -3,7 +3,7 @@
 
 <head>
  <meta charset="UTF-8">
- <title>Shippex Admin Dashboard</title>
+ <title><?= isset($title) ? esc($title) : ' ' ?></title>
  <meta name="viewport" content="width=device-width, initial-scale=1">
 
  <!-- Favicon -->
@@ -18,6 +18,7 @@
  <link rel="stylesheet" href="<?= base_url('assets/css/auth_style.css'); ?>">
  <?php if (!empty($defaultFont)): ?>
   <link href="https://fonts.googleapis.com/css2?family=<?= urlencode($defaultFont) ?>&display=swap" rel="stylesheet">
+  <?= $this->renderSection('styles') ?>
 
   <style>
    body {
@@ -54,7 +55,7 @@
       $currentUrl = current_url();
 
       // Check if the URL contains 'packages/' followed by a number
-      $isPackageActive = preg_match('#/packages/\d+#', $currentUrl);
+      $isPackageActive = preg_match('#/packages(/create/\d+|/\d+(/edit)?)?#', $currentUrl);
       ?>
 
       <li class="nav-item">
@@ -77,6 +78,11 @@
       <li class="nav-item">
        <a class="nav-link <?= (strpos(current_url(), 'admin/combine-requests') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/combine-requests') ?>">
         <i class="fas fa-boxes me-2"></i> Combine & Repack
+       </a>
+      </li>
+      <li class="nav-item">
+       <a class="nav-link <?= (strpos(current_url(), 'admin/dispose-return') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/dispose-return') ?>">
+        <i class="fas fa-trash me-2"></i> Disposal/Return Requests
        </a>
       </li>
 
@@ -174,6 +180,11 @@
         <i class="fas fa-question me-2"></i> How it Works
        </a>
       </li>
+      <li class="nav-item">
+       <a class="nav-link btn btn-sm btn-shippex-orange d-block d-md-none" href="<?= base_url('logout'); ?>">
+        <i class="fas fa-sign-out-alt me-1"></i> Logout
+       </a>
+      </li>
      </ul>
     </div>
    </nav>
@@ -187,19 +198,26 @@
        <button class="btn btn-sm d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCollapse">
         <i class="fas fa-bars"></i>
        </button>
-       <span class="navbar-brand mb-0 h6">
+       <span class="d-none d-md-inline navbar-brand mb-0 h6">
         <i class="fas fa-user-circle me-2 text-shippex-purple"></i>
         Welcome, <?= esc(session()->get('full_name'))  ?>
        </span>
+       <span class="d-block d-md-none navbar-brand mb-0 h6">
+        <i class="fas fa-user-circle me-2 text-shippex-purple"></i>
+        Welcome
+       </span>
       </div>
-      <div class="ms-auto">
-       <a class="btn btn-sm btn-shippex-orange" href="<?= base_url('logout'); ?>">
+      <div class="ms-lg-auto ms-md-auto">
+       <a class="btn btn-sm btn-shippex" href="<?= base_url('/'); ?>">
+        <i class="fas fa-eye me-1"></i> Back to Site
+       </a>
+       <a class="btn btn-sm btn-shippex-orange d-none d-md-inline" href="<?= base_url('logout'); ?>">
         <i class="fas fa-sign-out-alt me-1"></i> Logout
        </a>
       </div>
      </div>
     </nav>
-    <div class="row content">
+    <div class="content">
 
      <?= $this->renderSection('content') ?>
     </div>

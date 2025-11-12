@@ -35,19 +35,48 @@ class WarehouseController extends BaseController
  public function create()
  {
   $data['users'] = $this->userModel->findAll();
+  $data['title'] = 'Create a Warehouse';
   return view('admin/warehouses/create', $data);
  }
 
  public function store()
  {
-  $this->addressModel->save($this->request->getPost());
-  return redirect()->to('/warehouse')->with('success', 'Warehouse address added successfully.');
+  $data = $this->request->getPost();
+
+  // Validation rules
+  $rules = [
+   'code'            => 'required|max_length[16]',
+   'country'         => 'required|max_length[100]',
+   'city'            => 'required|max_length[255]',
+   'address_line_1'  => 'required|max_length[255]',
+   'address_line_2'  => 'permit_empty|max_length[255]',
+   'state'           => 'required|max_length[255]',
+   'address_line'    => 'permit_empty',
+   'map_link'        => 'permit_empty|valid_url',
+   'postal_code'     => 'required|max_length[20]',
+   'phone'           => 'permit_empty|max_length[20]',
+   'is_active'       => 'required|in_list[0,1]',
+  ];
+
+  if (! $this->validate($rules)) {
+   return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+  }
+
+  try {
+   $this->addressModel->save($data);
+   return redirect()->to('/warehouse')->with('success', 'Warehouse address added successfully.');
+  } catch (\Exception $e) {
+   log_message('error', 'Warehouse address save error: ' . $e->getMessage());
+   return redirect()->back()->withInput()->with('error', 'Failed to save warehouse address. Try again.');
+  }
  }
+
 
  public function edit($id)
  {
   $data['address'] = $this->addressModel->find($id);
   $data['users'] = $this->userModel->findAll();
+  $data['title'] = 'Edit warehouse';
   return view('admin/warehouses/edit', $data);
  }
 
@@ -109,9 +138,9 @@ class WarehouseController extends BaseController
   $categories = $data['item_categories'] ?? [];
   // Convert code to view file name
   $viewFile = $code . '-warehouse';
-
+  $title = 'Warehouse Details';
   // Load the view from app/Views/warehouse/
-  return view('warehouses/' . $viewFile, compact('categories'));
+  return view('warehouses/' . $viewFile, compact('categories', 'title'));
  }
 
  public function show($countryCode)

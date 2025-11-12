@@ -7,13 +7,17 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
-    <div class="row align-items-center">
+   <div class="row align-items-center">
+    <div class="card-header border-0 align-items-center d-flex justify-content-between">
+     <h5 class="mb-0">Edit Promotion Card</h5>
+
+    </div>
+    <div class="card-body">
      <form action="<?= isset($card) ? site_url('/admin/cms/promo-cards/update/' . $card['id']) : site_url('/admin/cms/promo-cards/store') ?>" method="post" enctype="multipart/form-data">
       <?= csrf_field() ?>
 
       <div class="mb-3">
-       <label>Titlesss</label>
+       <label>Title</label>
        <input type="text" name="title" class="form-control" value="<?= isset($card) ? esc($card['title']) : old('title') ?>" required>
       </div>
 
@@ -36,18 +40,21 @@
        <label>Image</label>
        <input type="file" name="image" class="form-control">
        <?php if (isset($card) && $card['image']): ?>
-        <img src="<?= base_url('writable/uploads/promo_cards/' . $card['image']) ?>" width="100" class="mt-2">
+        <img src="<?= base_url('uploads/promo_cards/' . $card['image']) ?>" width="100" class="mt-2">
        <?php endif; ?>
       </div>
       <div class="mb-3">
        <label>Background Image</label>
        <input type="file" name="background" class="form-control">
        <?php if (isset($card) && $card['background']): ?>
-        <img src="<?= base_url('writable/uploads/promo_cards/' . $card['background']) ?>" width="150" class="mt-2">
+        <img src="<?= base_url('uploads/promo_cards/' . $card['background']) ?>" width="100" class="mt-2">
        <?php endif; ?>
       </div>
-
-      <button type="submit" class="btn btn-success"><?= isset($card) ? 'Update' : 'Create' ?></button>
+      <hr>
+      <div class="d-flex justify-content-between">
+       <button type="submit" class="btn btn-primary"><?= isset($card) ? 'Update' : 'Create' ?></button>
+       <a href="<?= site_url('admin/cms/promo-cards') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
      </form>
 
 

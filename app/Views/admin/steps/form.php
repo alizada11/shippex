@@ -7,9 +7,14 @@
  <!-- Stats Overview -->
  <div class="row">
   <div class="card">
-   <div class="card-body">
-    <div class="row align-items-center">
-     <h2><?= $step['id'] ?? 'Add New Step' ?></h2>
+   <div class="row align-items-center">
+    <div class="card-header border-0">
+
+     <h5><?= isset($step['id']) ? 'Edit Step ' . $step['id'] : 'Add New Step' ?></h5>
+
+    </div>
+
+    <div class="card-body ">
 
      <form method="post" enctype="multipart/form-data" action="<?= isset($step) ? site_url('/admin/cms/steps/edit/' . $step['id']) : site_url('/admin/cms/steps/create') ?>">
       <div class="mb-3">
@@ -34,9 +39,10 @@
        <label class="form-label">Order</label>
        <input type="number" name="order" class="form-control" value="<?= $step['order'] ?? 0 ?>">
       </div>
-
-      <button type="submit" class="btn btn-success">Save</button>
-      <a href="<?= site_url('admin/steps') ?>" class="btn btn-secondary">Cancel</a>
+      <div class="d-flex align-items-center justify-content-between">
+       <button type="submit" class="btn btn-primary">Save</button>
+       <a href="<?= site_url('admin/cms/steps') ?>" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+      </div>
      </form>
     </div>
    </div>

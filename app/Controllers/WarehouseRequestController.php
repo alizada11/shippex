@@ -31,7 +31,7 @@ class WarehouseRequestController extends BaseController
    ->join('virtual_addresses', 'virtual_addresses.id = warehouse_requests.warehouse_id')
    ->orderBy('warehouse_requests.created_at', 'DESC')
    ->findAll();
-
+  $data['title'] = 'Warehose Requests';
   return view('admin/warehouse_requests/index', $data);
  }
 
@@ -104,7 +104,6 @@ class WarehouseRequestController extends BaseController
   $request = $this->warehouseRequest
    ->where('user_id', $userId)
    ->where('warehouse_id', $warehouseId)
-   ->where('status', 'accepted')
    ->first();
 
   if (!$request) {
@@ -137,13 +136,13 @@ class WarehouseRequestController extends BaseController
   $userId = session()->get('user_id');
 
   $requests = $this->warehouseRequest
-   ->select('warehouse_requests.*, virtual_addresses.city, virtual_addresses.country')
+   ->select('warehouse_requests.*, virtual_addresses.city, virtual_addresses.is_active, virtual_addresses.country')
    ->join('virtual_addresses', 'virtual_addresses.id = warehouse_requests.warehouse_id')
    ->where('user_id', $userId)
    ->orderBy('created_at', 'DESC')
    ->findAll();
 
-  return view('customers/warehouse_requests/my_requests', ['requests' => $requests]);
+  return view('customers/warehouse_requests/my_requests', ['requests' => $requests, 'title' => 'My Warehouses']);
  }
 
 
@@ -152,6 +151,7 @@ class WarehouseRequestController extends BaseController
  public function edit($id)
  {
   $data['request'] = $this->warehouseRequest->find($id);
+  $data['title'] = 'Edit Warehouse';
   return view('admin/warehouse_requests/edit', $data);
  }
 
