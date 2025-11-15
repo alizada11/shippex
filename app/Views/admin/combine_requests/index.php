@@ -105,8 +105,14 @@ if ($role === 'admin') {
         </div>
       <?php else: ?>
         <tbody>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <h4>No Data Found</h4>
+            <p>There are no requests yet.</p>
 
-          <div class="p-5 text-center">No Request Submitted Yet</div>
+          </div>
         </tbody>
       <?php endif; ?>
     </div>

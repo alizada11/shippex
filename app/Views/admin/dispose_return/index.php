@@ -18,7 +18,14 @@ if ($role === 'admin') {
   </div>
   <div class="card-body  p-0">
    <?php if (empty($requests)): ?>
-    <div class="text-center text-muted">No requests found.</div>
+    <div class="empty-state">
+     <div class="empty-icon">
+      <i class="fas fa-box-open"></i>
+     </div>
+     <h4>No Request Found</h4>
+     <p>There are no request yet.</p>
+
+    </div>
    <?php else: ?>
     <div class="table-responsive">
      <table class="table table-hover align-middle ">

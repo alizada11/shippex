@@ -10,7 +10,7 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\VirtualAddressModel;
 use CodeIgniter\Controller;
-
+use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
@@ -121,7 +121,7 @@ class PackageController extends BaseController
     // Save package
     $packageData = [
       'retailer' => $this->request->getPost('retailer'),
-      'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
+      // 'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
       'user_id' => $this->request->getPost('user_id'),
       'virtual_address_id' => $this->request->getPost('warehouse_id'),
       'weight' => $this->request->getPost('weight') ?: '',
@@ -130,7 +130,7 @@ class PackageController extends BaseController
       'width'  => $this->request->getPost('width') ?: '',
       'height' => $this->request->getPost('height') ?: '',
       'status' => $this->request->getPost('status'),
-      'tracking_number' => $this->request->getPost('tracking_number'),
+      'tracking_number' => $this->request->getPost('tracking_number') ?? null,
       'storage_days' => 30,
       'created_at' => date('Y-m-d H:i:s'),
       'updated_at' => date('Y-m-d H:i:s')
@@ -197,20 +197,41 @@ class PackageController extends BaseController
     $fileModel = new PackageFileModel();
     $actionModel = new PackageActionModel();
 
-    $data['packages'] = $packageModel
-      ->select('packages.*, virtual_addresses.country as warehouse_name, virtual_addresses.postal_code')
-      ->join('virtual_addresses', 'virtual_addresses.id = packages.virtual_address_id', 'left')
-      ->orderBy('packages.created_at', 'DESC')
-      ->where('virtual_addresses.id', $id)
-      ->findAll();
-    if (!$data['packages']) {
-      $data['packages'] = [];
+    $data['pkg'] = $packageModel->find($id);
+
+    $createdAt = new DateTime($data['pkg']['created_at']);
+    $now = new DateTime();
+    $daysPassed = $createdAt->diff($now)->days;
+
+    $freeDays = $data['pkg']['storage_days'] ?? 30;
+    $overdueFee = 0;
+
+    // Only calculate overdue fee if free days are exceeded
+    if ($daysPassed > $freeDays) {
+      $overdueDays = $daysPassed - $freeDays;
+      $overdueFee = $overdueDays * 0.5;
+
+      // Update the separate over_due_fee field
+      $packageModel->update($data['pkg']['id'], ['over_due_fee' => $overdueFee]);
     }
+
+    // Re-fetch package for view
+    $data['package'] = $packageModel->find($id);
+    $data['items']   = $itemModel->getByPackage($id);
+    $data['files']   = $fileModel->getFilesByPackage($id);
+    $data['actions'] = $actionModel->getHistory($id);
+    $data['title']   = 'Package Details';
+
+    // Pass to view
+    $data['over_due'] = $overdueFee;
+
+
     $data['package'] = $packageModel->find($id);
     $data['items'] = $itemModel->getByPackage($id);
     $data['files'] = $fileModel->getFilesByPackage($id);
     $data['actions'] = $actionModel->getHistory($id);
     $data['title'] = 'Package Details';
+    $data['over_due'] = $overdueFee;
     return view('admin/packages/show', $data);
   }
 
@@ -410,31 +431,73 @@ class PackageController extends BaseController
 
   public function uploadFile($packageId)
   {
+    // Get the uploaded file and form data
     $file = $this->request->getFile('file');
+    $fileType = $this->request->getPost('file_type'); // "invoice", "photo", "label", "other"
 
+    // Validate file
     if (!$file->isValid()) {
       return redirect()->back()->with('error', 'Invalid file.');
     }
 
+    // Generate random file name and move it to uploads directory
     $newName = $file->getRandomName();
     $file->move(FCPATH . 'uploads/packages/', $newName);
 
+    // Save file details in the database
     $fileModel = new PackageFileModel();
     $fileModel->insert([
-      'package_id' => $packageId,
-      'file_path'  => 'uploads/packages/' . $newName,
-      'file_name'  => $file->getClientName(),
-      'file_type'  => $file->getClientMimeType(),
-      'uploaded_by' => session()->get('user_id'),
-      'created_at' => date('Y-m-d H:i:s'),
+      'package_id'   => $packageId,
+      'file_path'    => 'uploads/packages/' . $newName,
+      'file_name'    => $file->getClientName(),
+      'file_type'    => $fileType,
+      'uploaded_by'  => session()->get('user_id'),
+      'created_at'   => date('Y-m-d H:i:s'),
     ]);
 
-    return redirect()->to(base_url("packages/show/$packageId"))
-      ->with('success', 'File uploaded successfully.');
+    /**
+     * ✅ If the uploaded file type is "label", send an email to the customer.
+     */
+    if ($fileType === 'label') {
+      $packageModel = new PackageModel();
+      $package = $packageModel->where('id', $packageId)->first();
+
+      $user_id = $package['user_id'];
+
+
+
+      $model = new \App\Models\UserModel();
+      $user = $model->where('id', $user_id)->first();
+
+      if ($user) {
+
+        $link['name'] = $user['firstname'] . ' ' . $user['lastname'];
+        $user_email = $user['email'];
+
+        $link['text'] = base_url("packages/show/$packageId/#files");
+
+
+        $message = view('emails/download_label', $link);
+
+        $email = \Config\Services::email();
+
+        $email->setTo($user_email);
+        $email->setSubject('Password Reset Link');
+        $email->setMessage($message);
+        $email->setMailType('html'); // Important
+
+        $email->send();
+      }
+
+      // Redirect back to the package detail page
+      return redirect()->to(base_url("packages/show/$packageId"))
+        ->with('success', 'File uploaded successfully.');
+    }
   }
 
   public function deleteFile($id)
   {
+
     $fileModel = new PackageFileModel();
     $file = $fileModel->find($id);
 

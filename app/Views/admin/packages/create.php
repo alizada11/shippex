@@ -11,7 +11,7 @@ if ($role === 'admin') {
 ?>
 <?= $this->section('content') ?>
 
-<div class="premium-admin-container p-0">
+<div class="card shadow-sm p-0">
  <div class="premium-header">
   <div class="container">
    <div class="d-flex justify-content-between align-items-center">
@@ -38,10 +38,10 @@ if ($role === 'admin') {
        <div class="row g-2">
         <div class="col-md-4">
          <select name="files[0][file_type]" class="form-select">
-          <option value="invoice">Invoice</option>
-          <option value="photo">Photo</option>
-          <option value="label">Label</option>
-          <option value="other">Other</option>
+          <option value="invoice" <?= old('files.0.file_type') === 'invoice' ? 'selected' : '' ?>>Invoice</option>
+          <option value="photo" <?= old('files.0.file_type') === 'photo' ? 'selected' : '' ?>>Photo</option>
+          <option value="label" <?= old('files.0.file_type') === 'label' ? 'selected' : '' ?>>Label</option>
+          <option value="other" <?= old('files.0.file_type') === 'other' ? 'selected' : '' ?>>Other</option>
          </select>
         </div>
         <div class="col-md-6">
@@ -58,6 +58,7 @@ if ($role === 'admin') {
      </button>
     </div>
    </div>
+
    <!-- Package Information -->
    <div class="premium-card mb-4">
     <div class="card-header">
@@ -67,64 +68,79 @@ if ($role === 'admin') {
      <div class="row">
       <div class="col-md-6">
        <label class="form-label fw-semibold">Retailer <span class="text-danger">*</span></label>
-       <input type="text" name="retailer" class="form-control" required>
+       <input type="text" name="retailer" class="form-control" required value="<?= old('retailer') ?>">
 
-       <?php if ($role == 'admin') { ?>
+       <?php if ($role == 'admin') : ?>
         <label class="form-label fw-semibold mt-3">Status</label>
         <select name="status" class="form-select">
-         <option value="incoming">Incoming</option>
-         <option value="ready">Ready</option>
-         <option value="shipped">Shipped</option>
-         <option value="returned">Returned</option>
+         <option value="incoming" <?= old('status') === 'incoming' ? 'selected' : '' ?>>Incoming</option>
+         <option value="ready" <?= old('status') === 'ready' ? 'selected' : '' ?>>Ready</option>
+         <option value="shipped" <?= old('status') === 'shipped' ? 'selected' : '' ?>>Shipped</option>
+         <option value="returned" <?= old('status') === 'returned' ? 'selected' : '' ?>>Returned</option>
         </select>
-       <?php } else { ?>
+       <?php else : ?>
         <input type="hidden" name="status" value="incoming">
-       <?php } ?>
-       <?php if ($role == 'admin') { ?>
+       <?php endif; ?>
+
+       <?php if ($role == 'admin') : ?>
         <label for="userSelect" class="form-label fw-semibold mt-3">Choose a user:</label>
         <select class="form-control" id="userSelect" name="user_id" style="width: 100%;">
          <option value="">Select a user</option>
-         <?php foreach ($users as $user): ?>
-          <option value="<?= esc($user['id']) ?>">
+         <?php foreach ($users as $user) : ?>
+          <option value="<?= esc($user['id']) ?>" <?= old('user_id') == $user['id'] ? 'selected' : '' ?>>
            <?= esc($user['firstname'] . ' ' . $user['lastname']) . ' | ' . $user['id'] ?>
           </option>
          <?php endforeach; ?>
         </select>
         <div id="userPreview" class="mt-2 text-muted">Selected user will appear here</div>
-       <?php } else { ?>
+       <?php else : ?>
         <input type="hidden" name="user_id" value="<?= $session->get('user_id') ?>">
-       <?php } ?>
-       <label class="mt-3 form-label fw-semibold">Tracking Number <span class="text-danger">*</span></label>
-       <input type="number" name="tracking_number" class="form-control" required>
+       <?php endif; ?>
+
+       <div class="mt-3">
+        <div class="d-flex align-items-center justify-content-between">
+         <label for="tracking_number" class="form-label fw-semibold mb-0">
+          Tracking Number <span class="text-danger" id="trackingStar">*</span>
+         </label>
+
+         <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="noTrackingCheckbox" <?= old('noTrackingCheckbox') ? 'checked' : '' ?>>
+          <label class="form-check-label text-muted small" for="noTrackingCheckbox">
+           I don't have a tracking number yet
+          </label>
+         </div>
+        </div>
+
+        <input type="number" name="tracking_number" id="trackingInput" class="form-control mt-1" placeholder="Enter tracking number" required value="<?= old('tracking_number') ?>">
+       </div>
       </div>
 
       <div class="col-md-6">
        <input type="hidden" name="warehouse_id" value="<?= $virtual_address_id ?>">
 
+       <label class="form-label fw-semibold">Value</label>
+       <input type="number" step="0.01" name="value" class="form-control" value="<?= old('value') ?>">
+
        <label class="form-label fw-semibold">Weight (Kg)</label>
-       <input type="number" step="0.01" name="weight" class="form-control">
+       <input type="number" step="0.01" name="weight" class="form-control" value="<?= old('weight') ?>">
 
        <label class="form-label fw-semibold mt-3">Dimensions (L × W × H)</label>
        <div class="d-flex gap-2">
-        <input type="number" name="length" class="form-control" placeholder="Length">
-        <input type="number" name="width" class="form-control" placeholder="Width">
-        <input type="number" name="height" class="form-control" placeholder="Height">
+        <input type="number" name="length" class="form-control" placeholder="Length" value="<?= old('length') ?>">
+        <input type="number" name="width" class="form-control" placeholder="Width" value="<?= old('width') ?>">
+        <input type="number" name="height" class="form-control" placeholder="Height" value="<?= old('height') ?>">
        </div>
-
-
       </div>
      </div>
     </div>
    </div>
 
-
-
-
    <div class="d-flex justify-content-end">
-    <a href="<?= base_url('packages') ?>" class="btn btn-outline-secondary me-2">Cancel</a>
+    <a href="<?= base_url('packages/' . $virtual_address_id) ?>" class="btn btn-outline-secondary me-2">Cancel</a>
     <button type="submit" class="btn btn-shippex"><i class="fas fa-save me-2"></i>Save Package</button>
    </div>
   </form>
+
  </div>
 </div>
 
@@ -527,5 +543,22 @@ if ($role === 'admin') {
  });
 </script>
 
+<script>
+ const checkbox = document.getElementById('noTrackingCheckbox');
+ const input = document.getElementById('trackingInput');
+ const star = document.getElementById('trackingStar');
+
+ checkbox.addEventListener('change', function() {
+  if (this.checked) {
+   input.disabled = true;
+   input.removeAttribute('required');
+   star.style.display = 'none';
+  } else {
+   input.disabled = false;
+   input.setAttribute('required', 'required');
+   star.style.display = 'inline';
+  }
+ });
+</script>
 <?= $this->endSection() ?>
 <?= $this->endSection() ?>

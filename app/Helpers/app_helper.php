@@ -133,10 +133,15 @@ if (!function_exists("fullname")) {
   {
     $model = new \App\Models\UserModel();
     $user = $model->select(['firstname', 'lastname'])->where('id', $userId)->first();
-    $fullname = $user['firstname'] . ' ' . $user['lastname'];
-    return $fullname;
+    if (!$user) return '-';
+
+    $fullname = esc($user['firstname'] . ' ' . $user['lastname']);
+
+    // Return clickable name (with data attribute)
+    return '<a href="javascript:void(0);" style="text-decoration:none;color:#a84dff;" class="user-info-link" data-user-id="' . $userId . '">' . $fullname . '</a>';
   }
 }
+
 
 if (!function_exists("warehouse_name")) {
   function warehouse_name($id = null)

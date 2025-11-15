@@ -241,7 +241,39 @@
                 </div>
               </div>
             </div>
-
+            <!-- Shipping Information -->
+            <div class="card">
+              <div class="card-header">
+                <i class="fas fa-info-circle me-2"></i>Shipping Information
+              </div>
+              <div class="card-body">
+                <div class="detail-item">
+                  <span class="detail-label">Courier:</span>
+                  <span class="float-end"><?= $request['courier_name'] ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Service:</span>
+                  <span class="float-end"><?= $request['service_name'] ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Delivery Time:</span>
+                  <span class="float-end"><?= $request['delivery_time'] ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Total Charge:</span>
+                  <span class="float-end fw-bold text-success"><?= $request['currency'] . ' ' . $request['total_charge'] ?></span>
+                </div>
+                <hr>
+                <div class="detail-item">
+                  <span class="detail-label">Tracking Number:</span>
+                  <span class="float-end"><?= $request['id'] ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Reference ID:</span>
+                  <span class="float-end"><?= $request['id'] ?></span>
+                </div>
+              </div>
+            </div>
             <!-- Package Details -->
             <div class="card">
               <div class="card-header">
@@ -282,31 +314,7 @@
                 </div>
               </div>
             </div>
-            <!-- purchase invoice Details -->
-            <div class="card">
-              <div class="card-header">
-                <i class="fas fa-info-circle me-2"></i>Purchase Invoic
-              </div>
-              <div class="card-body">
-                <?php if ($request['purchase_invoice']): ?>
 
-                  <div class="text-center ">
-                    <img src="<?= base_url('images/invoices/') . $request['purchase_invoice'] ?>" alt="" height="120px" width="auto">
-                    <br>
-                    <a href="<?= base_url('images/invoices/' . $request['purchase_invoice']) ?>" target="_blank">
-                      View
-                    </a>
-                  </div>
-                <?php else: ?>
-                  <div class="text-center py-4">
-                    <h4>No Purchase invoice uploaded</h4>
-                    <a href="<?= base_url('shipping/notify_user/' . $request['id']) ?>" class="btn btn-status-update ">
-                      <i class="fas fa-bell me-2"></i>Notify User
-                    </a>
-                  </div>
-                <?php endif; ?>
-              </div>
-            </div>
 
             <!-- Shipping Timeline -->
             <div class="card">
@@ -336,46 +344,72 @@
           </div>
 
           <!-- Right Column -->
-          <div class="col-lg-4">
-            <!-- Shipping Information -->
+          <div class="col-lg-4"> <!-- Actions Card -->
             <div class="card">
               <div class="card-header">
-                <i class="fas fa-info-circle me-2"></i>Shipping Information
+                <i class="fas fa-tag me-2"></i>Label Information
               </div>
               <div class="card-body">
-                <div class="detail-item">
-                  <span class="detail-label">Courier:</span>
-                  <span class="float-end"><?= $request['courier_name'] ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Service:</span>
-                  <span class="float-end"><?= $request['service_name'] ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Delivery Time:</span>
-                  <span class="float-end"><?= $request['delivery_time'] ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Total Charge:</span>
-                  <span class="float-end fw-bold text-success"><?= $request['currency'] . ' ' . $request['total_charge'] ?></span>
-                </div>
-                <hr>
-                <div class="detail-item">
-                  <span class="detail-label">Tracking Number:</span>
-                  <span class="float-end"><?= $request['id'] ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Reference ID:</span>
-                  <span class="float-end"><?= $request['id'] ?></span>
-                </div>
+                <?php if (empty($request['label'])): ?>
+                  <form action="<?= base_url('shipping/update-label/' . $request['id']) ?>" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                      <label for="label" class="form-label text-muted mb-4">Upload the label for this request.</label>
+                      <input type="file" name="label" id="label" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-shippex-orange">Upload label</button>
+                  </form>
+                <?php else: ?>
+                  <div class="text-center ">
+                    <img src="<?= base_url('images/labels/') . $request['label'] ?>" alt="" height="120px" width="auto">
+                  </div>
+                  <hr>
+                  <div class="d-flex justify-content-center gap-3">
+
+                    <a class="btn btn-action view" href="<?= base_url('images/labels/' . $request['label']) ?>" target="_blank"><i class="fas fa-eye"></i></a>
+                    <a class="btn btn-action edit" href="<?= base_url('images/labels/' . $request['label']) ?>" download><i class="fas fa-download"></i></a>
+                    <form class="delete-form" action="<?= base_url('shipping/delete-label/' . $request['id']) ?>" method="post" class="d-inline delete-form">
+                      <?= csrf_field() ?>
+                      <button type="submit" class="btn btn-action delete "><i class="fas fa-trash"></i></button>
+                    </form>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </div>
+
+
+            <!-- purchase invoice Details -->
+            <div class="card">
+              <div class="card-header">
+                <i class="fas fa-info-circle me-2"></i>Purchase Invoic
+              </div>
+              <div class="card-body">
+                <?php if ($request['purchase_invoice']): ?>
+
+                  <div class="text-center ">
+                    <img src="<?= base_url('images/invoices/') . $request['purchase_invoice'] ?>" alt="" height="120px" width="auto">
+                    <br>
+                    <a href="<?= base_url('images/invoices/' . $request['purchase_invoice']) ?>" target="_blank">
+                      View
+                    </a>
+                  </div>
+                <?php else: ?>
+                  <div class="text-center py-4">
+                    <h4>No Purchase invoice uploaded</h4>
+                    <a href="<?= base_url('shipping/notify_user/' . $request['id']) ?>" class="btn btn-status-update ">
+                      <i class="fas fa-bell me-2"></i>Notify User
+                    </a>
+                  </div>
+                <?php endif; ?>
               </div>
             </div>
 
             <!-- Actions Card -->
             <div class="card">
-              <div class="status-management">
-                <h4 class="status-header"><i class="fas fa-exchange-alt me-2"></i>Update Booking Status</h4>
+              <div class="card-header">
+                <h5><i class="fas fa-exchange-alt me-2"></i>Update Booking Status</h5>
 
+              </div>
+              <div class="card-body">
                 <div class="current-status mb-4">
                   <p class="mb-1">Current Status:</p>
                   <span class="status-badge status-shipping" id="currentStatusDisplay"><?= $request['status'] ?></span>
@@ -412,102 +446,90 @@
                     <span class="status-text">Canceled</span>
                   </div>
                 </div>
+              </div>
 
-                <div class="mt-4">
-                  <button class="btn btn-status-update w-100" id="updateStatusBtn">
-                    <i class="fas fa-save me-2"></i>Update Status
-                  </button>
-                </div>
-
-                <div class="status-history">
-                  <h6 class="mb-3"><i class="fas fa-history me-2"></i>Status History</h6>
-                  <?php foreach ($history as $hist): ?>
-                    <div class="history-item">
-                      <span class="history-status status-<?= isset($hist['new_status']) && $hist['new_status'] ? $hist['new_status'] : 'pending' ?>">
-                        <?= isset($hist['new_status']) && $hist['new_status'] ? ucfirst($hist['new_status']) : 'Pending' ?>
-                      </span>
-                      <span class="history-date"><?= $hist['changed_at'] ?></span>
-                    </div>
-                  <?php endforeach; ?>
-
-
-                </div>
+              <div class="mb-4 px-4">
+                <button class="btn btn-status-update w-100" id="updateStatusBtn">
+                  <i class="fas fa-save me-2"></i>Update Status
+                </button>
               </div>
             </div>
 
-
           </div>
+
+
         </div>
       </div>
     </div>
-    <?= $this->section('script') ?>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const statusOptions = document.querySelectorAll('.status-option');
-        let selectedStatus = '<?= $request['status'] ?>';
+  </div>
+  <?= $this->section('script') ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusOptions = document.querySelectorAll('.status-option');
+      let selectedStatus = '<?= $request['status'] ?>';
 
-        document.querySelector(`.status-option[data-status="${selectedStatus}"]`)?.classList.add('selected');
+      document.querySelector(`.status-option[data-status="${selectedStatus}"]`)?.classList.add('selected');
 
-        statusOptions.forEach(option => {
-          option.addEventListener('click', function() {
-            statusOptions.forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            selectedStatus = this.getAttribute('data-status');
-          });
-        });
-
-        const updateBtn = document.getElementById('updateStatusBtn');
-        updateBtn.addEventListener('click', function() {
-          const bookingId = <?= $request['id'] ?? 'null' ?>;
-          if (!bookingId) {
-            Swal.fire('Error', 'Booking ID not found!', 'error');
-            return;
-          }
-
-          Swal.fire({
-            title: 'Updating status...',
-            text: 'Please wait while the update is processed.',
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            }
-          });
-
-          fetch(`/shipping/update-status/${bookingId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: JSON.stringify({
-                new_status: selectedStatus
-              })
-            })
-            .then(res => res.json())
-            .then(data => {
-              Swal.close();
-
-              if (data.success) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Status Updated!',
-                  text: data.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                }).then(() => {
-                  window.location.reload();
-                });
-              } else {
-                Swal.fire('Error', data.message, 'error');
-              }
-            })
-            .catch(err => {
-              Swal.close();
-              Swal.fire('Error', 'Network error: ' + err.message, 'error');
-            });
+      statusOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          statusOptions.forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedStatus = this.getAttribute('data-status');
         });
       });
-    </script>
 
-    <?= $this->endSection() ?>
-    <?= $this->endSection() ?>
+      const updateBtn = document.getElementById('updateStatusBtn');
+      updateBtn.addEventListener('click', function() {
+        const bookingId = <?= $request['id'] ?? 'null' ?>;
+        if (!bookingId) {
+          Swal.fire('Error', 'Booking ID not found!', 'error');
+          return;
+        }
+
+        Swal.fire({
+          title: 'Updating status...',
+          text: 'Please wait while the update is processed.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        fetch(`/shipping/update-status/${bookingId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              new_status: selectedStatus
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            Swal.close();
+
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Status Updated!',
+                text: data.message,
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                window.location.reload();
+              });
+            } else {
+              Swal.fire('Error', data.message, 'error');
+            }
+          })
+          .catch(err => {
+            Swal.close();
+            Swal.fire('Error', 'Network error: ' + err.message, 'error');
+          });
+      });
+    });
+  </script>
+
+  <?= $this->endSection() ?>
+  <?= $this->endSection() ?>

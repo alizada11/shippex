@@ -281,41 +281,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Shipping Timeline -->
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-history me-2"></i>Shipping Timeline
-            </div>
-            <div class="card-body">
-              <div class="timeline">
-                <?php
-
-                use CodeIgniter\Database\BaseUtils;
-
-                if (!$history): ?>
-                  <div class="timeline-item completed">
-                    <h6 class="mb-1"><?= $request['status'] ?> </h6>
-                    <p class="text-muted mb-0"><?= $request['created_at'] ?> </p>
-                  </div>
-                <?php else: ?>
-                  <?php foreach ($history as $hist): ?>
-                    <div class="timeline-item completed">
-                      <h6 class="mb-1"><?= $hist['new_status'] ?> </h6>
-                      <p class="text-muted mb-0"><?= $hist['changed_at'] ?> </p>
-                    </div>
-                <?php endforeach;
-                endif;
-                ?>
-
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-lg-4">
-          <!-- Shipping Information -->
           <div class="card">
             <div class="card-header">
               <i class="fas fa-info-circle me-2"></i>Shipping Information
@@ -349,40 +314,46 @@
             </div>
           </div>
 
+        </div>
 
-          <div class="card" id="purchaseInvoice">
-            <div class="card-header">
-              <i class="fas fa-info-circle me-2"></i>Purchase Invoic
-            </div>
-            <div class="card-body">
-              <?php if (empty($request['purchase_invoice'])): ?>
-                <form action="<?= base_url('shipping/updateInvoice/' . $request['id']) ?>" method="post" enctype="multipart/form-data">
-                  <div class="mb-3">
-                    <label for="purchase_invoice" class="form-label">Upload the purchase invoice for your payment to be accepted.</label>
-                    <input type="file" name="purchase_invoice" id="purchase_invoice" class="form-control" required>
-                  </div>
-                  <button type="submit" class="btn shippex-btn">Upload Invoice</button>
-                </form>
-              <?php else: ?>
+        <!-- Right Column -->
+        <div class="col-lg-4">
+          <?php if (!empty($request['label'])): ?>
+            <div class="card">
+              <div class="card-header">
+                <i class="fas fa-tag me-2"></i>Label Information
+              </div>
+              <div class="card-body">
+
                 <div class="text-center ">
-                  <img src="<?= base_url('images/invoices/') . $request['purchase_invoice'] ?>" alt="" height="120px" width="auto">
+                  <img src="<?= base_url('images/labels/') . $request['label'] ?>" alt="" height="120px" width="auto">
                   <br>
-                  <a href="<?= base_url('images/invoices/' . $request['purchase_invoice']) ?>" target="_blank">
-                    View
-                  </a>
                 </div>
-              <?php endif; ?>
+                <div class="row d-flex justify-content-center gap-2">
+                  <a class="btn btn-action view" href="<?= base_url('images/labels/' . $request['label']) ?>" target="_blank"><i class="fas fa-eye"></i></a>
+                  <a class="btn btn-action edit" href="<?= base_url('images/labels/' . $request['label']) ?>" download=""><i class="fas fa-download"></i></a>
+                </div>
+              </div>
             </div>
-          </div>
+          <?php endif; ?>
+          <!-- Shipping Information -->
 
-          <?php if ($request['status'] == "accepted"): ?>
+          <?php if ($request['status'] == "accepted" && $request['purchase_invoice'] !== null): ?>
             <div class="card noprint">
               <div class="card-header">
                 <i class="fas fa-pay-circle me-2"></i>Payment
               </div>
               <div class="card-body">
-                <h5>Request ID: <?= $request['id'] ?></h5>
-                <p>Amount to pay: $<?= $request['total_charge'] ?></p>
+                <div class="detail-item">
+                  <span class="detail-label">Request ID</span>
+                  <span class="float-end"> <?= $request['id'] ?></span>
+
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Amount to pay:</span>
+                  <span class="float-end fw-bold text-success"> $<?= $request['total_charge'] ?></span>
+
+                </div>
 
                 <!-- PayPal Buttons -->
                 <div id="paypal-button-container"></div>
@@ -412,6 +383,61 @@
               </div>
             </div>
           <?php endif; ?>
+
+          <div class="card" id="purchaseInvoice">
+            <div class="card-header">
+              <i class="fas fa-info-circle me-2"></i>Purchase Invoic
+            </div>
+            <div class="card-body">
+              <?php if (empty($request['purchase_invoice'])): ?>
+                <form action="<?= base_url('shipping/updateInvoice/' . $request['id']) ?>" method="post" enctype="multipart/form-data">
+                  <div class="mb-3">
+                    <label for="purchase_invoice" class="form-label">Upload the purchase invoice for your payment to be accepted.</label>
+                    <input type="file" name="purchase_invoice" id="purchase_invoice" class="form-control" required>
+                  </div>
+                  <button type="submit" class="btn shippex-btn">Upload Invoice</button>
+                </form>
+              <?php else: ?>
+                <div class="text-center ">
+                  <img src="<?= base_url('images/invoices/') . $request['purchase_invoice'] ?>" alt="" height="120px" width="auto">
+                </div>
+                <div class="d-flex justify-content-center mt-3 gap-3">
+
+                  <a class="btn btn-action view" href="<?= base_url('images/invoices/' . $request['purchase_invoice']) ?>" target="_blank"><i class="fas fa-eye"></i></a>
+                </div>
+              <?php endif; ?>
+            </div>
+          </div>
+          <!-- Shipping Timeline -->
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-history me-2"></i>Shipping Timeline
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                <?php
+
+                use CodeIgniter\Database\BaseUtils;
+
+                if (!$history): ?>
+                  <div class="timeline-item completed">
+                    <h6 class="mb-1"><?= $request['status'] ?> </h6>
+                    <p class="text-muted mb-0"><?= $request['created_at'] ?> </p>
+                  </div>
+                <?php else: ?>
+                  <?php foreach ($history as $hist): ?>
+                    <div class="timeline-item completed">
+                      <h6 class="mb-1"><?= $hist['new_status'] ?> </h6>
+                      <p class="text-muted mb-0"><?= $hist['changed_at'] ?> </p>
+                    </div>
+                <?php endforeach;
+                endif;
+                ?>
+
+              </div>
+            </div>
+          </div>
+
 
         </div>
       </div>

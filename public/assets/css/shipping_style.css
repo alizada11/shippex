@@ -11,16 +11,15 @@
    Page / Container
    --------------------------- */
 .premium-package-container {
-  background-color: #f8fafc;
+  background-color: #fff;
   min-height: 100vh;
 }
 
 .premium-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #3a0d6b 100%);
-  color: white;
-  padding: 1.5rem 0;
-  margin-bottom: 2rem;
-  border-radius: 0 0 15px 15px;
+  padding: 1.5rem 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #eee;
 }
 
 .page-title {
@@ -37,14 +36,6 @@
 /* ---------------------------
    Tables (package-table + generic table)
    --------------------------- */
-.package-table-container,
-.table-container {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-}
 
 .package-table {
   margin-bottom: 0;
@@ -109,7 +100,92 @@
 .rates-table tr:last-child td {
   border-bottom: none;
 }
+/* pacckage tabs */
 
+.shippex-tabs {
+  border-bottom: 2px solid var(--shippex-light);
+  margin-bottom: 20px;
+}
+
+.shippex-tabs .nav-item {
+  margin-bottom: -2px;
+}
+
+.shippex-tabs .nav-link {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6c757d;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  border-radius: 8px 8px 0 0;
+}
+
+.shippex-tabs .nav-link:hover {
+  color: var(--primary-color);
+  background-color: rgba(77, 20, 140, 0.05);
+  border-bottom-color: rgba(77, 20, 140, 0.3);
+}
+
+.shippex-tabs .nav-link.active {
+  color: var(--primary-color);
+  background-color: white;
+  border-bottom: 3px solid var(--secondary-color);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.shippex-tabs .nav-link .badge {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #6a1fb9 100%);
+  color: white;
+  font-size: 0.7rem;
+  margin-left: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.shippex-tabs .nav-link.active .badge {
+  background: var(--secondary-color);
+}
+
+.shippex-tabs .tab-content {
+  background: white;
+  border-radius: 0 12px 12px 12px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--shippex-light);
+  border-top: none;
+}
+
+/* Animation for tab content */
+.shippex-tabs .tab-pane {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .shippex-tabs .nav-link {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .shippex-tabs .tab-content {
+    padding: 20px 15px;
+    border-radius: 0 0 12px 12px;
+  }
+}
 /* ---------------------------
    Selection / columns
    --------------------------- */
@@ -183,6 +259,15 @@
   background-color: rgba(23, 162, 184, 0.15);
   color: #17a2b8;
 }
+.status-returned,
+.status-disposed {
+  background-color: rgba(234, 102, 69, 0.15);
+  color: #111617;
+}
+.status-combined {
+  background-color: rgba(234, 102, 69, 0.15);
+  color: #111617;
+}
 
 /* alternative statuses used later in file (kept names + styles) */
 .status-arrived {
@@ -204,9 +289,7 @@
    Bulk Actions
    --------------------------- */
 .bulk-actions-card {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  border-top: 1px solid #eee;
   padding: 1.5rem;
 }
 
@@ -240,11 +323,12 @@
   flex-wrap: wrap;
 }
 
+.bton-action,
 .bulk-action {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 4px;
   font-weight: 600;
-  border: 2px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   background: white;
   color: #64748b;
   transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
@@ -263,7 +347,7 @@
   color: var(--primary-color);
 }
 
-.bulk-action.dispose {
+.bton-action.disposal {
   border-color: var(--shippex-accent);
   color: var(--shippex-accent);
 }
@@ -274,6 +358,12 @@
 }
 
 /* hover states (consolidated) */
+.bton-action.disposal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--shippex-accent);
+  color: white;
+}
 .bulk-action:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -288,38 +378,12 @@
   background: var(--primary-color);
 }
 
-.bulk-action.dispose:hover {
+.bulk-action.disposal:hover {
   background: var(--shippex-accent);
 }
 
 .bulk-action.return:hover {
   background: #ffc107;
-}
-
-/* ---------------------------
-   Empty states (merged)
-   --------------------------- */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #a0aec0;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  color: rgba(77, 20, 140, 0.2);
-  margin-bottom: 1.5rem;
-}
-
-.empty-state h4 {
-  color: var(--primary-color);
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  color: var(--secondary-color);
-  max-width: 400px;
-  margin: 0 auto;
 }
 
 /* ---------------------------
@@ -526,7 +590,9 @@
   transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   background: white;
 }
-
+.form-check .form-check-input:disabled {
+  opacity: 0;
+}
 .card-option .form-check-input:checked + .form-check-label {
   border-color: var(--primary-color);
   background: rgba(77, 20, 140, 0.05);

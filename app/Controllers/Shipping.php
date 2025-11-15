@@ -231,6 +231,7 @@ class Shipping extends BaseController
             ->where('book_id', $id)
             ->orderBy('changed_at', 'AESC')
             ->findAll();
+        // dd($data);
         $data['title'] = 'Shipping Req Details';
         return view('admin/shipping/details', $data);
     }
@@ -273,7 +274,14 @@ class Shipping extends BaseController
 
         // Update booking status
         if ($newStatus === 'canceled') {
+
             // allow cancellation at any stage
+        } else if ($newStatus === 'shipping' && empty($booking['payment_status'])) {
+            $totalCharge = $booking['total_charge'];
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => "User did not payed yet. The amount to pay is <b>$</b><b>{$totalCharge}</b>"
+            ]);
         } else if ($statusOrder[$newStatus] == $statusOrder[$oldStatus]) {
             return $this->response->setJSON([
                 'success' => false,
@@ -325,28 +333,28 @@ class Shipping extends BaseController
             $email->setMailType('html');
             $email->send();
         }
-        $users_warehouse = $usersWarehouseModel->where('user_id', $booking['user_id'])->where('is_default', 1)->first();
+        // $users_warehouse = $usersWarehouseModel->where('user_id', $booking['user_id'])->where('is_default', 1)->first();
 
-        $ware_house_id  =  $users_warehouse['warehouse_id'];
+        // $ware_house_id  =  $users_warehouse['warehouse_id'];
 
-        // If status is shipped → create a package
-        if ($newStatus === 'shipped') {
-            $packageData = [
-                'virtual_address_id' => $ware_house_id,
-                'user_id'            => $booking['user_id'],
-                'retailer'           => $booking['courier_name'] ?? 'Unknown',
-                'tracking_number'    => 'PENDING-' . strtoupper(uniqid()),
-                'length'             => $booking['length'],
-                'width'              => $booking['width'],
-                'height'             => $booking['height'],
-                'weight'             => $booking['weight'],
-                'value'              => $booking['total_charge'] ?? 0,
-                'status'             => 'incoming',
-                'created_at'         => date('Y-m-d H:i:s')
-            ];
+        // // If status is shipped → create a package
+        // if ($newStatus === 'shipped') {
+        //     $packageData = [
+        //         'virtual_address_id' => $ware_house_id,
+        //         'user_id'            => $booking['user_id'],
+        //         'retailer'           => $booking['courier_name'] ?? 'Unknown',
+        //         'tracking_number'    => 'PENDING-' . strtoupper(uniqid()),
+        //         'length'             => $booking['length'],
+        //         'width'              => $booking['width'],
+        //         'height'             => $booking['height'],
+        //         'weight'             => $booking['weight'],
+        //         'value'              => $booking['total_charge'] ?? 0,
+        //         'status'             => 'incoming',
+        //         'created_at'         => date('Y-m-d H:i:s')
+        //     ];
 
-            $packageModel->insert($packageData);
-        }
+        //     $packageModel->insert($packageData);
+        // }
 
         // Get updated history
         $history = $historyModel
@@ -365,6 +373,79 @@ class Shipping extends BaseController
     }
 
 
+
+    public function updateLabel($id)
+    {
+        $model = new ShippingBookingModel();
+        $file = $this->request->getFile('label');
+
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+
+            $newName = $file->getRandomName();
+            $file->move(FCPATH . 'images/labels', $newName); // saves to writable/uploads/invoices
+
+            $model->update($id, ['label' => $newName]);
+
+            $shippingModel = new ShippingBookingModel();
+            $result = $shippingModel->where('id', $id)->first();
+
+            $user_id = $result['user_id'];
+
+
+
+            $model = new \App\Models\UserModel();
+            $user = $model->where('id', $user_id)->first();
+
+            if ($user) {
+
+                $link['name'] = $user['firstname'] . ' ' . $user['lastname'];
+                $user_email = $user['email'];
+
+                $link['text'] = base_url("customer/shipping/details/$id");
+
+                // html page
+                $message = view('emails/download_label', $link);
+
+                $email = \Config\Services::email();
+
+                $email->setTo($user_email);
+                $email->setSubject('Download Your Labe');
+                $email->setMessage($message);
+                $email->setMailType('html'); // Important
+
+                $email->send();
+            }
+            return redirect()->to('/shipping/details/' . $id)->with('success', 'Label uploaded successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Please select a valid file.');
+    }
+    public function deleteLabel($id)
+    {
+        $model = new \App\Models\ShippingBookingModel();
+
+        // Fetch the record
+        $booking = $model->find($id);
+
+        if (!$booking) {
+            return redirect()->back()->with('error', 'Booking not found.');
+        }
+
+        // Check if a label file exists
+        if (!empty($booking['label'])) {
+            $filePath = FCPATH . 'images/labels/' . $booking['label'];
+
+            // Delete file from the server if it exists
+            if (is_file($filePath)) {
+                unlink($filePath);
+            }
+        }
+
+        // Update database (set label to null)
+        $model->update($id, ['label' => null]);
+
+        return redirect()->to('/shipping/details/' . $id)->with('success', 'Label deleted successfully.');
+    }
 
     public function updateInvoice($id)
     {
@@ -545,7 +626,7 @@ class Shipping extends BaseController
 
         if ($email->send()) {
 
-            return redirect()->back()->with('success', 'Email has been setn successfully.');
+            return redirect()->back()->with('success', 'Email has been sent successfully.');
         } else {
             log_message('error', $email->printDebugger(['headers']));
             return redirect()->back()->with('error', 'There has been an error while sending email.');

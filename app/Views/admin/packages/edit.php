@@ -10,7 +10,7 @@ if ($role === 'admin') {
 }
 ?>
 <?= $this->section('content') ?>
-<div class="premium-admin-container">
+<div class="card shadow-sm">
   <!-- Premium Header Section -->
   <div class="premium-header">
     <div class="container">
@@ -34,95 +34,103 @@ if ($role === 'admin') {
   </div>
 
   <!-- Files Card -->
-  <div class="premium-card">
-    <div class="card-header">
-      <h3 class="card-title">
-        <i class="fas fa-paperclip me-2"></i>Attached Files
-      </h3>
-      <div class="card-actions">
-        <span class="badge bg-shippex-purple"><?= count($files) ?> files</span>
-      </div>
-    </div>
-    <div class="card-body">
-      <?php if (empty($files)): ?>
-        <div class="empty-state small">
-          <div class="empty-icon">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <h5>No Files Attached</h5>
-          <p>This package doesn't have any files attached yet.</p>
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-paperclip me-2"></i>Attached Files
+        </h3>
+        <div class="card-actions">
+          <span class="badge bg-shippex-purple"><?= count($files) ?> files</span>
         </div>
-      <?php else: ?>
-        <div class="row">
-          <?php foreach ($files as $file): ?>
-            <div class="col-md-6 mb-3">
-              <div class="file-card">
-                <div class="file-icon">
-                  <?php
-                  $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
-                  $iconClass = 'fas fa-file';
-                  if (in_array($fileExtension, ['pdf'])) {
-                    $iconClass = 'fas fa-file-pdf text-danger';
-                  } elseif (in_array($fileExtension, ['doc', 'docx'])) {
-                    $iconClass = 'fas fa-file-word text-primary';
-                  } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
-                    $iconClass = 'fas fa-file-excel text-success';
-                  } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    $iconClass = 'fas fa-file-image text-warning';
-                  }
-                  ?>
-                  <i class="<?= $iconClass ?>"></i>
-                </div>
-                <div class="file-info">
-                  <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
-                  <div class="file-path"><?= esc(basename($file['file_path'])) ?></div>
-                </div>
-                <div class="file-actions">
-                  <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
-                    <i class="fas fa-download"></i>
-                  </a>
+      </div>
+      <div class="card-body">
+        <?php if (empty($files)): ?>
+          <div class="empty-state small">
+            <div class="empty-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <h5>No Files Attached</h5>
+            <p>This package doesn't have any files attached yet.</p>
+          </div>
+        <?php else: ?>
+          <div class="row">
+            <?php foreach ($files as $file): ?>
+              <div class="col-md-6 mb-3">
+                <div class="file-card">
+                  <div class="file-icon">
+                    <?php
+                    $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
+                    $iconClass = 'fas fa-file';
+                    if (in_array($fileExtension, ['pdf'])) {
+                      $iconClass = 'fas fa-file-pdf text-danger';
+                    } elseif (in_array($fileExtension, ['doc', 'docx'])) {
+                      $iconClass = 'fas fa-file-word text-primary';
+                    } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
+                      $iconClass = 'fas fa-file-excel text-success';
+                    } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                      $iconClass = 'fas fa-file-image text-warning';
+                    }
+                    ?>
+                    <i class="<?= $iconClass ?>"></i>
+                  </div>
+                  <div class="file-info">
+                    <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
+                    <div class="file-path"><?= esc(basename($file['file_path'])) ?></div>
+                  </div>
+                  <div class="file-actions">
+                    <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
+                      <i class="fas fa-download"></i>
+                    </a>
+                    <?php if ($role === "admin"): ?>
+                      <form class="delete-form" action="<?= base_url('packages/files/delete/' . $file['id']) ?>" method="post" class="d-inline delete-form">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-icon  "><i class="fas fa-trash"></i></button>
+                      </form>
+                    <?php endif; ?>
+                  </div>
                 </div>
               </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
-
-      <!-- Upload File Form -->
-      <div class="upload-section mt-4 pt-4 border-top">
-        <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Upload New File</h5>
-
-        <form action="<?= base_url('packages/' . $package['id'] . '/files/upload') ?>" method="post" enctype="multipart/form-data">
-          <?= csrf_field() ?>
-          <input type="hidden" name="package_id" value="<?= $package['id'] ?>">
-
-          <div class="row g-3 align-items-start">
-            <div class="col-md-3">
-              <label class="form-label fw-semibold">File Type</label>
-              <select name="file_type" class="form-select">
-                <option value="invoice">Invoice</option>
-                <option value="photo">Photo</option>
-                <option value="label">Label</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Select File <span class="text-danger">*</span></label>
-              <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif">
-              <small class="form-text text-muted">Supported formats: PDF, DOC, XLS, JPG, PNG, GIF</small>
-            </div>
-
-            <div class="col-md-3 mt-5">
-              <button type="submit" class="btn btn-shippex w-100">
-                <i class="fas fa-upload me-2"></i> Upload File
-              </button>
-            </div>
+            <?php endforeach; ?>
           </div>
-        </form>
+        <?php endif; ?>
+
+        <!-- Upload File Form -->
+        <div class="upload-section mt-4 pt-4 border-top">
+          <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Upload New File</h5>
+
+          <form action="<?= base_url('packages/' . $package['id'] . '/files/upload') ?>" method="post" enctype="multipart/form-data">
+            <?= csrf_field() ?>
+            <input type="hidden" name="package_id" value="<?= $package['id'] ?>">
+
+            <div class="row g-3 align-items-start">
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">File Type</label>
+                <select name="file_type" class="form-select">
+                  <option value="invoice">Invoice</option>
+                  <option value="photo">Photo</option>
+                  <option value="label">Label</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Select File <span class="text-danger">*</span></label>
+                <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif">
+                <small class="form-text text-muted">Supported formats: PDF, DOC, XLS, JPG, PNG, GIF</small>
+              </div>
+
+              <div class="col-md-3 mt-5">
+                <button type="submit" class="btn btn-shippex w-100">
+                  <i class="fas fa-upload me-2"></i> Upload File
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -182,6 +190,9 @@ if ($role === 'admin') {
               <input type="hidden" name="warehouse_id" value="<?= esc($package['virtual_address_id']) ?>">
 
               <!-- Weight -->
+              <label class="form-label fw-semibold">Value</label>
+              <input type="number" step="0.01" name="value" class="form-control" value="<?= esc($package['value']) ?>">
+              <!-- Weight -->
               <label class="form-label fw-semibold">Weight (Kg)</label>
               <input type="number" step="0.01" name="weight" class="form-control" value="<?= esc($package['weight']) ?>">
 
@@ -216,10 +227,7 @@ if ($role === 'admin') {
     --transition: all 0.3s ease;
   }
 
-  .premium-admin-container {
-    background-color: var(--shippex-light);
-    min-height: 100vh;
-  }
+
 
   /* Header Styling */
   .premium-header {

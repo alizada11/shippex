@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\ShippingBookingModel;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 
@@ -181,6 +182,34 @@ class Auth extends BaseController
 
         return redirect()->back()->with('error', 'Email not found.');
     }
+    public function getUserInfo($id)
+    {
+        $userModel = new \App\Models\UserModel();
+
+        $bookingModel = new ShippingBookingModel();
+        $shopperModel = new \App\Models\ShopperRequestModel();
+        $packageModel = new \App\Models\PackageModel();
+
+        $user = $userModel->find($id);
+        if (!$user) {
+            return $this->response->setJSON(['error' => 'User not found']);
+        }
+
+        // Example counts — adjust table and column names as needed
+        $data = [
+            'fullname' => $user['firstname'] . ' ' . $user['lastname'],
+            'joined_date' => date('d M Y', strtotime($user['created_at'])),
+            'total_bookings' => $bookingModel->where('user_id', $id)->countAllResults(),
+            'total_shopper_requests' => $shopperModel->where('user_id', $id)->countAllResults(),
+            'total_packages' => $packageModel->where('user_id', $id)->countAllResults(),
+            'email' => $user['email'],
+            'id' => $user['id'],
+            'username' => $user['username'] ?? '-'
+        ];
+
+        return $this->response->setJSON($data);
+    }
+
     public function reset($token)
     {
 

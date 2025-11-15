@@ -1,0 +1,1863 @@
+{
+  "couriers": [
+    {
+      "key": "dhl",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/dhl.png",
+      "name": "DHL",
+      "supported_countries": [
+        {
+          "id": 2,
+          "alpha2": "AE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 39,
+          "alpha2": "CA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 49,
+          "alpha2": "CN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 78,
+          "alpha2": "GB",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 96,
+          "alpha2": "HK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 102,
+          "alpha2": "ID",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 167,
+          "alpha2": "NL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 178,
+          "alpha2": "PH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 199,
+          "alpha2": "SG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 219,
+          "alpha2": "TH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 242,
+          "alpha2": "VN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 104,
+          "alpha2": "IL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 229,
+          "alpha2": "TW",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 111,
+          "alpha2": "IT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 6,
+          "alpha2": "AL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 18,
+          "alpha2": "BA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 23,
+          "alpha2": "BG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 56,
+          "alpha2": "CY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 57,
+          "alpha2": "CZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 76,
+          "alpha2": "FR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 58,
+          "alpha2": "DE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 21,
+          "alpha2": "BE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 65,
+          "alpha2": "EE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 69,
+          "alpha2": "ES",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 90,
+          "alpha2": "GR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 99,
+          "alpha2": "HR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 101,
+          "alpha2": "HU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 110,
+          "alpha2": "IS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 134,
+          "alpha2": "LT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 135,
+          "alpha2": "LU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 136,
+          "alpha2": "LV",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 154,
+          "alpha2": "MT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 191,
+          "alpha2": "RS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 201,
+          "alpha2": "SI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 203,
+          "alpha2": "SK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 231,
+          "alpha2": "UA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 185,
+          "alpha2": "PT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 13,
+          "alpha2": "AT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 168,
+          "alpha2": "NO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 180,
+          "alpha2": "PL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 44,
+          "alpha2": "CH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 103,
+          "alpha2": "IE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 190,
+          "alpha2": "RO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 60,
+          "alpha2": "DK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 198,
+          "alpha2": "SE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 71,
+          "alpha2": "FI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 226,
+          "alpha2": "TR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 159,
+          "alpha2": "MY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 115,
+          "alpha2": "JP",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 172,
+          "alpha2": "NZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 123,
+          "alpha2": "KR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 158,
+          "alpha2": "MX",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "ups",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/ups.png",
+      "name": "UPS",
+      "supported_countries": [
+        {
+          "id": 2,
+          "alpha2": "AE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 39,
+          "alpha2": "CA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 49,
+          "alpha2": "CN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 78,
+          "alpha2": "GB",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 96,
+          "alpha2": "HK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 102,
+          "alpha2": "ID",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 167,
+          "alpha2": "NL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 178,
+          "alpha2": "PH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 199,
+          "alpha2": "SG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 219,
+          "alpha2": "TH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 242,
+          "alpha2": "VN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 104,
+          "alpha2": "IL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 229,
+          "alpha2": "TW",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 111,
+          "alpha2": "IT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 6,
+          "alpha2": "AL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 18,
+          "alpha2": "BA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 23,
+          "alpha2": "BG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 56,
+          "alpha2": "CY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 57,
+          "alpha2": "CZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 76,
+          "alpha2": "FR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 58,
+          "alpha2": "DE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 21,
+          "alpha2": "BE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 65,
+          "alpha2": "EE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 69,
+          "alpha2": "ES",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 90,
+          "alpha2": "GR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 99,
+          "alpha2": "HR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 101,
+          "alpha2": "HU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 110,
+          "alpha2": "IS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 134,
+          "alpha2": "LT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 135,
+          "alpha2": "LU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 136,
+          "alpha2": "LV",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 154,
+          "alpha2": "MT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 191,
+          "alpha2": "RS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 201,
+          "alpha2": "SI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 203,
+          "alpha2": "SK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 231,
+          "alpha2": "UA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 185,
+          "alpha2": "PT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 13,
+          "alpha2": "AT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 168,
+          "alpha2": "NO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 180,
+          "alpha2": "PL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 44,
+          "alpha2": "CH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 103,
+          "alpha2": "IE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 190,
+          "alpha2": "RO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 60,
+          "alpha2": "DK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 198,
+          "alpha2": "SE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 71,
+          "alpha2": "FI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 226,
+          "alpha2": "TR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 159,
+          "alpha2": "MY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 115,
+          "alpha2": "JP",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 172,
+          "alpha2": "NZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 106,
+          "alpha2": "IN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 123,
+          "alpha2": "KR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 158,
+          "alpha2": "MX",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "fedex",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/fedex.png",
+      "name": "FedEx",
+      "supported_countries": [
+        {
+          "id": 2,
+          "alpha2": "AE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 39,
+          "alpha2": "CA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 49,
+          "alpha2": "CN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 78,
+          "alpha2": "GB",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 96,
+          "alpha2": "HK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 102,
+          "alpha2": "ID",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 167,
+          "alpha2": "NL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 178,
+          "alpha2": "PH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 199,
+          "alpha2": "SG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 219,
+          "alpha2": "TH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 242,
+          "alpha2": "VN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 104,
+          "alpha2": "IL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 229,
+          "alpha2": "TW",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 111,
+          "alpha2": "IT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 6,
+          "alpha2": "AL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 18,
+          "alpha2": "BA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 23,
+          "alpha2": "BG",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 56,
+          "alpha2": "CY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 57,
+          "alpha2": "CZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 76,
+          "alpha2": "FR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 58,
+          "alpha2": "DE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 21,
+          "alpha2": "BE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 65,
+          "alpha2": "EE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 69,
+          "alpha2": "ES",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 90,
+          "alpha2": "GR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 99,
+          "alpha2": "HR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 101,
+          "alpha2": "HU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 110,
+          "alpha2": "IS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 134,
+          "alpha2": "LT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 135,
+          "alpha2": "LU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 136,
+          "alpha2": "LV",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 154,
+          "alpha2": "MT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 191,
+          "alpha2": "RS",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 201,
+          "alpha2": "SI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 203,
+          "alpha2": "SK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 231,
+          "alpha2": "UA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 185,
+          "alpha2": "PT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 13,
+          "alpha2": "AT",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 168,
+          "alpha2": "NO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 180,
+          "alpha2": "PL",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 44,
+          "alpha2": "CH",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 103,
+          "alpha2": "IE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 190,
+          "alpha2": "RO",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 60,
+          "alpha2": "DK",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 198,
+          "alpha2": "SE",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 71,
+          "alpha2": "FI",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 226,
+          "alpha2": "TR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 159,
+          "alpha2": "MY",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 115,
+          "alpha2": "JP",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 172,
+          "alpha2": "NZ",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 106,
+          "alpha2": "IN",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 123,
+          "alpha2": "KR",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        },
+        {
+          "id": 158,
+          "alpha2": "MX",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "australia-post",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/australia-post.png",
+      "name": "Australia Post eParcel",
+      "supported_countries": [
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "star-track",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/star-track.png",
+      "name": "StarTrack",
+      "supported_countries": [
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "australia-post-on-demand",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/australia-post-on-demand.png",
+      "name": "Australia Post On Demand",
+      "supported_countries": [
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "mypost-business",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/mypost-business.png",
+      "name": "Australia Post MyPost Business",
+      "supported_countries": [
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "sendle",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/sendle.png",
+      "name": "Sendle",
+      "supported_countries": [
+        {
+          "id": 14,
+          "alpha2": "AU",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 39,
+          "alpha2": "CA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        },
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "canada-post",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/canada-post.png",
+      "name": "Canada Post",
+      "supported_countries": [
+        {
+          "id": 39,
+          "alpha2": "CA",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "royal-mail",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/royal-mail.png",
+      "name": "Royal Mail",
+      "supported_countries": [
+        {
+          "id": 78,
+          "alpha2": "GB",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "fedex-cross-border",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/fedex-cross-border.png",
+      "name": "FedEx Cross Border",
+      "supported_countries": [
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "apg",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/apg.png",
+      "name": "APG",
+      "supported_countries": [
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "passport",
+      "logo_url": "https://storage.googleapis.com/easyship-assets/website/courier-logos/color-img/passport.png",
+      "name": "Passport",
+      "supported_countries": [
+        {
+          "id": 234,
+          "alpha2": "US",
+          "courier_id": null,
+          "creation": {
+            "contact": false,
+            "ui": true,
+            "api": false
+          }
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "next": null,
+      "count": 13
+    },
+    "request_id": "86672e7286ed5d1830d458623c85643e"
+  }
+}

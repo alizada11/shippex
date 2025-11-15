@@ -49,7 +49,7 @@ class DisposeReturnController extends BaseController
    * request_type[]  (values 'dispose'|'return' per package index),
    * reason[] (per package index)
    */
-  public function submit()
+  public function disposeSubmit()
   {
     $input = $this->request->getJSON(true) ?? $this->request->getPost();
 
@@ -107,7 +107,7 @@ class DisposeReturnController extends BaseController
           ->where('status', 'pending')
           ->first();
         if ($existing) {
-          $errors[] = "There is already a pending request for package {$pkgId}.";
+          $errors[] = "<br>There is already a pending request for package {$pkgId}.";
           continue;
         }
 
@@ -118,6 +118,14 @@ class DisposeReturnController extends BaseController
           'reason' => trim($reason) ?: null,
           'status' => 'pending'
         ]);
+        if ($type === 'dispose') {
+
+          $this->packageModel->update($pkgId, ['status' => 'disposed']);
+        }
+        if ($type === 'return') {
+
+          $this->packageModel->update($pkgId, ['status' => 'returned']);
+        }
         $inserted++;
       }
 

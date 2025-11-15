@@ -7,7 +7,7 @@
  <div class="row">
 
   <!-- Bookings Table -->
-  <div class="card px-2 shadow-sm border-0">
+  <div class="card px-0 shadow-sm border-0">
 
    <div class="card-header premium-header p-3 d-flex justify-content-between align-items-center">
     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Shipping Requests</h5>

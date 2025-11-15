@@ -30,7 +30,7 @@ if ($role === 'admin') {
     </div>
   </div>
 
-  <div class="container py-4">
+  <div class="container ">
     <div class="package-table-container">
       <?php if (empty($packages)): ?>
         <div class="empty-state">
@@ -44,61 +44,197 @@ if ($role === 'admin') {
           </a>
         </div>
       <?php else: ?>
-        <div class="table-responsive">
-          <table class="table package-table">
-            <thead>
-              <tr>
-                <th scope="col" class="select-col">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="select-all">
+        <?php
+        // Count incoming and ready packages
+        $incomingCount = 0;
+        $readyCount = 0;
+        foreach ($packages as $p) {
+          if ($p['status'] === 'incoming') {
+            $incomingCount++;
+          } else {
+            $readyCount++;
+          }
+        }
+        ?>
+
+        <!-- Tabs navigation -->
+        <ul class="nav nav-tabs shippex-tabs" id="packageTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="incoming-tab" data-bs-toggle="tab" data-bs-target="#incoming" type="button" role="tab" aria-controls="incoming" aria-selected="true">
+              Incoming <span class="badge"><?= $incomingCount ?></span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ready-tab" data-bs-toggle="tab" data-bs-target="#ready" type="button" role="tab" aria-controls="ready" aria-selected="false">
+              Ready <span class="badge"><?= $readyCount ?></span>
+            </button>
+          </li>
+        </ul>
+
+
+
+        <!-- Tabs content -->
+        <div class="tab-content mt-3" id="packageTabsContent">
+
+          <!-- Incoming Tab -->
+          <div class="tab-pane fade show active" id="incoming" role="tabpanel" aria-labelledby="incoming-tab">
+            <?php if ($incomingCount > 0): ?>
+              <div class="table-responsive">
+                <table class="table package-table">
+                  <thead>
+                    <tr>
+
+                      <th scope="col">Retailer & Tracking</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Weight</th>
+                      <th scope="col">Value</th>
+                      <th scope="col">User</th>
+                      <th scope="col">Received</th>
+                      <th scope="col" class="actions-col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($packages as $p): ?>
+                      <?php if ($p['status'] === 'incoming'): ?>
+                        <tr data-package-id="<?= $p['id'] ?>">
+
+                          <td>
+                            <div class="retailer-info-table">
+                              <div class="retailer-logo-table"><i class="fas fa-store"></i></div>
+                              <div class="retailer-details-table">
+                                <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
+                                <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
+                              </div>
+                            </div>
+                          </td>
+                          <td><span class="status-badge status-<?= $p['status'] ?>"><?= ucfirst($p['status']) ?></span></td>
+                          <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
+                          <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
+                          <td><span class="detail-value"><?= fullname($p['user_id']) ?></span></td>
+                          <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
+                          <td class="actions-col">
+                            <div class="action-buttons-table">
+                              <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
+                              <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
+                              <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      <?php endif ?>
+                    <?php endforeach ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php else: ?>
+              <div class="empty-state text-center py-5">
+                <div class="empty-icon mb-3">
+                  <i class="fas fa-box-open fa-3x text-muted"></i>
+                </div>
+                <h4>No Packages Found</h4>
+                <p>There are no packages incoming.</p>
+              </div>
+            <?php endif ?>
+          </div>
+
+          <!-- Ready Tab -->
+          <div class="tab-pane fade" id="ready" role="tabpanel" aria-labelledby="ready-tab">
+            <?php if ($readyCount > 0): ?>
+              <div class="table-responsive">
+                <table class="table package-table">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="select-col">
+                        <!-- <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="select-all-ready">
+                        </div> -->
+                      </th>
+                      <th scope="col">Retailer & Tracking</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Weight</th>
+                      <th scope="col">Value</th>
+                      <th scope="col">User</th>
+                      <th scope="col">Received</th>
+                      <th scope="col" class="actions-col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($packages as $p): ?>
+                      <?php if ($p['status'] !== 'incoming'): ?>
+                        <tr data-package-id="<?= $p['id'] ?>">
+                          <td class="select-col">
+                            <div class="form-check">
+                              <input class="form-check-input package-checkbox"
+                                type="checkbox"
+                                value="<?= $p['id'] ?>"
+                                <?= ($p['status'] === 'returned' || $p['status'] === 'disposed' || $p['status'] === 'combined') ? 'disabled' : '' ?>>
+
+                            </div>
+                          </td>
+                          <td>
+                            <div class="retailer-info-table">
+                              <div class="retailer-logo-table"><i class="fas fa-store"></i></div>
+                              <div class="retailer-details-table">
+                                <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
+                                <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="status-badge status-<?= $p['status'] ?>">
+                              <?php if ($p['status'] === 'combined'): ?>
+                                <i class="fas fa-compress-arrows-alt me-1"></i>
+                              <?php endif; ?>
+                              <?= ucfirst($p['status']) ?>
+                            </span>
+                          </td>
+
+                          <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
+                          <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
+                          <td><span class="detail-value"><?= fullname($p['user_id']) ?></span></td>
+                          <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
+                          <td class="actions-col">
+                            <div class="action-buttons-table">
+                              <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
+                              <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
+                              <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      <?php endif ?>
+                    <?php endforeach ?>
+                  </tbody>
+                </table>
+                <div class="bulk-actions-card mt-4" id="bulkActionsCard" style="display: none;">
+
+                  <div class="bulk-actions">
+                    <button class="btn bulk-action ship-now" data-action="ship"><i class="fas fa-rocket me-2"></i> Ship Now</button>
+                    <button class="btn bulk-action combine-repack" data-action="combine"><i class="fas fa-boxes me-2"></i> Combine & Repack</button>
+                    <button id="bulkDisposeReturnBtn" class="btn bton-action disposal me-4" data-action="dispose">
+                      <i class="fas fa-trash-alt me-1"></i> Dispose / Return Selected
+                    </button>
+                    <span class="selection-count" style="display: none;" id="selectionCount">0 packages selected</span>
                   </div>
-                </th>
-                <th scope="col">Retailer & Tracking</th>
-                <th scope="col">Status</th>
-                <th scope="col">Weight</th>
-                <th scope="col">Value</th>
-                <th scope="col">Warehouse</th>
-                <th scope="col">Received</th>
-                <th scope="col" class="actions-col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($packages as $p): ?>
-                <tr data-package-id="<?= $p['id'] ?>">
-                  <td class="select-col">
-                    <div class="form-check">
-                      <input class="form-check-input package-checkbox" type="checkbox" value="<?= $p['id'] ?>">
-                    </div>
-                  </td>
-                  <td>
-                    <div class="retailer-info-table">
-                      <div class="retailer-logo-table"><i class="fas fa-store"></i></div>
-                      <div class="retailer-details-table">
-                        <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
-                        <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="status-badge status-<?= $p['status'] ?>"><?= ucfirst($p['status']) ?></span></td>
-                  <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
-                  <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
-                  <td><span class="detail-value"><?= esc($p['warehouse_name']) ?></span></td>
-                  <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
-                  <td class="actions-col">
-                    <div class="action-buttons-table">
-                      <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
-                      <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
-                      <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-action delete "><i class="fas fa-trash"></i></button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              <?php endforeach ?>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            <?php else: ?>
+              <div class="empty-state text-center py-5">
+                <div class="empty-icon mb-3">
+                  <i class="fas fa-box-open fa-3x text-muted"></i>
+                </div>
+                <h4>No Packages Found</h4>
+                <p>There are no packages ready.</p>
+              </div>
+            <?php endif ?>
+          </div>
+
         </div>
+
       <?php endif; ?>
     </div>
 
@@ -106,23 +242,7 @@ if ($role === 'admin') {
       <?= $pager->links('default', 'bootstrap_full') ?>
     </div>
 
-    <div class="bulk-actions-card mt-4" id="bulkActionsCard" style="display: none;">
-      <div class="bulk-header">
-        <h5>Bulk Actions</h5>
-        <span class="selection-count" id="selectionCount">0 packages selected</span>
-      </div>
-      <div class="bulk-actions">
-        <button class="btn bulk-action ship-now" data-action="ship"><i class="fas fa-rocket me-2"></i> Ship Now</button>
-        <button class="btn bulk-action combine-repack" data-action="combine"><i class="fas fa-boxes me-2"></i> Combine & Repack</button>
-        <button id="bulkDisposeReturnBtn" class="btn btn-danger">
-          <i class="fas fa-trash-alt me-1"></i> Dispose / Return Selected
-        </button>
 
-
-
-
-      </div>
-    </div>
   </div>
 </div>
 
@@ -711,52 +831,73 @@ if ($role === 'admin') {
         const request_type = Array.from(disposeForm.querySelectorAll('select[name="request_type[]"]')).map(s => s.value);
         const reason = reasons.map(i => i.value);
 
-        // send
-        try {
-          const res = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-              package_ids,
-              request_type,
-              reason
-            })
-          });
-          const json = await res.json();
-          if (json.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Success!',
-              html: json.message || 'Requests submitted successfully',
-              confirmButtonColor: '#28a745', // green success button
-            }).then(() => {
-              bsModal.hide();
-              // Uncheck selected rows
-              document.querySelectorAll('.package-checkbox:checked').forEach(cb => cb.checked = false);
-              // Refresh page to reflect new requests/statuses
-              location.reload();
-            });
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops!',
-              html: json.message || 'Failed to submit requests',
-              confirmButtonColor: '#ff6600', // red error button
-            });
-          }
 
-        } catch (err) {
-          console.error(err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops!',
-            text: 'Server error while submitting requests.',
-            confirmButtonColor: '#ff6600'
-          });
-        }
+
+        // Before your fetch code
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You are about to dismess or return this packae.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, submit it!',
+          cancelButtonText: 'Cancel'
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // The user clicked "Yes"
+            // send
+            try {
+              const res = await fetch(SUBMIT_URL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                  package_ids,
+                  request_type,
+                  reason
+                })
+              });
+              const json = await res.json();
+              if (json.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  html: json.message || 'Requests submitted successfully',
+                  confirmButtonColor: '#28a745', // green success button
+                }).then(() => {
+                  bsModal.hide();
+                  // Uncheck selected rows
+                  document.querySelectorAll('.package-checkbox:checked').forEach(cb => cb.checked = false);
+                  // Refresh page to reflect new requests/statuses
+                  location.reload();
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops!',
+                  html: json.message || 'Failed to submit requests',
+                  confirmButtonColor: '#ff6600', // red error button
+                });
+              }
+
+            } catch (err) {
+              console.error(err);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: 'Server error while submitting requests.',
+                confirmButtonColor: '#ff6600'
+              });
+            }
+          }
+        });
+
+
+
+
       });
     }
 
@@ -770,6 +911,9 @@ if ($role === 'admin') {
   });
 </script>
 
+<script>
+  const packagesData = <?= json_encode($packages); ?>;
+</script>
 
 
 <script>
@@ -813,48 +957,65 @@ if ($role === 'admin') {
         }
 
         const dimensions = getCurrentDimensions();
+        console.log(dimensions);
+        // Before your fetch code
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You are about to submit this request.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, submit it!',
+          cancelButtonText: 'Cancel'
+        }).then(async (result) => {
 
-        fetch('/packages/combine-request', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              package_ids: packageIds,
-              warehouse_id: warehouse_id,
-              dimensions: dimensions
-            })
-          })
-          .then(r => r.json())
-          .then(res => {
-            if (res.status === 'success') {
-              Swal.fire({
-                icon: 'success',
-                title: 'Request Sent',
-                text: 'Combine & Repack request submitted successfully!',
-                confirmButtonColor: '#28a745'
-              }).then(() => {
-                combineModalInstance.hide();
-                // Refresh page to reflect new requests/statuses
-                location.reload();
+          if (result.isConfirmed) {
+            console.log('bye');
+            fetch('/packages/combine-request', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  package_ids: packageIds,
+                  warehouse_id: warehouse_id,
+                  dimensions: dimensions
+                })
+              })
+              .then(r => r.json())
+              .then(res => {
+                if (res.status === 'success') {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Request Sent',
+                    text: 'Combine & Repack request submitted successfully!',
+                    confirmButtonColor: '#28a745'
+                  }).then(() => {
+                    combineModalInstance.hide();
+                    // Refresh page to reflect new requests/statuses
+                    location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Error:' + res.message,
+                    confirmButtonColor: '#ff6600'
+                  });
+                }
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops!',
+                  text: 'Network error: ' + error.message,
+                  confirmButtonColor: '#ff6600'
+                });
               });
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops!',
-                text: 'Error:' + res.message,
-                confirmButtonColor: '#ff6600'
-              });
-            }
-          })
-          .catch(error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops!',
-              text: 'Network error: ' + error.message,
-              confirmButtonColor: '#ff6600'
-            });
-          });
+          }
+        });
+
       };
 
       combineModalInstance.show();
@@ -881,22 +1042,34 @@ if ($role === 'admin') {
     }
 
     function createPackageCard(packageId) {
+      const pkg = packagesData.find(p => p.id == packageId);
+
+      let detailsText = '';
+      if (pkg) {
+        const weight = parseFloat(pkg.weight) || 0;
+        const length = parseFloat(pkg.length) || 0;
+        const width = parseFloat(pkg.width) || 0;
+        const height = parseFloat(pkg.height) || 0;
+        detailsText = `${weight.toFixed(1)}kg • ${length}×${width}×${height}cm`;
+      }
+
       const card = document.createElement('div');
       card.className = 'package-card';
       card.innerHTML = `
-      <div class="package-icon">
-        <i class="fas fa-box"></i>
-      </div>
-      <div class="package-info">
-        <div class="package-id">#${packageId}</div>
-        <div class="package-details">2.5kg • 30×20×15cm</div>
-      </div>
-      <button class="remove-package" onclick="removePackage('${packageId}')">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
+          <div class="package-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="package-info">
+            <div class="package-id">#${packageId}</div>
+            <div class="package-details">${detailsText}</div>
+          </div>
+          <button class="remove-package" onclick="removePackage('${packageId}')">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
       return card;
     }
+
 
     function updateSelectionCount(count) {
       const badge = document.getElementById('selectedCountBadge');
@@ -940,17 +1113,31 @@ if ($role === 'admin') {
     }
 
     function calculateCombinedDimensions(packageIds) {
-      // Only calculate if we have at least 2 packages
       if (packageIds.length < 2) {
         resetDimensions();
         return;
       }
 
-      // Mock calculation - in real implementation, you would fetch package details
-      const totalLength = packageIds.length * 10 + 20;
-      const totalWidth = packageIds.length * 8 + 15;
-      const totalHeight = packageIds.length * 5 + 10;
-      const totalWeight = packageIds.length * 1.5;
+      let totalLength = 0;
+      let totalWidth = 0;
+      let totalHeight = 0;
+      let totalWeight = 0;
+
+      packageIds.forEach(id => {
+        const pkg = packagesData.find(p => p.id == id);
+        if (pkg) {
+          totalLength += parseFloat(pkg.length) || 0;
+          totalWidth += parseFloat(pkg.width) || 0;
+          totalHeight += parseFloat(pkg.height) || 0;
+          totalWeight += parseFloat(pkg.weight) || 0;
+        }
+      });
+
+      // Optionally, add some padding or container dimensions
+      const padding = 2; // e.g., 2 cm extra for repack
+      totalLength += padding;
+      totalWidth += padding;
+      totalHeight += padding;
 
       // Update inputs
       document.getElementById('inputLength').value = totalLength.toFixed(1);
@@ -961,6 +1148,7 @@ if ($role === 'admin') {
       // Update preview
       updatePreview(totalLength, totalWidth, totalHeight, totalWeight);
     }
+
 
     function updatePreview(length, width, height, weight) {
       document.getElementById('previewLength').textContent = length.toFixed(1) + ' cm';
@@ -1048,7 +1236,7 @@ if ($role === 'admin') {
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const selectAll = document.getElementById('select-all');
+    // const selectAll = document.getElementById('select-all-ready');
     const checkboxes = document.querySelectorAll('.package-checkbox');
     const bulkCard = document.getElementById('bulkActionsCard');
     const selectionCount = document.getElementById('selectionCount');
@@ -1102,14 +1290,14 @@ if ($role === 'admin') {
       const count = getSelectedPackages().length;
       selectionCount.textContent = `${count} package${count !== 1 ? 's' : ''} selected`;
       bulkCard.style.display = count > 0 ? 'block' : 'none';
-      selectAll.indeterminate = count > 0 && count < checkboxes.length;
-      selectAll.checked = count === checkboxes.length;
+      // selectAll.indeterminate = count > 0 && count < checkboxes.length;
+      // selectAll.checked = count === checkboxes.length;
     }
 
-    selectAll?.addEventListener('change', () => {
-      checkboxes.forEach(cb => cb.checked = selectAll.checked);
-      updateSelectionUI();
-    });
+    // selectAll?.addEventListener('change', () => {
+    //   checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    //   updateSelectionUI();
+    // });
 
     checkboxes.forEach(cb => cb.addEventListener('change', updateSelectionUI));
 
@@ -1343,47 +1531,179 @@ if ($role === 'admin') {
           currentRates = rates;
 
           if (!rates.length) {
-            ratesContainer.innerHTML = '<div class="alert alert-warning">No shipping rates available for this route.</div>';
+
+            let logoPath = `<a href="https://wa.me/+96892656567"><img src="<?= base_url('logos/WhatsAppButtonGreenSmall.svg') ?>"/></a>`;
+            ratesContainer.innerHTML = `<div class="alert alert-warning text-center">Failed to calculate rates. Please try again.<br>${logoPath}</div>`;
             return;
           }
 
-          let tableHTML = `
-          <table class="table rates-table">
-            <thead>
-              <tr>
-                <th>Courier</th>
-                <th>Service</th>
-                <th>Delivery Time</th>
-                <th>Rate</th>
-                <th>Description</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+          let html = '';
+          let availableServices = rates.length;
+
+          // Logo base path
+          let logoPath = '/logos/'; // Adjust as needed, e.g. your CDN or assets path
 
           rates.forEach(rate => {
-            tableHTML += `
-            <tr>
-              <td><strong>${rate.courier_service?.umbrella_name || '-'}</strong></td>
-              <td>${rate.courier_service?.name || '-'}</td>
-              <td class="rate-delivery">${rate.min_delivery_time} - ${rate.max_delivery_time} days</td>
-              <td class="rate-price">${rate.currency} ${rate.total_charge.toFixed(2)}</td>
-              <td><small class="text-muted">${rate.full_description || '-'}</small></td>
-              <td>
-                <button class="btn btn-primary btn-sm book-btn" 
-                  data-rate='${JSON.stringify(rate).replace(/'/g, "\\'")}'>
-                  Book
-                </button>
-              </td>
-            </tr>
-          `;
+            let logoFile = 'default.png';
+            let courierIcon = '';
+            const name = (rate.courier_service?.umbrella_name || '').trim();
+
+            switch (name) {
+              case 'DHL':
+                logoFile = 'dhl.svg';
+                break;
+              case 'UPS':
+                logoFile = 'ups.svg';
+                break;
+              case 'Aramex':
+                logoFile = 'aramex.svg';
+                break;
+              case 'FlatExportRate':
+                logoFile = 'flatexportrate.svg';
+                break;
+              case 'SFExpress':
+                logoFile = 'sf-express.svg';
+                break;
+              case 'Asendia':
+                logoFile = 'asendia.svg';
+                break;
+              case 'Passport':
+                logoFile = 'passport.svg';
+                break;
+              case 'FedEx':
+                logoFile = 'fedex.svg';
+                break;
+              case 'USPS':
+                logoFile = 'usps.svg';
+                break;
+              case 'Sendle':
+                logoFile = 'sendle.svg';
+                break;
+              case 'Purolator':
+                logoFile = 'purolator.svg';
+                break;
+              case 'Canada Post':
+                logoFile = 'canada-post.svg';
+                break;
+              case 'Canpar':
+                logoFile = 'canpar.svg';
+                break;
+              case 'StarTrack':
+                logoFile = 'star-track.png';
+                break;
+              case 'CouriersPlease':
+                logoFile = 'couriers-please.svg';
+                break;
+              case 'AlliedExpress':
+                logoFile = 'alliedexpress.svg';
+                break;
+              case 'TNT':
+                logoFile = 'tnt.svg';
+                break;
+              case 'Quantium':
+                logoFile = 'quantium.svg';
+                break;
+              case 'Toll':
+                logoFile = 'toll.svg';
+                break;
+              case 'HKPost':
+                logoFile = 'hong-kong-post.svg';
+                break;
+              case 'APG':
+                logoFile = 'apg.svg';
+                break;
+              case 'Hubbed':
+                logoFile = 'hubbed.svg';
+                break;
+              default:
+                courierIcon = `
+                  <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" stroke-width="1.5">
+                    <rect x="2" y="7" width="20" height="12" rx="2" fill="#e6f2ff"/>
+                    <path d="M12 3v4"/>
+                    <path d="M7 7l5 4 5-4"/>
+                  </svg>`;
+            }
+
+            if (!courierIcon)
+              courierIcon = `<img class="rounded-3 me-2" src="${logoPath + logoFile}" alt="${name}" width="auto" height="40">`;
+
+            const chargeWithTax = rate.total_charge * 1.15;
+            const trackingRating = rate.tracking_rating || 0;
+
+            // Tracking dots
+            let trackingIcons = '';
+            for (let i = 0; i < 5; i++) {
+              trackingIcons += `<span style="color:${i < trackingRating ? '#00c853' : '#ccc'};">●</span>`;
+            }
+
+            // Handover options
+            let serviceOptions = '-';
+            if (rate.available_handover_options && rate.available_handover_options.length > 0) {
+              serviceOptions = rate.available_handover_options.map(opt => {
+                let icon = opt.includes('pickup') ? '🏠' : '📦';
+                let label = opt.replace(/_/g, ' ');
+                return `<div>${icon} ${label.charAt(0).toUpperCase() + label.slice(1)}</div>`;
+              }).join('');
+            }
+
+            html += `
+              <div class="card shadow-sm mb-3 p-3 rounded-3">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    ${courierIcon}
+                    <div>
+                      <h6 class="mb-0 fw-bold">${rate.courier_service?.umbrella_name || '-'}</h6>
+                      <small class="text-muted">${rate.courier_service?.name || '-'}</small>
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <h5 class="mb-0 fw-bold">${rate.currency} ${chargeWithTax.toFixed(2)}</h5>
+                  </div>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="row align-items-center text-muted small">
+                  <div class="col-md-2 col-6">
+                    <strong>Delivery Time:</strong><br>
+                    ${rate.min_delivery_time} - ${rate.max_delivery_time} days
+                  </div>
+                  <div class="col-md-1 col-6">
+                    <strong>Tracking:</strong><br>${trackingIcons}
+                  </div>
+                  <div class="col-md-2 col-6">
+                    <strong>Description:</strong><br>${rate.full_description || '—'}
+                  </div>
+                  <div class="col-md-2 col-6">
+                    <strong>Import Tax & Duty:</strong><br>
+                    Tax: ${rate.estimated_import_tax || 0}, Duty: ${rate.estimated_import_duty || 0}
+                  </div>
+                  <div class="col-md-2 col-6">
+                    <strong>Rating:</strong><br>${trackingRating}/5 ⭐
+                  </div>
+                  <div class="col-md-2 col-6">
+                    <strong>Service Options:</strong><br>${serviceOptions}
+                  </div>
+                  <div class="col-md-1 col-12 text-end mt-2 mt-md-0">
+                    <button class="btn btn-sm btn-primary book-btn" 
+                      data-rate='${JSON.stringify(rate).replace(/'/g, "\\'")}'>
+                      Book
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
           });
 
-          tableHTML += '</tbody></table>';
-          ratesContainer.innerHTML = tableHTML;
+          const availableHeader = `
+            <div class="row text-center py-3">
+              <h4>Available Services (${availableServices})</h4>
+            </div>
+          `;
 
-          // Add event listeners to book buttons
+          ratesContainer.innerHTML = availableHeader + html;
+
+          // Event listeners
           document.querySelectorAll('.book-btn').forEach(btn => {
             btn.addEventListener('click', function() {
               const rate = JSON.parse(this.dataset.rate);
@@ -1392,7 +1712,8 @@ if ($role === 'admin') {
           });
         })
         .catch(e => {
-          ratesContainer.innerHTML = '<div class="alert alert-danger">Failed to calculate rates. Please try again.</div>';
+          let logoPath = `<a href="https://wa.me/+96892656567"><img src="<?= base_url('logos/WhatsAppButtonGreenSmall.svg') ?>"/></a>`;
+          ratesContainer.innerHTML = `<div class="alert alert-danger">Failed to calculate rates. Please try again.${logoPath}</div>`;
           console.error(e);
         });
     }

@@ -27,11 +27,13 @@ class PackageModel extends Model
   'processed_by',
   'received_at',
   'storage_days',
-  'combined_from'
+  'combined_from',
+  'shipping_fee',
+  'over_due_fee'
  ];
 
  protected $validationRules = [
-  'tracking_number' => 'required|min_length[5]',
+  // 'tracking_number' => 'required|min_length[5]',
   'virtual_address_id' => 'required|integer',
  ];
 }

@@ -48,7 +48,7 @@
    <tbody>
     <?php foreach ($users as $user): ?>
      <tr>
-      <td><?= $user['firstname'] . ' ' . $user['lastname'] ?></td>
+      <td><?= fullname($user['id']) ?></td>
       <td><?= $user['email'] ?></td>
       <td><span class="badge bg-success"><?= $user['role'] ?></span></td>
       <td><?= $user['created_at'] ?></td>

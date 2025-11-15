@@ -35,7 +35,8 @@ class ShippingBookingModel extends Model
   'user_id',
   'purchase_invoice',
   'payment_status',
-  'payment_info'
+  'payment_info',
+  'label'
  ];
 
  protected $useTimestamps = true;

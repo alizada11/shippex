@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\CombineRepackRequestModel;
 use App\Models\PackageModel;
+use App\Models\UserModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class CombineRepackController extends BaseController
@@ -40,33 +41,48 @@ class CombineRepackController extends BaseController
                 'message' => 'No valid packages found for combination.'
             ]);
         }
+        if (!empty($packages)) {
+            // Extract unique user_ids from the selected packages
+            $userIds = array_unique(array_column($packages, 'user_id'));
 
-        // ✅ Calculate totals
-        $totals = ['weight' => 0, 'length' => 0, 'width' => 0, 'height' => 0];
-        foreach ($packages as $p) {
-            $totals['weight'] += (float) $p['weight'];
-            $totals['length'] += (float) $p['length'];
-            $totals['width']  += (float) $p['width'];
-            $totals['height'] += (float) $p['height'];
+            if (count($userIds) > 1) {
+                // More than one unique user_id found
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Cannot combine packages from different users.'
+                ]);
+            }
+
+            // ✅ Calculate totals
+            $totals = ['weight' => 0, 'length' => 0, 'width' => 0, 'height' => 0];
+            foreach ($packages as $p) {
+                $totals['weight'] += (float) $p['weight'];
+                $totals['length'] += (float) $p['length'];
+                $totals['width']  += (float) $p['width'];
+                $totals['height'] += (float) $p['height'];
+            }
+
+            // ✅ Save combine request
+            $requestId = $this->requestModel->insert([
+                'user_id'       => session()->get('user_id'),
+                'package_ids'   => json_encode($data['package_ids']),
+                'warehouse_id'  => $data['warehouse_id'],
+                'total_weight'  => $totals['weight'],
+                'total_length'  => $totals['length'],
+                'total_width'   => $totals['width'],
+                'total_height'  => $totals['height'],
+                'status'        => 'pending',
+            ]);
+            foreach ($packages as $pkg) {
+                $p_id = $pkg['id'];
+                $this->packageModel->update($p_id, ['status' => 'combined']);
+            }
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Combine & Repack request submitted successfully.',
+                'request_id' => $requestId
+            ]);
         }
-
-        // ✅ Save combine request
-        $requestId = $this->requestModel->insert([
-            'user_id'       => session()->get('user_id'),
-            'package_ids'   => json_encode($data['package_ids']),
-            'warehouse_id'  => $data['warehouse_id'],
-            'total_weight'  => $totals['weight'],
-            'total_length'  => $totals['length'],
-            'total_width'   => $totals['width'],
-            'total_height'  => $totals['height'],
-            'status'        => 'pending',
-        ]);
-
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Combine & Repack request submitted successfully.',
-            'request_id' => $requestId
-        ]);
     }
 
     /* ----------------------------------------------
@@ -147,7 +163,7 @@ class CombineRepackController extends BaseController
                 'length'        => $data['length'],
                 'width'         => $data['width'],
                 'height'        => $data['height'],
-                'status'        => 'incoming',
+                'status'        => 'ready',
                 'combined_from' => $id,
                 'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
                 'created_at'    => date('Y-m-d H:i:s'),
@@ -155,7 +171,33 @@ class CombineRepackController extends BaseController
 
             // Try inserting
             $inserted = $this->packageModel->insert($packageData);
+            if ($inserted) {
+                $email = \Config\Services::email();
 
+                // Prepare data for email
+
+                $userModel = new UserModel();
+
+                // Fetch main request
+                $request = $this->packageModel->find($inserted);
+                $userName = $userModel->find($data['user_id'])['firstname'] . ' ' . $userModel->find($data['user_id'])['lastname'];
+                $data = [
+                    'request' => $request, // the $request row
+                    'userName' => $userName ?? 'Customer'
+                ];
+
+                $message = view('emails/notify_combined', $data);
+
+                $email->setTo($userModel->find($request['user_id'])['email']);
+                $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Purchase Invoice');
+                $email->setMessage($message);
+                $email->setMailType('html'); // Important
+
+                if (!$email->send()) {
+                    log_message('error', $email->printDebugger(['headers']));
+                    return redirect()->back()->with('error', 'There has been an error while sending email.');
+                }
+            }
             if (!$inserted) {
                 // Get error from model
                 $dbError = $this->packageModel->errors();

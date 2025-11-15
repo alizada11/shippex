@@ -12,6 +12,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('/warehouses', 'Home::warehouses');
 $routes->get('warehouses/(:segment)', 'WarehouseController::view/$1');
+$routes->get('user/info/(:num)', 'Auth::getUserInfo/$1');
 
 // Shipping
 $routes->get('shipping/form', 'Shipping::form');
@@ -72,6 +73,8 @@ $routes->group(
   $routes->get('/shipping/details/(:num)', 'Shipping::details/$1');
   $routes->get('/shipping/delete/(:num)', 'Shipping::destroy/$1');
   $routes->post('/shipping/update-status/(:num)', 'Shipping::updateStatus/$1');
+  $routes->post('/shipping/update-label/(:num)', 'Shipping::updateLabel/$1');
+  $routes->post('/shipping/delete-label/(:num)', 'Shipping::deleteLabel/$1');
 
   // admin shopper routes
   $routes->get('admin/shopper/requests', 'Admin::shopperRequests');
@@ -99,7 +102,7 @@ $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'A
  $routes->get('items/delete/(:num)', 'PackageController::deleteItem/$1');
 
  $routes->post('(:num)/files/upload', 'PackageController::uploadFile/$1');
- $routes->get('files/delete/(:num)', 'PackageController::deleteFile/$1');
+ $routes->post('files/delete/(:num)', 'PackageController::deleteFile/$1');
  $routes->post('shipping-data', 'PackageController::getShippingData');
  // $routes->get('shipping-data', 'PackageController::getShippingData');
  $routes->post('getRates', 'PackageController::getRates');
@@ -190,7 +193,7 @@ $routes->group(
 $routes->group('', ['filter' => 'role:admin,customer'], function ($routes) {
  // user modal / bulk info
  $routes->post('packages/bulk-info', 'DisposeReturnController::bulkInfo');
- $routes->post('packages/dispose-return-submit', 'DisposeReturnController::submit');
+ $routes->post('packages/dispose-return-submit', 'DisposeReturnController::disposeSubmit');
 
  // Return Disposal Requests
  $routes->get('admin/dispose-return', 'DisposeReturnController::adminIndex');

@@ -318,8 +318,9 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
       $("button[type='submit']").prop('disabled', true);
       $("button[type='submit'] .spinner-border").removeClass('d-none');
 
+      $("#bookingLoader").removeClass('d-none');
       // Show loading indicator
-      $("#resultsContainer").addClass('d-none');
+      $("#rateContainer").addClass('d-none');
       $("#errorContainer").addClass('d-none');
 
       $.ajax({
@@ -329,16 +330,116 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
         dataType: "json",
         success: function(res) {
           if (res.rates && res.rates.length > 0) {
-            let html = '';
-            res.rates.forEach(function(rate) {
-              const svgPlaceholder = "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2245%22%20height%3D%2245%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%232b6cb0%22%20stroke-width%3D%221.5%22%3E%3Crect%20x%3D%222%22%20y%3D%227%22%20width%3D%2220%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23e6f2ff%22%20/%3E%3Cpath%20d%3D%22M12%203v4%22/%3E%3Cpath%20d%3D%22M7%207l5%204%205-4%22/%3E%3C/svg%3E";
 
+            $("#bookingLoader").addClass('d-none');
+            let html = '';
+            let availableServices = res.rates.length;
+            res.rates.forEach(function(rate) {
+
+
+              let logoPath = '<?= base_url('logos/') ?>';
+              let courierIcon = '';
+              let logoFile = 'default.png'; // fallback
+
+              switch ((rate.courier_service?.umbrella_name || '').trim()) {
+                case 'DHL':
+                  logoFile = 'dhl.svg';
+                  break;
+                case 'UPS':
+                  logoFile = 'ups.svg';
+                  break;
+                case 'Aramex':
+                  logoFile = 'aramex.svg'; // fix typo "arramex"
+                  break;
+                case 'FlatExportRate':
+                  logoFile = 'flatexportrate.svg';
+                  break;
+                case 'SFExpress':
+                  logoFile = 'sf-express.svg';
+                  break;
+                case 'Asendia':
+                  logoFile = 'asendia.svg';
+                  break;
+                case 'Passport':
+                  logoFile = 'passport.svg';
+                  break;
+                case 'FedEx':
+                  logoFile = 'fedex.svg';
+                  break;
+                case 'USPS':
+                  logoFile = 'usps.svg';
+                  break;
+                case 'Sendle':
+                  logoFile = 'sendle.svg';
+                  break;
+                case 'Purolator':
+                  logoFile = 'purolator.svg';
+                  break;
+                case 'Canada Post':
+                  logoFile = 'canada-post.svg';
+                  break;
+                case 'Canpar':
+                  logoFile = 'canpar.svg';
+                  break;
+                case 'StarTrack':
+                  logoFile = 'star-track.png';
+                  break;
+                case 'CouriersPlease':
+                  logoFile = 'couriers-please.svg';
+                  break;
+                case 'AlliedExpress':
+                  logoFile = 'alliedexpress.svg';
+                  break;
+                case 'TNT':
+                  logoFile = 'tnt.svg';
+                  break;
+                case 'Quantium':
+                  logoFile = 'quantium.svg';
+                  break;
+                case 'Toll':
+                  logoFile = 'toll.svg';
+                  break;
+                case 'HKPost':
+                  logoFile = 'hong-kong-post.svg';
+                  break;
+                case 'Purolator':
+                  logoFile = 'purolator.svg';
+                  break;
+                case 'Canpar':
+                  logoFile = 'apg.svg';
+                  break;
+                case 'APG':
+                  logoFile = 'Canpar.svg';
+                  break;
+                case 'Couriers Please':
+                  logoFile = 'Canpar.svg';
+                  break;
+                case 'Hubbed':
+                  logoFile = 'hubbed.svg';
+                  break;
+                default:
+                  // Inline fallback SVG (not in src)
+                  courierIcon = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" stroke-width="1.5">
+                      <rect x="2" y="7" width="20" height="12" rx="2" fill="#e6f2ff" />
+                      <path d="M12 3v4" />
+                      <path d="M7 7l5 4 5-4" />
+                    </svg>`;
+              }
+
+              // Only build <img> if not using inline SVG fallback
+              if (!courierIcon) {
+                courierIcon = `<img class="rounded-3 me-2" src="${logoPath + logoFile}" alt="${rate.courier_service?.umbrella_name}" width="auto" height="40">`;
+              }
+
+
+              // }
               // Tracking rating
               let trackingIcons = '';
               for (let i = 0; i < 5; i++) {
                 trackingIcons += `<span style="color:${i < rate.tracking_rating ? '#00c853' : '#ccc'};">●</span>`;
               }
-
+              const chargeWithTax = rate.total_charge * 1.15;
               // Service options with simple icons
               let serviceOptions = '';
 
@@ -350,6 +451,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
 
                   if (opt === 'dropoff') icon = '📦'; // dropoff icon
                   if (opt === 'paid_pickup') icon = '🏠'; // pickup icon
+                  if (opt === 'free_pickup') icon = '🏠'; // pickup icon
 
                   // each option in a new line
                   return `<div>${icon} ${label}</div>`;
@@ -363,15 +465,14 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
                 <div class="card shadow-sm mb-3 p-3 rounded-3">
                   <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                      <img src="${rate.courier_service?.logo || svgPlaceholder}" 
-                          alt="logo" class="me-3" width="45" height="45">
+                       ${courierIcon}
                       <div>
                         <h6 class="mb-0 fw-bold">${rate.courier_service?.umbrella_name || '-'}</h6>
                         <small class="text-muted">${rate.courier_service?.name || '-'}</small>
                       </div>
                     </div>
                     <div class="text-end">
-                      <h5 class="mb-0 fw-bold">${rate.currency} ${rate.total_charge.toFixed(2)}</h5>
+                      <h5 class="mb-0 fw-bold">${rate.currency} ${chargeWithTax.toFixed(2)}</h5>
                     </div>
                   </div>
 
@@ -410,7 +511,7 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
                         data-delivery="${rate.min_delivery_time} - ${rate.max_delivery_time} days" 
                         data-description="${rate.full_description}" 
                         data-currency="${rate.currency}" 
-                        data-charge="${rate.total_charge}">
+                        data-charge="${chargeWithTax}">
                         Book
                       </a>
                     </div>
@@ -418,9 +519,14 @@ $countries = json_decode(file_get_contents(__DIR__ . '/partials/countries.json')
                 </div>
               `;
             });
+            available = `
+            <div class="row text-center py-3">
+            <h3>Available Services (${availableServices})
+            </div>
+            `;
+            $("#rateContainer").removeClass('d-none');
+            $("#rateContainer").html(available + html);
 
-            $("#rateContainer").html(html);
-            $("#resultsContainer").removeClass('d-none');
 
           } else {
             showError("No shipping rates available for your destination.");

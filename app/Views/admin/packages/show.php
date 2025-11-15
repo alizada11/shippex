@@ -37,7 +37,7 @@ if ($role === 'admin') {
   <div class="container py-4">
     <!-- Package Overview Cards -->
     <div class="row mb-4">
-      <div class="col-md-3">
+      <div class="col">
         <div class="stat-card">
           <div class="stat-icon primary">
             <i class="fas fa-weight-hanging"></i>
@@ -48,7 +48,7 @@ if ($role === 'admin') {
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col">
         <div class="stat-card">
           <div class="stat-icon success">
             <i class="fas fa-dollar-sign"></i>
@@ -59,7 +59,18 @@ if ($role === 'admin') {
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col">
+        <div class="stat-card">
+          <div class="stat-icon success">
+            <i class="fas fa-dollar"></i>
+          </div>
+          <div class="stat-content">
+            <h3><?= isset($package['shipping_fee']) ? '$' . $package['shipping_fee']  : 'N/A' ?></h3>
+            <p>Shipping Fee</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
         <div class="stat-card">
           <div class="stat-icon warning">
             <i class="fas fa-calendar-day"></i>
@@ -71,38 +82,43 @@ if ($role === 'admin') {
           // how many days have passed since creation
           $daysPassed = $createdAt->diff($now)->days;
 
-          // calculate remaining days (can be negative)
+          // calculate remaining days
           $remainingDays = $package['storage_days'] - $daysPassed;
           ?>
           <div class="stat-content">
-            <h3><?= esc($remainingDays) ?></h3>
+            <h3>
+              <?= esc($remainingDays) ?>
+
+              <!-- Info icon with tooltip -->
+              <i class="fas fa-info-circle text-muted ms-2"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="⚠️ Notice: Free storage is available for the first 30 days. After that, a daily storage fee will be applied.">
+              </i>
+            </h3>
             <p>Storage Days</p>
           </div>
-
-
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col">
         <div class="stat-card">
-          <div class="stat-card-icon">
-            <?php if ($package['status'] === 'ready'): ?>
-              <div class="stat-icon delivered">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <div class="stat-content">
-                <h3>Ready</h3>
-                <p>Status</p>
-              </div>
-            <?php else: ?>
-              <div class="stat-icon pending">
-                <i class="fas fa-clock"></i>
-              </div>
-              <div class="stat-content">
-                <h3><?= ucfirst($package['status']) ?></h3>
-                <p>Status</p>
-              </div>
-            <?php endif; ?>
-          </div>
+          <?php if ($package['status'] === 'ready'): ?>
+            <div class="stat-icon delivered">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Ready</h3>
+              <p>Status</p>
+            </div>
+          <?php else: ?>
+            <div class="stat-icon pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <h3><?= ucfirst($package['status']) ?></h3>
+              <p>Status</p>
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -164,7 +180,7 @@ if ($role === 'admin') {
 
 
         <!-- Files Card -->
-        <div class="premium-card mb-4">
+        <div class="premium-card mb-4" id="files">
           <div class="card-header">
             <h3 class="card-title">
               <i class="fas fa-paperclip me-2"></i>Attached Files
@@ -183,7 +199,7 @@ if ($role === 'admin') {
             <?php else: ?>
               <div class="row">
                 <?php foreach ($files as $file): ?>
-                  <div class="col-md-4 mb-3">
+                  <div class="col mb-3">
                     <div class="file-card">
                       <div class="file-icon">
                         <?php
@@ -212,6 +228,12 @@ if ($role === 'admin') {
                         <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
                           <i class="fas fa-download"></i>
                         </a>
+                        <?php if ($role === "admin"): ?>
+                          <form class="delete-form" action="<?= base_url('packages/files/delete/' . $file['id']) ?>" method="post" class="d-inline delete-form">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-icon  "><i class="fas fa-trash"></i></button>
+                          </form>
+                        <?php endif; ?>
                       </div>
                     </div>
                   </div>
@@ -224,6 +246,56 @@ if ($role === 'admin') {
 
       <!-- Sidebar - Actions History -->
       <div class="col-lg-4">
+        <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)):
+
+        ?>
+          <div class="premium-card">
+            <div class="card-header">
+              <h4><i class="fas fa-receipt"></i> Payment Summary</h4>
+            </div>
+            <div class="card-body">
+              <?php if (!empty($over_due) && $over_due > 0): ?>
+                <div class="fee-item">
+                  <div class="fee-label">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Overdue Storage Fee</span>
+                  </div>
+                  <div class="fee-value overdue">$<?= number_format($over_due, 2); ?></div>
+                </div>
+
+              <?php endif; ?>
+
+              <?php if (!empty($package['shipping_fee']) && $package['shipping_fee'] > 0): ?>
+                <div class="fee-item">
+                  <div class="fee-label">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Shipping Fee</span>
+
+                  </div>
+                  <div class="fee-value">$<?= number_format($package['shipping_fee'], 2) ?></div>
+                </div>
+                <div class="total">
+                  <div class="total-label">Total Amount</div>
+                  <div class="total-value">$<?= number_format($package['shipping_fee'] + $over_due, 2); ?></div>
+                </div>
+              <?php endif; ?>
+            </div>
+            <div class="card-footer">
+              <button class="btn-pay">
+                <i class="fas fa-credit-card"></i> Pay Now
+              </button>
+              <p class="info-text">All fees are calculated based on your package details</p>
+            </div>
+          </div>
+
+
+          <!-- Shipping Fee -->
+
+
+          <!-- Total Amount -->
+
+        <?php endif; ?>
+
         <div class="premium-card">
           <div class="card-header">
             <h3 class="card-title">
@@ -251,7 +323,7 @@ if ($role === 'admin') {
                       </div>
                       <div class="timeline-body">
                         <p class="mb-1"><?= esc($log['notes']) ?></p>
-                        <small class="text-muted">by <?= esc(fullname($log['performed_by']) ?? 'System') ?></small>
+                        <small class="text-muted">by <?= fullname($log['performed_by']) ?? 'System' ?></small>
                       </div>
                     </div>
                   </div>
@@ -318,8 +390,8 @@ if ($role === 'admin') {
   }
 
   .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -354,7 +426,7 @@ if ($role === 'admin') {
   }
 
   .stat-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
     color: var(--primary-color);
@@ -619,6 +691,98 @@ if ($role === 'admin') {
     font-size: 0.9rem;
   }
 
+  /* Payment Card */
+  .fee-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .fee-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .fee-item:first-child {
+    padding-top: 0;
+  }
+
+  .fee-label {
+    color: #6c757d;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fee-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+  }
+
+  .overdue {
+    color: #e74c3c;
+  }
+
+  .total {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #3498db;
+  }
+
+  .total-label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1rem;
+  }
+
+  .total-value {
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #2c3e50;
+  }
+
+  .card-footer {
+    padding: 0 25px 25px;
+  }
+
+  .btn-pay {
+    background: linear-gradient(160deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+  }
+
+  .info-text {
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 15px;
+  }
+
   /* Empty State */
   .empty-state {
     text-align: center;
@@ -708,5 +872,12 @@ if ($role === 'admin') {
     }
   }
 </style>
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
 <?= $this->endSection() ?>
