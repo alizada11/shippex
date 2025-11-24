@@ -73,8 +73,8 @@ if ($role === 'admin') {
         <label class="form-label" for="request_type">Action Type</label>
         <select name="request_type" class="form-select" id="request_type">
          <option value="">Select Action</option>
-         <option value="dispose">Dispose Package</option>
-         <option value="return">Return Package</option>
+         <option value="disposed">Dispose Package</option>
+         <option value="returned">Return Package</option>
         </select>
        </div>
       </div>

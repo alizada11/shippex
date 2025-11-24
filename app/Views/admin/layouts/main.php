@@ -95,6 +95,30 @@
                 </ul>
               </div>
             </li>
+            <?php
+            // Get current URL
+            $currentUrl = current_url();
+
+            // Check if the URL contains 'packages/' followed by a number
+            $isPackageActive = preg_match('#/history(/create/\d+|/\d+(/edit)?)?#', $currentUrl);
+            ?>
+
+            <li class="nav-item">
+              <a class="nav-link <?= $isPackageActive ? 'active' : '' ?>"
+                data-bs-toggle="collapse"
+                href="#shipmentHist"
+                role="button"
+                aria-expanded="<?= $isPackageActive ? 'true' : 'false' ?>"
+                aria-controls="shipmentHist">
+                <i class="fas fa-history me-2"></i>Shipment History
+                <i class="fas fa-chevron-down float-end mt-1 small"></i>
+              </a>
+              <div class="collapse ps-1 <?= $isPackageActive ? 'show' : '' ?>" id="shipmentHist">
+                <ul class="nav flex-column">
+                  <?= adminShipmentHistory(); ?>
+                </ul>
+              </div>
+            </li>
 
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), 'admin/combine-requests') !== false) ? 'active' : '' ?>" href="<?= base_url('admin/combine-requests') ?>">
@@ -132,6 +156,11 @@
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/fonts') !== false) ? 'active' : '' ?>" href="<?= site_url('/admin/fonts/select') ?>">
                 <i class="fas fa-font me-2"></i> Font Settings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <?= (strpos(current_url(), '/profile') !== false) ? 'active' : '' ?>" href="<?= site_url('/profile') ?>">
+                <i class="fas fa-user me-2"></i> Profile
               </a>
             </li>
             <!-- Divider -->

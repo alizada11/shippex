@@ -113,6 +113,7 @@ class Admin extends BaseController
 
   $message = view('emails/request_wait_for_payment', $data);
 
+  $email->setFrom('info@shippex.online', 'Shippex Admin');
   $email->setTo($userModel->find($request['user_id'])['email']);
   $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Payment');
   $email->setMessage($message);

@@ -14,6 +14,24 @@ $routes->get('/warehouses', 'Home::warehouses');
 $routes->get('warehouses/(:segment)', 'WarehouseController::view/$1');
 $routes->get('user/info/(:num)', 'Auth::getUserInfo/$1');
 
+
+//shipping services
+// CRUD resource routes (maps to index, show, create, update, delete)
+$routes->get('shipping-services/create', 'ShippingServices::create_form');
+$routes->get('shipping-services', 'ShippingServices::index');
+$routes->get('shipping-services/(:num)', 'ShippingServices::show/$1');
+$routes->post('shipping-services', 'ShippingServices::create');
+$routes->put('shipping-services/(:num)', 'ShippingServices::update/$1');
+$routes->patch('shipping-services/(:num)', 'ShippingServices::update/$1');
+$routes->delete('shipping-services/(:num)', 'ShippingServices::delete/$1');
+$routes->post('shipping-services/import-preview/(:num)', 'ShippingServices::importPreview/$1');
+$routes->get('shipping-services/get_all/(:num)', 'ShippingServices::getAll/$1');
+// bulk import of pasted html
+$routes->post('shipping-services/import-html/(:num)', 'ShippingServices::importHtml/$1');
+$routes->post('shipping-services/set-price/', 'ShippingServices::setPrice');
+$routes->post('shipping-services/manual-insert', 'ShippingServices::manualInsert');
+
+
 // Shipping
 $routes->get('shipping/form', 'Shipping::form');
 $routes->get('shipping/notify_user/(:num)', 'Shipping::notify_user/$1');
@@ -45,6 +63,9 @@ $routes->get('/reset-password/(:any)', 'Auth::reset/$1');
 $routes->post('/reset-password/(:any)', 'Auth::resetPost/$1');
 $routes->get('/change-password', 'Auth::changePassword');
 $routes->post('/change-password', 'Auth::changePasswordPost');
+$routes->post('/update-profile', 'Auth::updateProfile');
+$routes->get('verify-email/(:any)', 'Auth::verifyEmail/$1');
+
 /* *****************************************************************
 *                      admin routes                                *
 *******************************************************************/
@@ -71,7 +92,7 @@ $routes->group(
   // Shipping reques
   $routes->get('/shipping/requests', 'Shipping::requests');
   $routes->get('/shipping/details/(:num)', 'Shipping::details/$1');
-  $routes->get('/shipping/delete/(:num)', 'Shipping::destroy/$1');
+  $routes->post('/shipping/delete/(:num)', 'Shipping::destroy/$1');
   $routes->post('/shipping/update-status/(:num)', 'Shipping::updateStatus/$1');
   $routes->post('/shipping/update-label/(:num)', 'Shipping::updateLabel/$1');
   $routes->post('/shipping/delete-label/(:num)', 'Shipping::deleteLabel/$1');
@@ -85,6 +106,10 @@ $routes->group(
   $routes->get('admin/shopper-requests/get-items', 'Shopper::getItems');
  }
 );
+
+$routes->group('package/history', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
+ $routes->get('(:num)', 'PackageController::history/$1');
+});
 
 $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
  $routes->get('(:num)', 'PackageController::index/$1');
@@ -191,13 +216,14 @@ $routes->group(
 
 );
 $routes->group('', ['filter' => 'role:admin,customer'], function ($routes) {
+ $routes->get('profile', 'ProfileController::index');
  // user modal / bulk info
  $routes->post('packages/bulk-info', 'DisposeReturnController::bulkInfo');
  $routes->post('packages/dispose-return-submit', 'DisposeReturnController::disposeSubmit');
 
  // Return Disposal Requests
  $routes->get('admin/dispose-return', 'DisposeReturnController::adminIndex');
- $routes->post('adm in/dispose-return/process/(:num)', 'DisposeReturnController::process/$1');
+ $routes->post('admin/dispose-return/process/(:num)', 'DisposeReturnController::process/$1');
  $routes->post('admin/dispose_return/delete/(:num)', 'DisposeReturnController::delete/$1');
  $routes->get('admin/dispose_return/edit/(:num)', 'DisposeReturnController::edit/$1');
  $routes->post('admin/dispose_return/process/(:num)', 'DisposeReturnController::update/$1');
@@ -283,7 +309,7 @@ $routes->group(
  'profile',
  ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
  function ($routes) {
-  $routes->get('/', 'ProfileController::index');
+
   $routes->get('thank-you', 'ProfileController::thankYou');
   $routes->get('requests', 'ProfileController::myRequests');
   $routes->get('requests/edit/(:num)', 'ProfileController::edit/$1');

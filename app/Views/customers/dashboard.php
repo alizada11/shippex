@@ -211,7 +211,7 @@
                             data-bs-toggle="tooltip"
                             title="Request pending. Requested on: <?= date('Y-m-d H:i', strtotime($request['created_at'])) ?>"></i>
                         <?php elseif ($request['status'] == 'accepted'): ?>
-                          Your Own it <i class="fas fa-check-circle text-success"
+                          You Own it <i class="fas fa-check-circle text-success"
                             data-bs-toggle="tooltip"
                             title="Request accepted"></i>
                         <?php elseif ($request['status'] == 'rejected'): ?>
@@ -221,7 +221,7 @@
                       </a>
                     <?php endif; ?>
                   <?php else: ?>
-                    <a class="btn btn-outline-shippex-primary warehouse-select-btn"
+                    <a class="btn btn-outline-shippex-primary warehouse-select-btn mb-3"
                       data-warehouse-id="<?= $wh['id'] ?? '' ?>">
                       <i class="fas fa-paper-plane"></i> Request Warehouse
                     </a>
@@ -373,7 +373,5 @@
     background-size: cover;
   }
 </style>
-
-
 
 <?= $this->endSection() ?>

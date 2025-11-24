@@ -17,7 +17,7 @@ class ProfileController extends BaseController
 
 
         $data['profile'] = $userModel->where('id', $user_id)->first();
-
+        $data['title'] = 'Your Profile';
         return view('customers/profile/index', $data);
     }
 
@@ -44,7 +44,7 @@ class ProfileController extends BaseController
 
         $data['requestMap'] = $requestMap;
         $data['warehouses'] = $warehouses->findAll();
-
+        $data['title'] = 'warehouse addresses';
         return view('customers/profile/warehouse_addresses', $data);
     }
 }

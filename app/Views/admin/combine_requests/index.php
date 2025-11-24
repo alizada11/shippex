@@ -29,7 +29,9 @@ if ($role === 'admin') {
                 <th class="ps-4">ID</th>
                 <th>User</th>
                 <th>Packages</th>
+                <th>Weight</th>
                 <th>Status</th>
+                <th>Dimensions <sbu>(L×W×H)</sub></th>
                 <th class="text-end pe-4">Actions</th>
               </tr>
             </thead>
@@ -64,6 +66,7 @@ if ($role === 'admin') {
                       ?>
                     </div>
                   </td>
+                  <td class="ps-4 fw-medium"><?= $r['total_weight'] ?><sub>Kg</sub></td>
                   <td>
                     <?php
                     $statusClass = '';
@@ -82,6 +85,9 @@ if ($role === 'admin') {
                     }
                     ?>
                     <span class="badge <?= $statusClass ?>"><?= ucfirst($r['status']) ?></span>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark"><?= $r['total_length'] ?>×<?= $r['total_width'] ?>×<?= $r['total_height'] ?> <sub>cm</sub></span>
                   </td>
                   <td class="actions-col">
                     <div class="action-buttons-table">

@@ -244,7 +244,7 @@ if ($role === 'admin') {
         </div>
       </div>
 
-      <!-- Sidebar  -->
+      <!-- Sidebar - Actions History -->
       <div class="col-lg-4">
         <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)):
 
@@ -296,49 +296,6 @@ if ($role === 'admin') {
 
         <?php endif; ?>
 
-
-        <!-- package combination info -->
-        <?php if (!empty($package['combined_from'])): ?>
-          <div class="premium-card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <?php if ($package['status'] === 'combined'): ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined With
-
-
-                <?php else: ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined from
-                <?php endif; ?>
-              </h3>
-            </div>
-            <div class="card-body">
-              <span class="d-flex align-items-center flex-wrap gap-3 status-badge ">
-                <?php $combined_from = json_decode($package['combined_from'], true);
-
-                foreach ($combined_from as $packageId) {
-
-                  // Skip if this ID is the same as the current package
-                  if ($packageId == $package['id']) {
-                    continue;
-                  }
-                ?>
-                  <a href="<?= base_url('packages/show/' . $packageId) ?>"
-                    class="bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-box text-primary"></i>
-                    <?= $packageId ?>
-                  </a>
-
-                <?php } ?>
-                <?php if ($package['status'] === 'combined'): ?>
-                  <a href="<?= base_url('packages/show/' . $package['parent_package']) ?>" class="btn bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-eye"></i> View Parent Package</a>
-                <?php endif; ?>
-              </span>
-            </div>
-          </div>
-        <?php endif; ?>
-
-        <!-- actions history -->
         <div class="premium-card">
           <div class="card-header">
             <h3 class="card-title">

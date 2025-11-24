@@ -12,6 +12,7 @@ class CombineRepackRequestModel extends Model
   'user_id',
   'package_ids',
   'warehouse_id',
+  'total_value',
   'total_weight',
   'total_length',
   'total_width',

@@ -84,11 +84,18 @@
           </div>
 
           <!-- Default Checkbox -->
-          <div class="col-12 mt-2">
+          <div class="col-6 mt-2">
             <div class="form-check">
               <input type="checkbox" name="is_active" id="isDefault" value="1" class="form-check-input"
                 <?= old('is_active', $address['is_active'] ?? 1) ? 'checked' : '' ?>>
               <label class="form-check-label text-shippex-purple fw-bold" for="isDefault">Is Active</label>
+            </div>
+          </div>
+          <div class="col-6 mt-2">
+            <div class="form-check">
+              <input type="checkbox" name="easyship_wh" id="isEasyshipWh" value="1" class="form-check-input"
+                <?= old('easyship_wh', $address['easyship_wh'] ?? 1) ? 'checked' : '' ?>>
+              <label class="form-check-label text-shippex-purple fw-bold" for="isEasyshipWh">Is Easyship Warehouse</label>
             </div>
           </div>
 

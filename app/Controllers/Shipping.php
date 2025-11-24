@@ -147,6 +147,7 @@ class Shipping extends BaseController
             'currency'       => $request->getPost('currency'),
             'total_charge'   => $request->getPost('total_charge'),
             'description'    => $request->getPost('description'),
+            'set_rate'    => $request->getPost('set_rate'),
             //user
             'user_id'        => $user_id,
         ];
@@ -326,7 +327,7 @@ class Shipping extends BaseController
             ];
 
             $message = view('emails/shipping_payment', $data);
-
+            $email->setFrom('info@shippex.online', 'Shippex Admin');
             $email->setTo($user['email']);
             $email->setSubject('Your Request #' . $booking['id'] . ' is Waiting for Payment');
             $email->setMessage($message);
@@ -408,6 +409,7 @@ class Shipping extends BaseController
 
                 $email = \Config\Services::email();
 
+                $email->setFrom('info@shippex.online', 'Shippex Admin');
                 $email->setTo($user_email);
                 $email->setSubject('Download Your Labe');
                 $email->setMessage($message);
@@ -618,7 +620,7 @@ class Shipping extends BaseController
         ];
 
         $message = view('emails/notify_shipping_payment', $data);
-
+        $email->setFrom('info@shippex.online', 'Shippex Admin'); // MUST be your Hostinger email
         $email->setTo($userModel->find($request['user_id'])['email']);
         $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Purchase Invoice');
         $email->setMessage($message);

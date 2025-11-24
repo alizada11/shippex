@@ -29,7 +29,10 @@ class PackageModel extends Model
   'storage_days',
   'combined_from',
   'shipping_fee',
-  'over_due_fee'
+  'over_due_fee',
+  'combination_status',
+  'archive',
+  'parent_package'
  ];
 
  protected $validationRules = [

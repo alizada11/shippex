@@ -52,9 +52,9 @@
          <td><?= $req['category'] ?></td>
          <td><?= $req['weight'] ?> <small>kg</small></td>
          <td>(<?= $req['height'] . 'x' . $req['length'] . 'x' . $req['width'] ?>)<small>cm</small></td>
-         <td class="fw-bold"><?= $req['currency'] . ' ' . $req['total_charge'] ?></td>
+         <td class="fw-bold"><?= ($req['total_charge'] >= 1) ? ($req['currency'] . ' ' . $req['total_charge']) : 'N/A' ?></td>
          <td><?= fullname($req['user_id']) ?></td>
-         <td><span class="status-badge bg-success"><?= $req['delivery_time'] ?></span></td>
+         <td><span class="status-badge bg-success"><?= ($req['delivery_time']) ? $req['delivery_time'] : 'N/A' ?></span></td>
          <td><?= statusBadge($req['status']) ?></td>
 
          <td class="actions-col">

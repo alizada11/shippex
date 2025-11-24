@@ -93,6 +93,8 @@ class Autoload extends AutoloadConfig
         'app',
         'faq',
         'download',
-        'shipment'
+        'shipment',
+        'shipping',
+        'shipping_validation'
     ];
 }

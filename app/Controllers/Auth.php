@@ -54,6 +54,9 @@ class Auth extends BaseController
             ->first();
 
         if ($user && password_verify($password, $user['password'])) {
+            // if ($user['email_verified'] == 0) {
+            //     return redirect()->back()->with('error', 'Please verify your email before logging in.');
+            // }
 
             //Set session data
             $sessionData = [
@@ -113,9 +116,10 @@ class Auth extends BaseController
             'username'  => $this->request->getPost('username'),
             'email'     => $this->request->getPost('email'),
             'password'  => $this->request->getPost('password'),
+            'phone_number'  => $this->request->getPost('phone_number'),
         ];
 
-        // Define validation rules
+        // Validation Rules
         $rules = [
             'firstname' => 'required|min_length[2]|max_length[50]',
             'lastname'  => 'required|min_length[2]|max_length[50]',
@@ -125,22 +129,65 @@ class Auth extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            // If validation fails, redirect back with errors
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
-        // If valid, insert user
-        $model->insert([
+        // Generate token
+        $token = bin2hex(random_bytes(32));
+
+        // Insert user
+        $userId = $model->insert([
             'firstname'  => $data['firstname'],
             'lastname'   => $data['lastname'],
             'username'   => $data['username'],
             'email'      => $data['email'],
             'password'   => password_hash($data['password'], PASSWORD_DEFAULT),
             'role'       => 'customer',
+            'email_verified' => 0,
+            'email_verification_token' => $token,
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to('/login')->with('success', 'Registered successfully!');
+        // Send verification email
+        $email = \Config\Services::email();
+        $email->setFrom('info@shippex.online', 'Shippex Admin');
+        $email->setTo($data['email']);
+        $email->setSubject('Confirm Your Email');
+
+        $verificationLink = base_url("verify-email/" . $token);
+
+        $data['link'] = $verificationLink;
+        $message = view('emails/verify_email', $data);
+
+
+        $email->setMessage($message);
+        $email->setMailType('html');
+        $email->send();
+
+        return redirect()->to('/login')->with(
+            'success',
+            'Registered successfully! Please check your email to verify your account.'
+        );
+    }
+
+    public function verifyEmail($token)
+    {
+        $model = new \App\Models\UserModel();
+
+        $user = $model->where('email_verification_token', $token)->first();
+
+        if (!$user) {
+            return redirect()->to('/login')->with('error', 'Invalid or expired verification link.');
+        }
+
+        // Update user as verified
+        $model->update($user['id'], [
+            'email_verified' => 1,
+            'email_verification_token' => null,
+            'email_verified_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return redirect()->to('/login')->with('success', 'Email verified successfully! You can now log in.');
     }
 
     public function forgot()
@@ -170,14 +217,21 @@ class Auth extends BaseController
 
             $email = \Config\Services::email();
 
+
+            $email->setFrom('info@shippex.online', 'Shippex Admin');
             $email->setTo($user_email);
             $email->setSubject('Password Reset Link');
             $email->setMessage($message);
             $email->setMailType('html'); // Important
 
-            $email->send();
+            $send =  $email->send();
+            if ($send) {
 
-            return redirect()->back()->with('success', "Reset link has been sent via email, please check yout email");
+                return redirect()->back()->with('success', "Reset link has been sent via email. Please check yout email");
+            } else {
+
+                return redirect()->back()->with('error', "There was a problem while sending email. Please make sure you typed correct email");
+            }
         }
 
         return redirect()->back()->with('error', 'Email not found.');
@@ -232,11 +286,12 @@ class Auth extends BaseController
         $rules = [
             'password' => [
                 'label' => 'New Password',
-                'rules' => 'required|min_length[8]|max_length[50]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+$/]',
+                'rules' => 'required|min_length[6]|max_length[50]',
+                // 'rules' => 'required|min_length[6]|max_length[50]|regex_match[/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+$/]',
                 'errors' => [
                     'required' => 'Please enter a new password.',
-                    'min_length' => 'Password must be at least 8 characters.',
-                    'regex_match' => 'Password must contain an uppercase letter, lowercase letter, number, and special character.'
+                    'min_length' => 'Password must be at least 6 characters.',
+                    // 'regex_match' => 'Password must contain an uppercase letter, lowercase letter, number, and special character.'
                 ]
             ],
             'confirm_password' => [
@@ -261,6 +316,46 @@ class Auth extends BaseController
         $db->table('password_resets')->where('email', $reset->email)->delete();
 
         return redirect()->to('/login')->with('success', 'Password reset successfully.');
+    }
+    public function updateProfile()
+    {
+        // Ensure user is logged in
+        if (!session()->get('user_id')) {
+            return redirect()->to('/login');
+        }
+
+        $userId = session()->get('user_id');
+
+        // Load model
+        $userModel = new \App\Models\UserModel();
+
+        // Validation rules
+        $rules = [
+            'firstname'     => 'required|min_length[2]|max_length[50]',
+            'lastname'      => 'required|min_length[2]|max_length[50]',
+            'email'         => 'required|valid_email',
+            'phone_number'  => 'permit_empty|min_length[8]|max_length[20]',
+            'address'       => 'permit_empty|max_length[255]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->with('error', $this->validator->listErrors());
+        }
+
+        // Prepare data for update
+        $data = [
+            'firstname'    => $this->request->getPost('firstname'),
+            'lastname'     => $this->request->getPost('lastname'),
+            'email'        => $this->request->getPost('email'),
+            'phone_number' => $this->request->getPost('phone_number'),
+            'address'      => $this->request->getPost('address'),
+        ];
+
+        // Update user
+        $userModel->update($userId, $data);
+
+        // Flash success message
+        return redirect()->back()->with('success', 'Your profile has been updated successfully.');
     }
 
     public function changePassword()

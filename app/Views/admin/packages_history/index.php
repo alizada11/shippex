@@ -69,16 +69,7 @@ if ($role === 'admin') {
 
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs shippex-tabs" id="packageTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="incoming-tab" data-bs-toggle="tab" data-bs-target="#incoming" type="button" role="tab" aria-controls="incoming" aria-selected="true">
-              Incoming <span class="badge"><?= $incomingCount ?></span>
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="ready-tab" data-bs-toggle="tab" data-bs-target="#ready" type="button" role="tab" aria-controls="ready" aria-selected="false">
-              Ready <span class="badge"><?= $readyCount ?></span>
-            </button>
-          </li>
+
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="others-tab" data-bs-toggle="tab" data-bs-target="#others" type="button" role="tab" aria-controls="others" aria-selected="false">
               Others <span class="badge"><?= $others ?></span>
@@ -91,118 +82,9 @@ if ($role === 'admin') {
         <!-- Tabs content -->
         <div class="tab-content mt-3" id="packageTabsContent">
 
-          <!-- Incoming Tab -->
-          <div class="tab-pane fade show active" id="incoming" role="tabpanel" aria-labelledby="incoming-tab">
-            <?php if ($incomingCount > 0): ?>
-              <div class="table-responsive">
-                <table class="table package-table">
-                  <thead>
-                    <tr>
 
-                      <th scope="col">Retailer & Tracking</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Weight</th>
-                      <th scope="col">Value</th>
-                      <th scope="col">User</th>
-                      <th scope="col">Received</th>
-                      <th scope="col" class="actions-col">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php foreach ($packages as $p): ?>
-                      <?php if ($p['status'] === 'incoming'): ?>
-                        <tr data-package-id="<?= $p['id'] ?>">
-
-                          <td>
-                            <?php $logoFile = '';
-                            $name = $p['retailer'] ?? '';
-
-                            // Map of courier names to logo files
-                            $courierLogos = [
-                              'DHL' => 'dhl.svg',
-                              'UPS' => 'ups.svg',
-                              'Aramex' => 'aramex.svg',
-                              'FlatExportRate' => 'flatexportrate.svg',
-                              'SFExpress' => 'sf-express.svg',
-                              'Asendia' => 'asendia.svg',
-                              'Passport' => 'passport.svg',
-                              'FedEx' => 'fedex.svg',
-                              'USPS' => 'usps.svg',
-                              'Sendle' => 'sendle.svg',
-                              'Purolator' => 'purolator.svg',
-                              'Canada Post' => 'canada-post.svg',
-                              'Canpar' => 'canpar.svg',
-                              'StarTrack' => 'star-track.png',
-                              'CouriersPlease' => 'couriers-please.svg',
-                              'AlliedExpress' => 'alliedexpress.svg',
-                              'TNT' => 'tnt.svg',
-                              'Quantium' => 'quantium.svg',
-                              'Toll' => 'toll.svg',
-                              'HKPost' => 'hong-kong-post.svg',
-                              'APG' => 'apg.svg',
-                              'Hubbed' => 'hubbed.svg',
-                            ];
-
-                            // Check if the courier has a logo
-                            if (array_key_exists($name, $courierLogos)) {
-                              $logoFile = $courierLogos[$name];
-                              // print_r($logoFile);
-                            }
-                            ?>
-
-                            <div class="retailer-info-table">
-                              <?php if ($logoFile): ?>
-                                <!-- Show courier logo -->
-                                <div class="">
-                                  <img src="<?= base_url("logos/{$logoFile}") ?>" alt="<?= esc($name) ?>" style="border-radius: 8px; " width="45" height="auto">
-                                </div>
-                                <div class="retailer-details-table">
-                                  <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
-                                  <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
-                                </div>
-                              <?php else: ?>
-                                <!-- Default store icon -->
-                                <div class="retailer-logo-table"><i class="fas fa-store"></i></div>
-                                <div class="retailer-details-table">
-                                  <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
-                                  <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
-                                </div>
-                              <?php endif; ?>
-                            </div>
-                          </td>
-                          <td><span class="status-badge status-<?= $p['status'] ?>"><?= ucfirst($p['status']) ?></span></td>
-                          <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
-                          <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
-                          <td><span class="detail-value"><?= fullname($p['user_id']) ?></span></td>
-                          <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
-                          <td class="actions-col">
-                            <div class="action-buttons-table">
-                              <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
-                              <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
-                              <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
-                              </form>
-                            </div>
-                          </td>
-                        </tr>
-                      <?php endif ?>
-                    <?php endforeach ?>
-                  </tbody>
-                </table>
-              </div>
-            <?php else: ?>
-              <div class="empty-state text-center py-5">
-                <div class="empty-icon mb-3">
-                  <i class="fas fa-box-open fa-3x text-muted"></i>
-                </div>
-                <h4>No Packages Found</h4>
-                <p>There are no packages incoming.</p>
-              </div>
-            <?php endif ?>
-          </div>
           <!-- others Tab -->
-          <div class="tab-pane fade " id="others" role="tabpanel" aria-labelledby="others-tab">
+          <div class="tab-pane fade active show" id="others" role="tabpanel" aria-labelledby="others-tab">
             <?php if ($others > 0): ?>
               <div class="table-responsive">
                 <table class="table package-table">
@@ -215,7 +97,7 @@ if ($role === 'admin') {
                       <th scope="col">Weight</th>
                       <th scope="col">Value</th>
                       <th scope="col">User</th>
-                      <th scope="col">Received</th>
+                      <th scope="col">New Package</th>
                       <!-- <th scope="col" class="actions-col">Actions</th> -->
                     </tr>
                   </thead>
@@ -313,22 +195,24 @@ if ($role === 'admin') {
                                 <a href="<?= base_url('packages/show/' . $cid) ?>" class="badge bg-light text-dark text-decoration-none d-flex flex-row align-items-center gap-1"><i class="fas fa-box text-primary"></i><?= $cid ?></a>
                               <?php endforeach; ?>
                             </span>
-                          <?php endif; ?>
+                          <?php else: ?>
+                            <span class="align-items-center  status-badge status-<?= $p['status'] ?>"><?= $p['status'] ?>
+                            <?php endif; ?>
                         </td>
                         <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
                         <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
                         <td><span class="detail-value"><?= fullname($p['user_id']) ?></span></td>
-                        <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
-                        <!-- <td class="actions-col">
+                        <!-- <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td> -->
+                        <td class="actions-col">
                           <div class="action-buttons-table">
                             <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
-                            <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
+                            <!-- <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
                             <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
                               <?= csrf_field() ?>
                               <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
-                            </form>
+                            </form> -->
                           </div>
-                        </td> -->
+                        </td>
 
                       </tr>
                     <?php endforeach; ?>
@@ -347,158 +231,7 @@ if ($role === 'admin') {
             <?php endif ?>
           </div>
 
-          <!-- Ready Tab -->
-          <div class="tab-pane fade" id="ready" role="tabpanel" aria-labelledby="ready-tab">
-            <?php if ($readyCount > 0): ?>
-              <div class="table-responsive">
-                <table class="table package-table">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="select-col">
-                        <!-- <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="select-all-ready">
-                        </div> -->
-                      </th>
-                      <th scope="col">Retailer & Tracking</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Weight</th>
-                      <th scope="col">Value</th>
-                      <th scope="col">User</th>
-                      <th scope="col">Received</th>
-                      <th scope="col" class="actions-col">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php foreach ($packages as $p): ?>
-                      <?php if ($p['status'] === 'ready'): ?>
-                        <tr data-package-id="<?= $p['id'] ?>">
-                          <td class="select-col">
-                            <div class="form-check">
-                              <input class="form-check-input package-checkbox"
-                                type="checkbox"
-                                value="<?= $p['id'] ?>"
-                                <?= ($p['status'] === 'returned' || $p['status'] === 'disposed' || $p['status'] === 'combined') ? 'disabled' : '' ?>>
 
-                            </div>
-                          </td>
-                          <td>
-                            <?php $logoFile = '';
-                            $name = $p['retailer'] ?? '';
-
-                            // Map of courier names to logo files
-                            $courierLogos = [
-                              'DHL' => 'dhl.svg',
-                              'UPS' => 'ups.svg',
-                              'Aramex' => 'aramex.svg',
-                              'FlatExportRate' => 'flatexportrate.svg',
-                              'SFExpress' => 'sf-express.svg',
-                              'Asendia' => 'asendia.svg',
-                              'Passport' => 'passport.svg',
-                              'FedEx' => 'fedex.svg',
-                              'USPS' => 'usps.svg',
-                              'Sendle' => 'sendle.svg',
-                              'Purolator' => 'purolator.svg',
-                              'Canada Post' => 'canada-post.svg',
-                              'Canpar' => 'canpar.svg',
-                              'StarTrack' => 'star-track.png',
-                              'CouriersPlease' => 'couriers-please.svg',
-                              'AlliedExpress' => 'alliedexpress.svg',
-                              'TNT' => 'tnt.svg',
-                              'Quantium' => 'quantium.svg',
-                              'Toll' => 'toll.svg',
-                              'HKPost' => 'hong-kong-post.svg',
-                              'APG' => 'apg.svg',
-                              'Hubbed' => 'hubbed.svg',
-                            ];
-
-                            // Check if the courier has a logo
-                            if (array_key_exists($name, $courierLogos)) {
-                              $logoFile = $courierLogos[$name];
-                              // print_r($logoFile);
-                            }
-                            ?>
-
-                            <div class="retailer-info-table">
-                              <?php if ($logoFile): ?>
-                                <!-- Show courier logo -->
-                                <div class="">
-                                  <img src="<?= base_url("logos/{$logoFile}") ?>" alt="<?= esc($name) ?>" style="border-radius: 8px; " width="45" height="auto">
-                                </div>
-                                <div class="retailer-details-table">
-                                  <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
-                                  <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
-                                </div>
-                              <?php else: ?>
-                                <!-- Default store icon -->
-                                <div class="retailer-logo-table"><i class="fas fa-store"></i></div>
-                                <div class="retailer-details-table">
-                                  <h6 class="retailer-name"><?= esc($p['retailer']) ?></h6>
-                                  <span class="tracking-number-table"><?= esc($p['tracking_number']) ?></span>
-                                </div>
-                              <?php endif; ?>
-                            </div>
-                          </td>
-                          <td>
-                            <span class="status-badge status-<?= $p['status'] ?>">
-                              <?php if ($p['status'] === 'combined'): ?>
-                                <i class="fas fa-compress-arrows-alt me-1"></i>
-                              <?php endif;
-                              if (!empty($p['combined_from'])):
-                              ?>
-                                <i class="fas fa-info-circle text-muted ms-2"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="top"
-                                  title="this is a combined package, to see the details, please got to the package details.">
-                                </i>
-                              <?php
-                              endif;
-                              ?>
-
-                              <?= ucfirst($p['status']) ?>
-                            </span>
-                          </td>
-
-                          <td><span class="detail-value"><?= esc($p['weight']) ?> kg</span></td>
-                          <td><span class="detail-value">$<?= esc($p['value']) ?></span></td>
-                          <td><span class="detail-value"><?= fullname($p['user_id']) ?></span></td>
-                          <td><span class="detail-value"><?= date('M j, Y', strtotime($p['created_at'])) ?></span></td>
-                          <td class="actions-col">
-                            <div class="action-buttons-table">
-                              <a href="<?= base_url('packages/show/' . $p['id']) ?>" class="btn btn-action view"><i class="fas fa-eye"></i></a>
-                              <a href="<?= base_url('packages/' . $p['id'] . '/edit') ?>" class="btn btn-action edit"><i class="fas fa-edit"></i></a>
-                              <form class="delete-form" action="<?= base_url('packages/' . $p['id'] . '/delete') ?>" method="post" class="d-inline delete-form">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-action delete"><i class="fas fa-trash"></i></button>
-                              </form>
-                            </div>
-                          </td>
-                        </tr>
-                      <?php endif ?>
-                    <?php endforeach ?>
-                  </tbody>
-                </table>
-                <div class="bulk-actions-card mt-4" id="bulkActionsCard" style="display: none;">
-
-                  <div class="bulk-actions">
-                    <button class="btn bulk-action ship-now" data-action="ship"><i class="fas fa-rocket me-2"></i> Ship Now</button>
-                    <button class="btn bulk-action combine-repack" data-action="combine"><i class="fas fa-boxes me-2"></i> Combine & Repack</button>
-                    <button id="bulkDisposeReturnBtn" class="btn bton-action disposal me-4" data-action="dispose">
-                      <i class="fas fa-trash-alt me-1"></i> Dispose / Return Selected
-                    </button>
-                    <span class="selection-count" style="display: none;" id="selectionCount">0 packages selected</span>
-                  </div>
-                </div>
-              </div>
-            <?php else: ?>
-              <div class="empty-state text-center py-5">
-                <div class="empty-icon mb-3">
-                  <i class="fas fa-box-open fa-3x text-muted"></i>
-                </div>
-                <h4>No Packages Found</h4>
-                <p>There are no packages ready.</p>
-              </div>
-            <?php endif ?>
-          </div>
 
         </div>
 

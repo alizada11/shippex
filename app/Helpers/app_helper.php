@@ -32,6 +32,7 @@ if (!function_exists('warehousesMenu')) {
   }
 }
 
+
 if (!function_exists('getCountryCode')) {
   function getCountryCode($countryName)
   {
@@ -87,6 +88,45 @@ if (!function_exists('adminWarehousesMenu')) {
         strpos($currentUrl, '/packages/' . $id) !== false ||
         strpos($currentUrl, '/packages/create/' . $id) !== false ||
         strpos($currentUrl, '/packages/' . $id . '/edit') !== false;
+
+      $html .= '
+        <li class="nav-item">
+            <a class="nav-link ' . ($isActive ? 'active' : '') . '" href="' . $url . '">
+                <i class="fi fi-' . $flagCode . '"></i> ' . esc($adr['country']) . '
+            </a>
+        </li>';
+    }
+
+
+    return $html;
+  }
+}
+
+if (!function_exists('adminShipmentHistory')) {
+  function adminShipmentHistory(): string
+  {
+    $addressesModel = new \App\Models\VirtualAddressModel();
+    $addresses = $addressesModel->findAll();
+
+    $currentUrl = current_url(); // get current URL
+    $html = '';
+
+    foreach ($addresses as $adr) {
+      $code = strtolower($adr['code'] ?? 'us');
+
+      // Fix or map invalid country codes
+      $map = [
+        'uk' => 'gb', // show UK flag for 'uk'
+        'gp' => 'gb', // treat 'gp' as UK
+      ];
+
+      $flagCode = $map[$code] ?? $code;
+      $id = $adr['id'];
+      $url = base_url('package/history/' . $id);
+
+      // Check if current URL matches any of the related routes
+      $isActive =
+        strpos($currentUrl, '/package/history/' . $id) !== false;
 
       $html .= '
         <li class="nav-item">

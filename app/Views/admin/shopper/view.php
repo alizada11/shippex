@@ -155,8 +155,8 @@
 
 
                   <p><i class="fas fa-info-circle"></i>This request was shipped to
-                    <a href="<?= base_url('warehouse/edit/' . $request['warehouse_id']) ?>"><b><?= warehouse_name($request['warehouse_id'])['city'] . ',' .
-                                                                                                  warehouse_name($request['warehouse_id'])['country'] ?></b></a>
+                    <a href="<?= base_url('warehouse/edit/' . $request['warehouse_id']) ?>"><b>
+                        <?= warehouse_name($request['warehouse_id'])['city'] . ',' . warehouse_name($request['warehouse_id'])['country'] ?></b></a>
                     warehouse.
                   </p>
 

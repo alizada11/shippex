@@ -54,8 +54,9 @@ class CombineRepackController extends BaseController
             }
 
             // ✅ Calculate totals
-            $totals = ['weight' => 0, 'length' => 0, 'width' => 0, 'height' => 0];
+            $totals = ['value' => 0, 'weight' => 0, 'length' => 0, 'width' => 0, 'height' => 0];
             foreach ($packages as $p) {
+                $totals['value'] += (float) $p['value'];
                 $totals['weight'] += (float) $p['weight'];
                 $totals['length'] += (float) $p['length'];
                 $totals['width']  += (float) $p['width'];
@@ -67,6 +68,7 @@ class CombineRepackController extends BaseController
                 'user_id'       => session()->get('user_id'),
                 'package_ids'   => json_encode($data['package_ids']),
                 'warehouse_id'  => $data['warehouse_id'],
+                'total_value'  => $totals['value'],
                 'total_weight'  => $totals['weight'],
                 'total_length'  => $totals['length'],
                 'total_width'   => $totals['width'],
@@ -75,7 +77,7 @@ class CombineRepackController extends BaseController
             ]);
             foreach ($packages as $pkg) {
                 $p_id = $pkg['id'];
-                $this->packageModel->update($p_id, ['status' => 'combined']);
+                $this->packageModel->update($p_id, ['status' => 'combined', 'combination_status' => 0]);
             }
             return $this->response->setJSON([
                 'status' => 'success',
@@ -135,14 +137,19 @@ class CombineRepackController extends BaseController
         if (empty($data['weight']) || empty($data['length']) || empty($data['width']) || empty($data['height'])) {
             return redirect()->back()->with('error', 'All package dimensions and weight are required.');
         }
+        if (!empty($data['create_package']) && $data['create_package'] == '1') {
+            $stat = 'completed';
+        } else {
 
+            $stat = 'pending';
+        }
         // Update request record
         $this->requestModel->update($id, [
             'total_weight'  => $data['weight'],
             'total_length'  => $data['length'],
             'total_width'   => $data['width'],
             'total_height'  => $data['height'],
-            'status'        => 'completed',
+            'status'        => $stat,
             'admin_id'      => session()->get('user_id'),
             'updated_at'    => date('Y-m-d H:i:s')
         ]);
@@ -155,6 +162,10 @@ class CombineRepackController extends BaseController
                 log_message('error', 'CombineRepackController: Missing user_id or warehouse_id.');
                 return redirect()->back()->with('error', 'User and warehouse ID are required to create a package.');
             }
+            $request = $this->requestModel->where('id', $id)->first();
+            $combined_from = $request['package_ids'];
+
+            $total_value = $request['total_value'];
 
             $packageData = [
                 'user_id'       => $data['user_id'],
@@ -163,8 +174,9 @@ class CombineRepackController extends BaseController
                 'length'        => $data['length'],
                 'width'         => $data['width'],
                 'height'        => $data['height'],
+                'value'        => $total_value,
                 'status'        => 'ready',
-                'combined_from' => $id,
+                'combined_from' => $combined_from,
                 'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
                 'created_at'    => date('Y-m-d H:i:s'),
             ];
@@ -172,6 +184,17 @@ class CombineRepackController extends BaseController
             // Try inserting
             $inserted = $this->packageModel->insert($packageData);
             if ($inserted) {
+                $ids = json_decode($combined_from, true);
+
+                foreach ($ids as $packageId) {
+
+                    $this->packageModel->update($packageId, [
+                        'combination_status' => 1,
+                        'archive' => 1,
+                        'parent_package' => $inserted
+                    ]);
+                }
+
                 $email = \Config\Services::email();
 
                 // Prepare data for email
@@ -188,6 +211,7 @@ class CombineRepackController extends BaseController
 
                 $message = view('emails/notify_combined', $data);
 
+                $email->setFrom('info@shippex.online', 'Shippex Admin');
                 $email->setTo($userModel->find($request['user_id'])['email']);
                 $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Purchase Invoice');
                 $email->setMessage($message);

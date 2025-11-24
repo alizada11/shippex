@@ -148,9 +148,25 @@ class DisposeReturnController extends BaseController
   public function adminIndex()
   {
     helper('app');
-    $requests = $this->requestModel->orderBy('created_at', 'DESC')->paginate(12);
-    $pager = $this->requestModel->pager;
-    return view('admin/dispose_return/index', ['requests' => $requests, 'title' => 'Return/Dispose Requests', 'pager' => $pager]);
+
+    $userRole = session('role');
+    $userId   = session('user_id');
+
+    $query = $this->requestModel->orderBy('created_at', 'DESC');
+
+    // Apply filter only if customer
+    if ($userRole === 'customer') {
+      $query = $query->where('user_id', $userId);
+    }
+
+    $requests = $query->paginate(12);
+    $pager    = $this->requestModel->pager;
+
+    return view('admin/dispose_return/index', [
+      'requests' => $requests,
+      'title'    => 'Return/Dispose Requests',
+      'pager'    => $pager,
+    ]);
   }
 
   /**
@@ -188,6 +204,7 @@ class DisposeReturnController extends BaseController
 
           // prevent invalid transition
           if (!in_array($pkg['status'], ['disposed', 'returned'])) {
+
             $this->packageModel->update($pkg['id'], ['status' => $newStatus]);
           } else {
             // already disposed/returned; still mark request approved
@@ -235,16 +252,18 @@ class DisposeReturnController extends BaseController
       return redirect()->back()->with('error', 'Request not found.');
     }
 
+
     // Only allow editing if pending
     if ($req['status'] !== 'pending') {
       return redirect()->back()->with('error', 'Only pending requests can be updated.');
     }
+    $packageId = $req['package_id'];
 
     $data = $this->request->getPost();
 
     // Simple validation
     $rules = [
-      'request_type' => 'required|in_list[dispose,return]',
+      'request_type' => 'required|in_list[disposed,returned]',
       'reason'       => 'permit_empty|min_length[3]',
     ];
 
@@ -258,8 +277,10 @@ class DisposeReturnController extends BaseController
       'status' => $this->request->getPost('status')
     ];
 
-    $this->requestModel->update($id, $updateData);
-
+    $update = $this->requestModel->update($id, $updateData);
+    if ($update) {
+      $this->packageModel->update($packageId, ['archive' => 1]);
+    }
     return redirect()->to('/admin/dispose-return')->with('success', 'Request updated successfully.');
   }
 }

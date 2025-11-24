@@ -105,7 +105,7 @@
             </li>
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/shopper') !== false) ? 'active' : '' ?>" data-bs-toggle="collapse" href="#personalShopper" role="button" aria-expanded="false" aria-controls="personalShopper">
-                <i class="fas fa-shopping-bag me-2"></i> Personal Shopper
+                <i class="fas fa-shopping-bag me-2"></i> Personal Shopper<i class="fas fa-chevron-down float-end mt-1 small"></i>
               </a>
               <div class="collapse ps-4" id="personalShopper">
                 <ul class="nav flex-column">
@@ -125,7 +125,7 @@
 
             <li class="nav-item">
               <a class="nav-link <?= (strpos(current_url(), '/profile') !== false) ? 'active' : '' ?> <?= (strpos(current_url(), '/addresses') !== false) ? 'active' : '' ?>" data-bs-toggle="collapse" href="#proffile" role="button" aria-expanded="false" aria-controls="proffile">
-                <i class="fas fa-user me-2"></i> Profile
+                <i class="fas fa-user me-2"></i> Profile<i class="fas fa-chevron-down float-end mt-1 small"></i>
               </a>
               <div class="collapse ps-4" id="proffile">
                 <ul class="nav flex-column">
@@ -246,35 +246,59 @@
 
           if (!warehouseId) return;
 
-          // Optional: confirm
-          if (!confirm(`Are you sure you want to request this warehouse?`)) return;
+          // SweetAlert Confirmation
+          Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to request warehouse: ${warehouseName}?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, request it",
+            cancelButtonText: "Cancel"
+          }).then((result) => {
+            if (!result.isConfirmed) return;
 
-          fetch("<?= site_url('warehouse-requests/request') ?>", {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: 'warehouse_id=' + encodeURIComponent(warehouseId)
-            })
-            .then(res => res.json())
-            .then(data => {
-              if (data.status === 'success') {
-                alert(data.message);
-                // Optionally disable the button
-                btn.textContent = 'You Own it';
-              } else {
-                alert(data.message);
-              }
-            })
-            .catch(err => {
-              console.error(err);
-              alert('Something went wrong.');
-            });
+            fetch("<?= site_url('warehouse-requests/request') ?>", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'warehouse_id=' + encodeURIComponent(warehouseId)
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.status === 'success') {
+                  Swal.fire({
+                    title: "Success",
+                    text: data.message,
+                    icon: "success"
+                  });
+
+                  btn.innerHTML = 'You Own It <i class="fas fa-check-circle text-success" data-bs-toggle="tooltip" title="Request accepted"></i>';
+                  btn.disabled = true;
+                } else {
+                  Swal.fire({
+                    title: "Error",
+                    text: data.message,
+                    icon: "error"
+                  });
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                Swal.fire({
+                  title: "Error",
+                  text: "Something went wrong.",
+                  icon: "error"
+                });
+              });
+          });
+
         });
       });
     });
   </script>
+
   <?= $this->renderSection('script') ?>
 
 </body>

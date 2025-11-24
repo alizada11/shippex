@@ -28,6 +28,7 @@ class WarehouseController extends BaseController
 
  public function index()
  {
+  $data['title'] = 'All Warehouses';
   $data['addresses'] = $this->addressModel->orderBy('id', 'DESC')->findAll();
   return view('admin/warehouses/index', $data);
  }
@@ -48,6 +49,7 @@ class WarehouseController extends BaseController
    'code'            => 'required|max_length[16]',
    'country'         => 'required|max_length[100]',
    'city'            => 'required|max_length[255]',
+   'state'            => 'required|max_length[255]',
    'address_line_1'  => 'required|max_length[255]',
    'address_line_2'  => 'permit_empty|max_length[255]',
    'state'           => 'required|max_length[255]',
@@ -55,6 +57,7 @@ class WarehouseController extends BaseController
    'map_link'        => 'permit_empty|valid_url',
    'postal_code'     => 'required|max_length[20]',
    'phone'           => 'permit_empty|max_length[20]',
+   'easyship_wh'     => 'permit_empty|max_length[20]',
    'is_active'       => 'required|in_list[0,1]',
   ];
 
@@ -84,13 +87,44 @@ class WarehouseController extends BaseController
  {
   $data = $this->request->getPost();
 
-  // If checkbox not in post data, set it manually
+  // Validation rules (same as store)
+  $rules = [
+   'code'            => 'required|max_length[16]',
+   'country'         => 'required|max_length[100]',
+   'city'            => 'required|max_length[255]',
+   'state'           => 'required|max_length[255]',
+   'address_line_1'  => 'required|max_length[255]',
+   'address_line_2'  => 'permit_empty|max_length[255]',
+   'address_line'    => 'permit_empty',
+   'map_link'        => 'permit_empty|valid_url',
+   'postal_code'     => 'required|max_length[20]',
+   'phone'           => 'permit_empty|max_length[20]',
+   'easyship_wh'     => 'permit_empty|in_list[0,1]', // ensure it’s 0/1
+   'is_active'       => 'permit_empty|in_list[0,1]', // checkbox handling
+  ];
+
+  // Validate incoming data
+  if (! $this->validate($rules)) {
+   return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+  }
+
+  // Checkbox fix: if not in POST, it's 0
   $data['is_active'] = $this->request->getPost('is_active') ? 1 : 0;
 
-  $this->addressModel->update($id, $data);
+  // Checkbox fix for easyship_wh (if it's a checkbox)
+  if (!isset($data['easyship_wh'])) {
+   $data['easyship_wh'] = 0;
+  }
 
-  return redirect()->to('/warehouse')->with('success', 'Warehouse address updated successfully.');
+  try {
+   $this->addressModel->update($id, $data);
+   return redirect()->to('/warehouse')->with('success', 'Warehouse address updated successfully.');
+  } catch (\Exception $e) {
+   log_message('error', 'Warehouse update error: ' . $e->getMessage());
+   return redirect()->back()->withInput()->with('error', 'Failed to update warehouse address. Try again.');
+  }
  }
+
 
 
  public function delete($id)

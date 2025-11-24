@@ -2,7 +2,10 @@
 
 <?= $this->section('content') ?>
 
-
+<?php
+$session = session();
+$role = $session->get('role');
+?>
 <div class="container">
   <!-- Stats Overview -->
   <div class="row">
@@ -37,7 +40,19 @@
 
               <div class="d-flex justify-content-between ">
                 <h4 class="d-inline mb-1">Package Status: <?= statusBadge($request['status']) ?> </h4>
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-3 align-items-center">
+                  <?php if (($request['set_rate']) == 1):
+
+                  ?>
+                    <a class="btn btn-shippex-orange" id="viewRates" data-bs-toggle="modal"
+                      data-bs-target="#viewRatesModal"
+                      style="cursor: pointer;"
+                      title="Click to view payment details">
+                      <i class="fas fa-eye"></i>
+                      View Shipping Prices
+                    </a>
+                  <?php endif; ?>
+
                   <?php
                   // Get payment info JSON from request
                   $paymentTableHtml = '';
@@ -196,6 +211,31 @@
           </div>
         </div>
       </div>
+
+      <!-- Rates Prevview Modal -->
+      <div class="modal fade rounded-xl" id="viewRatesModal" tabindex="-1" aria-labelledby="viewRatesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header card-header flex-column align-items-start">
+              <div class="w-100 d-flex justify-content-between align-items-start">
+                <div>
+                  <h4 class="modal-title mb-1" id="viewRatesModalLabel">Available Rates and Courier Services</h4>
+                  <small class="text-white-50">Select one of the services below to ship your request.</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+            </div>
+
+            <div class="modal-body">
+
+
+              <div id="ratePreviewTable" style="max-height:500px; overflow:auto">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="row">
         <!-- Left Column -->
         <div class="col-lg-8">
@@ -288,19 +328,19 @@
             <div class="card-body">
               <div class="detail-item">
                 <span class="detail-label">Courier:</span>
-                <span class="float-end"><?= $request['courier_name'] ?></span>
+                <span class="float-end"><?= ($request['courier_name']) ? $request['courier_name'] : 'N/A' ?></span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Service:</span>
-                <span class="float-end"><?= $request['service_name'] ?></span>
+                <span class="float-end"><?= ($request['service_name']) ? $request['service_name'] : 'N/A' ?></span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Delivery Time:</span>
-                <span class="float-end"><?= $request['delivery_time'] ?></span>
+                <span class="float-end"><?= ($request['delivery_time']) ? $request['delivery_time'] : 'N/A' ?></span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Total Charge:</span>
-                <span class="float-end fw-bold text-success"><?= $request['currency'] . ' ' . $request['total_charge'] ?></span>
+                <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? ($request['currency'] . ' ' . $request['total_charge']) : 'N/A' ?></span>
               </div>
               <hr>
               <div class="detail-item">
@@ -551,6 +591,178 @@
           });
       });
     });
+
+    document.getElementById('viewRates').addEventListener('click', async function() {
+      const id = "<?= htmlspecialchars($request['id'], ENT_QUOTES) ?>";
+      const tableDiv = document.getElementById('ratePreviewTable');
+
+      async function loadShippingServices() {
+        // Show Bootstrap loading spinner
+        tableDiv.innerHTML = `
+            <div class="d-flex justify-content-center py-5">
+                <div class="spinner-border text-primary me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="fw-bold align-self-center">Loading...</span>
+            </div>
+            `;
+
+        try {
+          const res = await fetch(`/shipping-services/get_all/${id}`);
+          const json = await res.json();
+
+          if (json.status !== 'ok') {
+            tableDiv.innerHTML = '<p class="text-center text-danger">Error loading records</p>';
+            return;
+          }
+
+          const data = json.data;
+
+          if (!data.length) {
+            tableDiv.innerHTML = '<p class="text-center">No shipping services found.</p>';
+            return;
+          }
+
+          // Function to generate star rating HTML
+          function generateStarRating(rating) {
+            if (!rating) return 'N/A';
+
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+
+            for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star text-warning"></i>';
+            if (hasHalfStar) starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) starsHtml += '<i class="far fa-star text-warning"></i>';
+
+            return starsHtml;
+          }
+
+          // Function to format features
+          function formatFeatures(featuresObj) {
+            if (!featuresObj) return 'Features not available';
+
+            const featuresHtml = [];
+            if (featuresObj.tracking) featuresHtml.push(`Tracking: ${featuresObj.tracking}`);
+            if (featuresObj.insurance) featuresHtml.push(`Insurance: ${featuresObj.insurance}`);
+            if (featuresObj.multi_piece) featuresHtml.push(`Multi-piece: ${featuresObj.multi_piece}`);
+            if (featuresObj.combine_and_repack) featuresHtml.push(`Combine and Repack: ${featuresObj.combine_and_repack}`);
+
+            return featuresHtml.join('<br>') || 'Features not available';
+          }
+
+          // Generate HTML for the rates display
+          let html = '';
+          data.forEach(row => {
+            html += `
+            
+                    <div style="cursor:pointer" class="pricing-service mb-4 border rounded"  data-service-id="${row.id}" data-service-request-id="${row.request_id}"  data-service="${row.service_name}">
+                        <div class="prices py-4">
+                            <div class="container">
+                            <div class="row align-items-center h-100">
+                            <div class="col-sm-3 my-auto">
+                            <div class="service-logo text-center d-flex flex-column align-items-center">
+                            <img src="${row.provider_logo}" class="me-3" width="140" alt="${row.provider_name}">
+                            <span class="service-name text-center fw-bold">${row.provider_name} ${row.service_name}</span>
+                            </div>
+                            </div>
+                            <div class="col-sm-6 text-center">
+                            <div class="service-price mb-2">
+                            <span class="h4 fw-bold">${row.currency} ${row.price}</span>
+                            <small class="text-muted">+ VAT</small>
+                            </div>
+                            <div class="service-info-rating mb-2">
+                            <strong>Ratings:</strong>
+                            <span class="ms-2">${generateStarRating(row.rating)}</span>
+                            </div>
+                            <div class="service-info-transit-time">
+                                            <strong>Transit Time:</strong>
+                                            <span class="ms-2">${row.transit_text} (${row.transit_days} days)</span>
+                                            </div>
+                                    </div>
+                                    <div class="col-sm-3 text-center">
+                                    <div class="service-details small">
+                                    ${formatFeatures(row.features)}
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <div class="row d-block d-sm-none mt-3">
+                                    <div class="col-8 m-auto">
+                                    <button type="button" class="btn btn-block btn-danger lock-prices-button-btn" aria-label="lock-prices" data-lock-prices="${row.quote_key}">
+                                    Lock Prices
+                                        </button>
+                                        </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                    `;
+          });
+
+          tableDiv.innerHTML = html;
+
+        } catch (error) {
+          console.error('Error fetching shipping services:', error);
+          tableDiv.innerHTML = '<p class="text-center text-danger">Error fetching data</p>';
+        }
+      }
+
+      loadShippingServices();
+
+      tableDiv.addEventListener('click', function(e) {
+        const row = e.target.closest('.pricing-service');
+        if (!row) return;
+
+        const serviceId = row.dataset.serviceId;
+        const requestId = row.dataset.serviceRequestId;
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to proceed with this service?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, confirm!',
+          cancelButtonText: 'Cancel'
+        }).then(result => {
+          if (result.isConfirmed) {
+            fetch('/shipping-services/set-price/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  service_id: serviceId,
+                  request_id: requestId
+                })
+              })
+              .then(res => res.json())
+              .then(data => {
+                Swal.fire({
+                  title: data.success ? 'Confirmed!' : 'Error!',
+                  text: data.message || '',
+                  icon: data.success ? 'success' : 'error',
+                  timer: 3000, // 3 seconds
+                  timerProgressBar: true, // show progress bar
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  },
+                  willClose: () => {
+                    if (data.success) {
+                      location.reload(); // reload page after timer
+                    }
+                  }
+                });
+              })
+              .catch(() => Swal.fire('Error!', 'Request failed. Try again.', 'error'));
+          }
+        });
+      });
+
+    });
+
+    // After rendering the rows
   </script>
   <?= $this->endSection() ?>
   <?= $this->endSection() ?>

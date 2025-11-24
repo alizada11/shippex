@@ -40,11 +40,12 @@ class PackageController extends BaseController
     $actionModel = new PackageActionModel();
 
     // Number of records per page
-    $perPage = 10;
+    $perPage = 30;
 
     // Base query with join
     $packageModel->select('packages.*, virtual_addresses.country as warehouse_name, virtual_addresses.postal_code')
       ->join('virtual_addresses', 'virtual_addresses.id = packages.virtual_address_id', 'left')
+      ->where('archive', 0)
       ->orderBy('packages.created_at', 'DESC');
 
     // If the logged-in user is not admin, restrict to their own packages
@@ -75,6 +76,56 @@ class PackageController extends BaseController
     $data['title'] = 'Packages';
     // Render the same layout for everyone
     return view('admin/packages/index', $data);
+  }
+
+  public function history($id)
+  {
+    $session = session();
+    $role = $session->get('role');       // 'admin' or 'customer'
+    $userId = $session->get('user_id');  // logged-in user id
+
+    $packageModel = new PackageModel();
+    $itemModel = new PackageItemModel();
+    $fileModel = new PackageFileModel();
+    $actionModel = new PackageActionModel();
+
+    // Number of records per page
+    $perPage = 10;
+
+    // Base query with join
+    $packageModel->select('packages.*, virtual_addresses.country as warehouse_name, virtual_addresses.postal_code')
+      ->join('virtual_addresses', 'virtual_addresses.id = packages.virtual_address_id', 'left')
+      ->where('packages.archive', 1)
+      ->orderBy('packages.created_at', 'DESC');
+
+    // If the logged-in user is not admin, restrict to their own packages
+    if ($role !== 'admin') {
+      $packageModel->where('packages.user_id', $userId);
+    }
+
+    // Optional: filter by virtual address id if needed
+    if ($id) {
+      $packageModel->where('virtual_addresses.id', $id);
+    }
+
+    // Pagination
+    $data['packages'] = $packageModel->paginate($perPage);
+    $data['pager'] = $packageModel->pager;
+
+    // If no packages found
+    if (!$data['packages']) {
+      $data['packages'] = [];
+    }
+
+    // Optional: load specific package details (if $id refers to package id)
+    $data['package'] = $packageModel->find($id);
+    $data['items'] = $itemModel->getByPackage($id);
+    $data['files'] = $fileModel->getFilesByPackage($id);
+    $data['actions'] = $actionModel->getHistory($id);
+    $data['virtual_address_id'] = $id;
+    $data['title'] = 'Packages';
+    // Render the same layout for everyone
+    return view('admin/packages_history/index', $data);
   }
 
 
@@ -481,6 +532,7 @@ class PackageController extends BaseController
 
         $email = \Config\Services::email();
 
+        $email->setFrom('info@shippex.online', 'Shippex Admin');
         $email->setTo($user_email);
         $email->setSubject('Password Reset Link');
         $email->setMessage($message);
@@ -573,7 +625,7 @@ class PackageController extends BaseController
 
 
     $currentWarehouse = $virtualAddressModel->find($package['virtual_address_id']);
-    $availableWarehouses = $virtualAddressModel->where('is_active', 1)->findAll();
+    $availableWarehouses = $virtualAddressModel->where(['is_active' => 1, 'easyship_wh' => 1])->findAll();
 
     return $this->response->setJSON([
       'currentWarehouse' => $currentWarehouse,

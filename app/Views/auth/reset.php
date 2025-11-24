@@ -12,7 +12,20 @@
   <?php if (session()->getFlashdata('success')): ?>
    <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
   <?php endif; ?>
-
+  <?php if (session()->getFlashdata('errors')): ?>
+   <div class="alert alert-danger">
+    <?php
+    $errors = session()->getFlashdata('errors');
+    if (is_array($errors)) {
+     foreach ($errors as $error) {
+      echo "<p>$error</p>";
+     }
+    } else {
+     echo $errors;
+    }
+    ?>
+   </div>
+  <?php endif; ?>
   <form method="post" action="<?= base_url('/reset-password/' . $token) ?>" class="auth-form">
    <div class="form-group mb-4">
     <label for="password">New Password</label>

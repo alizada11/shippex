@@ -17,8 +17,10 @@ class VirtualAddressModel extends Model
   'phone',
   'city',
   'code',
+  'state',
   'is_active',
-  'map_link'
+  'map_link',
+  'easyship_wh'
  ];
  protected $useTimestamps = true;
 }
