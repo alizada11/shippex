@@ -54,9 +54,9 @@ class Auth extends BaseController
             ->first();
 
         if ($user && password_verify($password, $user['password'])) {
-            // if ($user['email_verified'] == 0) {
-            //     return redirect()->back()->with('error', 'Please verify your email before logging in.');
-            // }
+            if ($user['email_verified'] == 0) {
+                return redirect()->back()->with('error', 'Please verify your email before logging in.');
+            }
 
             //Set session data
             $sessionData = [
