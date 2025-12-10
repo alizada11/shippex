@@ -43,7 +43,7 @@
                   <h4 class="d-inline mb-1">Package Status: <?= statusBadge($request['status']) ?> </h4>
 
                   <div class="d-flex gap-3 align-items-center">
-                    <?php if (($request['set_rate']) == 1):
+                    <?php if (!isset($request['set_rate']) || $request['set_rate'] == 1):
                       if ($role === 'admin'):
                     ?>
 
@@ -57,7 +57,8 @@
                         </a>
                       <?php
                       endif;
-                    else: ?>
+                    endif;
+                    if (isset($request['set_rate']) && $request['set_rate'] == 0): ?>
                       <a class="btn btn-shippex-orange" id="viewRates" data-bs-toggle="modal"
                         data-bs-target="#viewRatesModal"
                         style="cursor: pointer;"
@@ -252,43 +253,53 @@
                 </form>
                 <div id="manualForm" style="display:none;">
                   <form id="manualInsertForm">
-
-                    <div class="form-group mb-2">
-                      <label>Provider Name</label>
-                      <input type="text" class="form-control" name="provider_name">
+                    <div class="row mb-3">
+                      <div class="col form-group mb-2">
+                        <label>Provider Name</label>
+                        <input type="text" class="form-control" name="provider_name">
+                      </div>
+                      <div class="col form-group mb-2">
+                        <label class="form-label">Provider Logo URL</label>
+                        <input type="text" class="form-control" name="provider_logo">
+                      </div>
                     </div>
+                    <div class="row mb-3">
+                      <div class="col form-group mb-2">
+                        <label>Service Name</label>
+                        <input type="text" class="form-control" name="service_name">
+                      </div>
 
-                    <div class="form-group mb-2">
-                      <label>Service Name</label>
-                      <input type="text" class="form-control" name="service_name">
+                      <div class="col form-group mb-2">
+                        <label>Price</label>
+                        <input type="number" class="form-control" name="price">
+                        <input type="hidden" class="form-control" name="request_id" value="<?= $request['id'] ?>">
+                      </div>
+
                     </div>
+                    <div class="row mb-3">
+                      <div class="col form-group mb-2">
+                        <label>Currency</label>
+                        <input type="text" class="form-control" name="currency">
+                      </div>
 
-                    <div class="form-group mb-2">
-                      <label>Price</label>
-                      <input type="number" class="form-control" name="price">
-                      <input type="hidden" class="form-control" name="request_id" value="<?= $request['id'] ?>">
+                      <div class="col form-group mb-2">
+                        <label>Transit Text</label>
+                        <input type="text" class="form-control" name="transit_text">
+                      </div>
+
                     </div>
+                    <div class="row mb-3">
+                      <div class="col form-group mb-2">
+                        <label>Transit Days</label>
+                        <input type="number" class="form-control" name="transit_days">
+                      </div>
 
-                    <div class="form-group mb-2">
-                      <label>Currency</label>
-                      <input type="text" class="form-control" name="currency">
+                      <div class="col form-group mb-2">
+                        <label>Features (key:value, comma separated)</label>
+                        <textarea class="form-control" name="features">{"tracking":"Yes","insurance":"Extra Cost","multi_piece":"Yes","combine_and_repack":"Yes"}</textarea>
+                      </div>
+
                     </div>
-
-                    <div class="form-group mb-2">
-                      <label>Transit Text</label>
-                      <input type="text" class="form-control" name="transit_text">
-                    </div>
-
-                    <div class="form-group mb-2">
-                      <label>Transit Days</label>
-                      <input type="number" class="form-control" name="transit_days">
-                    </div>
-
-                    <div class="form-group mb-2">
-                      <label>Features (key:value, comma separated)</label>
-                      <textarea class="form-control" name="features"></textarea>
-                    </div>
-
                     <button type="button" id="submitManualBtn" class="btn btn-success mt-3">
                       <i class="fas fa-save"></i> Save Manually
                     </button>
@@ -309,8 +320,7 @@
                           <th>Service</th>
                           <th>Price</th>
                           <th>Transit Days</th>
-                          <th>Valid</th>
-                          <th>Errors</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody></tbody>
@@ -325,10 +335,15 @@
         <div class="modal fade " id="viewRatesModal" tabindex="-1" aria-labelledby="viewRatesModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-xl">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header d-flex justify-content-between">
                 <h4 class="modal-title" id="viewRatesModalLabel">Set Rate For this Request</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div>
+                  <a href="<?= base_url('shipping-services/get_all/' . $request['id']) ?>" class="btn btn-primary"><i class="fas fa-pencil"></i> Edit </a>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
               </div>
+
               <div class="modal-body">
 
 
@@ -404,6 +419,31 @@
                 <div class="detail-item">
                   <span class="detail-label">Total Charge:</span>
                   <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? $request['currency'] . ' ' . $request['total_charge'] : 'N/A' ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Tax & Duty:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['tax_duty']) ? $request['currency'] . ' ' . $request['tax_duty'] : 'N/A' ?></span>
+                </div>
+                <hr>
+                <div class="detail-item">
+                  <span class="detail-label">Customs value:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['declared_customs_value']) ? $request['declared_currency'] . ' ' . $request['declared_customs_value'] : 'N/A' ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Insurance:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['is_insured'] == 1) ?  'Yes' : 'No' ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Insurance Ammount:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['insured_amount']) ?  $request['insured_amount'] : 'N/A' ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Incoterms:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['incoterms']) ?  $request['incoterms'] : 'N/A' ?></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Residential Add:</span>
+                  <span class="float-end fw-bold text-success"><?= ($request['set_as_residential'] == 1) ?  'Yes' : 'No' ?></span>
                 </div>
                 <hr>
                 <div class="detail-item">
@@ -708,24 +748,105 @@
         return;
       }
       const preview = resp.preview;
+      window.__previewData = preview;
       const tbody = document.querySelector('#previewTable tbody');
       tbody.innerHTML = '';
       preview.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
                 <td>${item.index}</td>
-                <td>${(item.record.provider_name||'')}</td>
-                <td>${(item.record.service_name||'')}</td>
-                <td>${(item.record.currency||'')}${(item.record.price!=null?item.record.price:'')}</td>
-                <td>${(item.record.transit_days!=null?item.record.transit_days:'')}</td>
-                <td>${item.valid?'<span class="text-success">Yes</span>':'<span class="text-danger">No</span>'}</td>
-                <td>${item.errors.length?item.errors.join(', '):''}</td>
+                <td><input class="form-control form-control-sm edit-field" data-field="provider_name" data-index="${item.index}" value="${item.record.provider_name || ''}"></td>
+                <td><input class="form-control form-control-sm edit-field" data-field="service_name" data-index="${item.index}" value="${item.record.service_name || ''}"></td>
+
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control edit-field" style="max-width:70px"
+                              data-field="currency" data-index="${item.index}" 
+                              value="${item.record.currency || ''}">
+                        <input type="number" step="0.01" class="form-control edit-field" 
+                              data-field="price" data-index="${item.index}" 
+                              value="${item.record.price ?? ''}">
+                    </div>
+                </td>
+
+                <td>
+                    <input type="number" class="form-control form-control-sm edit-field" 
+                          data-field="transit_days" data-index="${item.index}" 
+                          value="${item.record.transit_days ?? ''}">
+                </td>
+
+                
+                <td>
+                    <button class="btn btn-success btn-sm save-row-btn" data-index="${item.index}">
+                        Save
+                    </button>
+                </td>
             `;
+
+
         tbody.appendChild(tr);
       });
       document.getElementById('previewSummary').innerText = `Found ${preview.length} records`;
       document.getElementById('previewArea').style.display = 'block';
     });
+    document.addEventListener('input', function(e) {
+      if (!e.target.classList.contains('edit-field')) return;
+
+      const idx = e.target.getAttribute('data-index');
+      const field = e.target.getAttribute('data-field');
+      let value = e.target.value;
+
+      // convert numbers
+      if (field === 'price' || field === 'transit_days') {
+        value = value === "" ? null : Number(value);
+      }
+
+      // update stored record
+      window.__previewData[idx].record[field] = value;
+    });
+
+    document.addEventListener('click', async function(e) {
+      if (!e.target.classList.contains('save-row-btn')) return;
+
+      const idx = e.target.getAttribute('data-index');
+      const record = window.__previewData[idx];
+      const id = <?= $request['id'] ?>;
+
+      const confirmResult = await Swal.fire({
+        title: 'Save this rate?',
+        text: 'Only this row will be imported.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Save',
+      });
+
+      if (!confirmResult.isConfirmed) return;
+
+      // 🔥 Show loader popup
+      Swal.fire({
+        title: 'Saving...',
+        text: 'Please wait.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Perform request
+      const resp = await postJson(`/shipping-services/import-single/${id}`, record);
+
+      // Close the loader
+      Swal.close();
+
+      if (resp.status !== 'ok') {
+        Swal.fire('Error', 'Failed to save.', 'error');
+        return;
+      }
+
+      Swal.fire('Saved!', 'This rate has been inserted.', 'success');
+    });
+
 
     document.getElementById('importBtn').addEventListener('click', async function() {
 
@@ -806,7 +927,15 @@
         `;
 
         try {
-          const res = await fetch(`/shipping-services/get_all/${id}`);
+          const res = await fetch(`/shipping-services/get_all/${id}`, {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+              "Accept": "application/json"
+            }
+          });
+
+
+
           const json = await res.json();
 
           if (json.status !== 'ok') {

@@ -41,9 +41,7 @@ $role = $session->get('role');
               <div class="d-flex justify-content-between ">
                 <h4 class="d-inline mb-1">Package Status: <?= statusBadge($request['status']) ?> </h4>
                 <div class="d-flex gap-3 align-items-center">
-                  <?php if (($request['set_rate']) == 1):
-
-                  ?>
+                  <?php if (isset($request['set_rate']) && $request['set_rate'] == 0): ?>
                     <a class="btn btn-shippex-orange" id="viewRates" data-bs-toggle="modal"
                       data-bs-target="#viewRatesModal"
                       style="cursor: pointer;"
@@ -52,6 +50,7 @@ $role = $session->get('role');
                       View Shipping Prices
                     </a>
                   <?php endif; ?>
+
 
                   <?php
                   // Get payment info JSON from request
@@ -328,7 +327,7 @@ $role = $session->get('role');
             <div class="card-body">
               <div class="detail-item">
                 <span class="detail-label">Courier:</span>
-                <span class="float-end"><?= ($request['courier_name']) ? $request['courier_name'] : 'N/A' ?></span>
+                <span class="float-end"><?= ($request['courier_name']) ? $request['courier_name'] : 'N/A'  ?></span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Service:</span>
@@ -340,7 +339,32 @@ $role = $session->get('role');
               </div>
               <div class="detail-item">
                 <span class="detail-label">Total Charge:</span>
-                <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? ($request['currency'] . ' ' . $request['total_charge']) : 'N/A' ?></span>
+                <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? $request['currency'] . ' ' . $request['total_charge'] : 'N/A' ?></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Tax & Duty:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['tax_duty']) ? $request['currency'] . ' ' . $request['tax_duty'] : 'N/A' ?></span>
+              </div>
+              <hr>
+              <div class="detail-item">
+                <span class="detail-label">Customs value:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['declared_customs_value']) ? $request['declared_currency'] . ' ' . $request['declared_customs_value'] : 'N/A' ?></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Insurance:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['is_insured'] == 1) ?  'Yes' : 'No' ?></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Insurance Ammount:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['insured_amount']) ?  $request['insured_amount'] : 'N/A' ?></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Incoterms:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['incoterms']) ?  $request['incoterms'] : 'N/A' ?></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Residential Add:</span>
+                <span class="float-end fw-bold text-success"><?= ($request['set_as_residential'] == 1) ?  'Yes' : 'No' ?></span>
               </div>
               <hr>
               <div class="detail-item">
@@ -608,7 +632,12 @@ $role = $session->get('role');
             `;
 
         try {
-          const res = await fetch(`/shipping-services/get_all/${id}`);
+          const res = await fetch(`/shipping-services/get_all/${id}`, {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+              "Accept": "application/json"
+            }
+          });
           const json = await res.json();
 
           if (json.status !== 'ok') {

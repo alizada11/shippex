@@ -37,7 +37,16 @@ class ShippingBookingModel extends Model
   'payment_status',
   'payment_info',
   'label',
-  'set_rate'
+  'set_rate',
+  'hs_code',
+  'declared_customs_value',
+  'declared_currency',
+  'is_insured',
+  'insured_amount',
+  'incoterms',
+  'set_as_residential',
+  'tax_duty',
+  'price_set'
  ];
 
  protected $useTimestamps = true;

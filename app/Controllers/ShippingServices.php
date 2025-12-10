@@ -27,13 +27,29 @@ class ShippingServices extends BaseController
  }
  public function getAll($id)
  {
+
   $records = $this->model->where('request_id', $id)->findAll();
 
-  return $this->response->setJSON([
-   'status' => 'ok',
-   'data'   => $records
+  if (empty($records)) {
+   $records = [];
+  }
+  // If the request is AJAX → return JSON
+  if ($this->request->isAJAX()) {
+   return $this->response->setJSON([
+    'status' => 'ok',
+    'data' => $records
+   ]);
+  }
+
+  // Otherwie → return a view
+
+  return view('admin/shipping/rates', [
+   'records' => $records,
+   'title' => 'Rates',
+   'requestId' => $id
   ]);
  }
+
 
 
 
@@ -97,7 +113,7 @@ class ShippingServices extends BaseController
    'delivery_time' => $service['transit_days'],
    'total_charge'  => $service['price'],
    'description'   => $description,
-   'set_rate'       => 0, // default to 1 if not set
+   'price_set'       => 1, // default to 1 if not set
   ];
 
 
@@ -159,7 +175,7 @@ class ShippingServices extends BaseController
   $this->model->insert($input);
   $id = $this->model->getInsertID();
 
-  return $this->response->setStatusCode(201)->setJSON(['status' => 'created', 'id' => $id]);
+  return $this->response->setStatusCode(201)->setJSON(['status' => 'ok', 'id' => $id]);
  }
 
  public function manualInsert()
@@ -183,13 +199,14 @@ class ShippingServices extends BaseController
 
   $data = [
    'provider_name' => $request['provider_name'],
+   'provider_logo'  => $request['provider_logo'],
    'service_name'  => $request['service_name'],
    'price'         => $request['price'],
    'currency'      => $request['currency'],
    'transit_text'  => $request['transit_text'],
    'transit_days'  => $request['transit_days'],
    'request_id'  => $request['request_id'],
-   'features'      => json_encode($features, JSON_UNESCAPED_UNICODE),
+   'features'      => json_encode($request['features']),
    'created_at'    => date('Y-m-d H:i:s')
   ];
 
@@ -260,39 +277,28 @@ class ShippingServices extends BaseController
  public function delete($id = null)
  {
   if (!$id) {
-   return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Missing id']);
+   return $this->response->setStatusCode(400)->setJSON([
+    'status' => 'error',
+    'message' => 'Missing id'
+   ]);
   }
-  $this->model->delete($id);
-  return $this->response->setJSON(['status' => 'ok', 'message' => 'deleted']);
+
+  $ok = $this->model->delete($id);
+
+  if (!$ok) {
+   return $this->response->setStatusCode(400)->setJSON([
+    'status' => 'error',
+    'message' => 'Delete failed'
+   ]);
+  }
+
+  return $this->response->setJSON([
+   'status' => 'ok',
+   'message' => 'deleted'
+  ]);
  }
 
- // POST /shipping-services/import-html
- // Accepts form-field `html` (textarea content) and saves multiple rows
- // public function importHtml()
- // {
- //  $html = $this->request->getPost('html');
- //  if (!$html) {
- //   $json = $this->request->getJSON(true);
- //   $html = $json['html'] ?? null;
- //  }
- //  if (!$html) {
- //   return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Missing html payload']);
- //  }
 
- //  $records = parse_shipping_services_html($html);
- //  $saved = [];
- //  foreach ($records as $rec) {
- //   // ensure features is JSON string
- //   if (isset($rec['features']) && !is_string($rec['features'])) {
- //    $rec['features'] = json_encode($rec['features']);
- //   }
- //   // insert
- //   $this->model->insert($rec);
- //   $saved[] = $this->model->getInsertID();
- //  }
-
- //  return $this->response->setJSON(['status' => 'ok', 'inserted_ids' => $saved, 'count' => count($saved)]);
- // }
 
  public function importPreview($id)
  {
@@ -372,5 +378,80 @@ class ShippingServices extends BaseController
    $email->send();
   }
   return $this->response->setJSON(['status' => 'ok', 'inserted' => $inserted, 'errors' => $errors]);
+ }
+
+ public function importSingle($id)
+ {
+  // Read input
+  $data = $this->request->getPost();
+  if (!$data) {
+   $data = $this->request->getJSON(true);
+  }
+
+  if (!$data) {
+   return $this->response->setStatusCode(400)->setJSON([
+    'status' => 'error',
+    'message' => 'missing record'
+   ]);
+  }
+
+  // Extract real shipping record
+  $record = $data['record'] ?? $data;
+
+  // Validate
+  list($ok, $errs) = validate_shipping_record($record);
+  if (!$ok) {
+   return $this->response->setStatusCode(422)->setJSON([
+    'status' => 'error',
+    'errors' => $errs,
+    'record' => $record
+   ]);
+  }
+
+  // Encode features as JSON if needed
+  if (isset($record['features']) && !is_string($record['features'])) {
+   $record['features'] = json_encode($record['features']);
+  }
+
+  // Insert record into DB
+  $this->model->insert($record);
+  $insertId = $this->model->getInsertID();
+
+  // Update booking
+  $bookingModel = new ShippingBookingModel();
+  $bookingModel->update($id, ['set_rate' => 0]);
+
+  // Get user
+  $booking = $bookingModel->select('user_id')->where('id', $id)->first();
+  $userId = $booking['user_id'] ?? null;
+
+  if ($userId) {
+   $userModel = new UserModel();
+   $user = $userModel->find($userId);
+
+   if ($user) {
+    $userName = trim(($user['firstname'] ?? '') . ' ' . ($user['lastname'] ?? ''));
+    if (!$userName) $userName = 'Customer';
+
+    $dataEmail = [
+     'userName' => $userName,
+     'reqLink' => base_url("customer/shipping/details/" . $id)
+    ];
+
+    $email = \Config\Services::email();
+    $email->setFrom('info@shippex.online', 'Shippex Admin');
+    $email->setTo($user['email']);
+    $email->setSubject("We've Set The Shipping Price");
+    $email->setMessage(view('emails/shipping_price_set', $dataEmail));
+    $email->setMailType('html');
+    $email->send();
+   }
+  }
+
+  return $this->response->setJSON([
+   'status' => 'ok',
+   'inserted' => $insertId,
+   'record' => $record
+  ]);
  }
 }

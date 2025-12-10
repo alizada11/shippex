@@ -23,11 +23,13 @@ $routes->get('shipping-services/(:num)', 'ShippingServices::show/$1');
 $routes->post('shipping-services', 'ShippingServices::create');
 $routes->put('shipping-services/(:num)', 'ShippingServices::update/$1');
 $routes->patch('shipping-services/(:num)', 'ShippingServices::update/$1');
+$routes->post('shipping-services/(:num)', 'ShippingServices::update/$1');
 $routes->delete('shipping-services/(:num)', 'ShippingServices::delete/$1');
 $routes->post('shipping-services/import-preview/(:num)', 'ShippingServices::importPreview/$1');
 $routes->get('shipping-services/get_all/(:num)', 'ShippingServices::getAll/$1');
 // bulk import of pasted html
 $routes->post('shipping-services/import-html/(:num)', 'ShippingServices::importHtml/$1');
+$routes->post('shipping-services/import-single/(:num)', 'ShippingServices::importSingle/$1');
 $routes->post('shipping-services/set-price/', 'ShippingServices::setPrice');
 $routes->post('shipping-services/manual-insert', 'ShippingServices::manualInsert');
 
@@ -326,11 +328,4 @@ $routes->group('addresses', ['filter' => 'role:customer', 'namespace' => 'App\Co
  $routes->post('update/(:num)', 'AddressController::update/$1');
  $routes->get('delete/(:num)', 'AddressController::delete/$1');
  $routes->get('primary/(:num)', 'AddressController::setDefault/$1');
-});
-
-//page buildder
-$routes->group('pagebuilder', ['namespace' => 'App\Controllers'], function ($routes) {
- $routes->get('index/(:num)', 'PageBuilder::index/$1'); // Edit page with ID
- $routes->get('load/(:num)', 'PageBuilder::load/$1'); // load page with ID
- $routes->post('save', 'PageBuilder::save'); // Save page content
 });

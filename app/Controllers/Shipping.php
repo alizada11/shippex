@@ -40,72 +40,134 @@ class Shipping extends BaseController
 
     public function getRates()
     {
-        if ($this->request->isAJAX()) {
-            $data = $this->request->getPost();
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405)->setJSON(['error' => 'Method not allowed']);
+        }
 
-            try {
-                $client = new \GuzzleHttp\Client();
+        $body = json_decode($this->request->getBody(), true);
+        if (!$body) {
+            return $this->response->setJSON(['error' => ['message' => 'Invalid JSON body']]);
+        }
 
-                $payload = [
-                    "origin_address" => [
-                        "line_1"        => $data['origin_line_1'] ?? '',
-                        "state"         => $data['origin_state'] ?? '',
-                        "city"          => $data['origin_city'] ?? '',
-                        "postal_code"   => $data['origin_postal_code'] ?? '',
-                        "country_alpha2" => $data['origin_country'] ?? '',
-                    ],
-                    "destination_address" => [
-                        "line_1"        => $data['dest_line_1'] ?? '',
-                        "state"         => $data['dest_state'] ?? '',
-                        "city"          => $data['dest_city'] ?? '',
-                        "postal_code"   => $data['dest_postal_code'] ?? '',
-                        "country_alpha2" => $data['dest_country'] ?? '',
-                    ],
-                    "incoterms" => "DDU",
-                    "parcels" => [[
-                        "total_actual_weight" => (float)($data['weight'] ?? 1),
-                        "items" => [[
-                            "origin_country_alpha2" => $data['origin_country'] ?? '',
-                            "quantity" => 1,
-                            "declared_currency" => "USD",
-                            "description" => "Test item",
-                            "category" => $data['category'],
-                            "hs_code" => $data['hs_code'], // example HS code (T-shirts)
-                            "actual_weight" => (float)($data['weight'] ?? 1),
-                            "dimensions" => [
-                                "length" => (float)($data['length'] ?? 10),
-                                "width"  => (float)($data['width'] ?? 10),
-                                "height" => (float)($data['height'] ?? 10),
-                            ],
-                            "declared_customs_value" => 20
-                        ]]
-                    ]]
-                ];
+        // Normalize inputs & defaults
+        $origin = $body['origin_address'] ?? [];
+        $dest   = $body['destination_address'] ?? [];
+        $parcels = $body['parcels'] ?? [];
+        $incoterms = $body['incoterms'] ?? 'DDU';
 
-                $response = $client->post('https://public-api.easyship.com/2024-09/rates', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . trim($this->token),
-                        'Content-Type'  => 'application/json',
-                        'Accept'        => 'application/json; version=2024-09',
-                    ],
-                    'json' => $payload,  // ← let Guzzle handle encoding
-                    'http_errors' => false,
-                ]);
+        $isInsured = false;
+        if (isset($body['insurance']['is_insured'])) {
+            $isInsured = filter_var($body['insurance']['is_insured'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        // Validate minimal required fields
+        if (
+            empty($origin['line_1']) || empty($origin['city']) || empty($origin['country_alpha2']) ||
+            empty($dest['line_1']) || empty($dest['city']) || empty($dest['country_alpha2'])
+        ) {
+            return $this->response->setStatusCode(422)->setJSON(['error' => ['message' => 'Missing required origin/destination fields']]);
+        }
+
+        // Ensure parcels structure
+        if (empty($parcels) || !is_array($parcels)) {
+            // build a default parcel from single item fields if provided (compat fallback)
+            $parcels = [[
+                'total_actual_weight' => floatval($body['weight'] ?? 1),
+                'box' => [
+                    'length' => floatval($body['length'] ?? 0),
+                    'width'  => floatval($body['width'] ?? 0),
+                    'height' => floatval($body['height'] ?? 0),
+                ],
+                'items' => [[
+                    'quantity' => 1,
+                    'declared_currency' => $body['declared_currency'] ?? 'USD',
+                    'declared_customs_value' => floatval($body['declared_customs_value'] ?? 0),
+                    'actual_weight' => floatval($body['weight'] ?? 1),
+                    'display_weight_unit' => 'kg',
+                    'hs_code' => $body['hs_code'] ?? null,
+                    'category' => $body['category'] ?? null,
+                    'set_as_residential' => isset($dest['set_as_residential']) ? (bool)$dest['set_as_residential'] : false
+                ]]
+            ]];
+        }
+
+        // Build final payload according to Easyship public API spec (2024-09)
+        $payload = [
+            'origin_address' => [
+                'line_1' => $origin['line_1'] ?? '',
+                'line_2' => $origin['line_2'] ?? null,
+                'state'  => $origin['state'] ?? null,
+                'city'   => $origin['city'] ?? '',
+                'postal_code' => $origin['postal_code'] ?? null,
+                'country_alpha2' => $origin['country_alpha2'] ?? ''
+            ],
+            'destination_address' => [
+                'line_1' => $dest['line_1'] ?? '',
+                'line_2' => $dest['line_2'] ?? null,
+                'state'  => $dest['state'] ?? null,
+                'city'   => $dest['city'] ?? '',
+                'postal_code' => $dest['postal_code'] ?? null,
+                'country_alpha2' => $dest['country_alpha2'] ?? '',
+                'delivery_instructions' => $dest['delivery_instructions'] ?? null,
+                'set_as_residential' => isset($dest['set_as_residential']) ? (bool)$dest['set_as_residential'] : false
+            ],
+            'incoterms' => in_array($incoterms, ['DDU', 'DDP']) ? $incoterms : 'DDU',
+            'insurance' => [
+                'is_insured' => $isInsured
+            ],
+            'parcels' => $parcels,
+            // optional: prefer currency passed from client
+            'shipping_settings'   => (object) ($body['shipping_settings'] ?? []),
+            'courier_settings'    => (object) ($body['courier_settings'] ?? [])
 
 
-                $rates = json_decode($response->getBody(), true);
-                header('Content-Type: application/json');
-                echo json_encode($rates);
-            } catch (\Exception $e) {
-                return $this->response->setJSON([
-                    'error' => $e->getMessage()
-                ]);
+        ];
+
+        try {
+            $client = new \GuzzleHttp\Client();
+
+            // Use your token storage: replace with $this->token if you have it
+            $token = $this->token;
+
+            $response = $client->post('https://public-api.easyship.com/2024-09/rates', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . trim($token),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json; version=2024-09',
+                ],
+                'json' => $payload,
+                'http_errors' => false,
+                'timeout' => 30,
+            ]);
+
+            $status = $response->getStatusCode();
+            $body = (string)$response->getBody();
+            // Return upstream body as-is (decoded)
+            $decoded = json_decode($body, true);
+
+            return $this->response->setStatusCode($status)->setJSON($decoded);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $msg = $e->getMessage();
+            if ($e->hasResponse()) {
+                $msgBody = (string)$e->getResponse()->getBody();
+                $decoded = json_decode($msgBody, true);
+                return $this->response->setStatusCode(502)->setJSON(['error' => $decoded ?? ['message' => $msg]]);
             }
+            return $this->response->setStatusCode(500)->setJSON(['error' => ['message' => $msg]]);
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(500)->setJSON(['error' => ['message' => $e->getMessage()]]);
         }
     }
 
+
+
     public function book()
     {
+        // $request = service('request');
+        // echo "<pre>";
+        // print_r($request->getPost());
+        // echo "<pre>";
+        // exit;
         $session = session();
         // Check if user is logged in
         if (!$session->has('user_id')) {
@@ -121,36 +183,49 @@ class Shipping extends BaseController
 
         $data = [
             // Origin
-            'origin_line_1'  => $request->getPost('origin_line_1'),
-            'origin_city'    => $request->getPost('origin_city'),
-            'origin_state'   => $request->getPost('origin_state'),
-            'origin_postal'  => $request->getPost('origin_postal_code'),
-            'origin_country' => $request->getPost('origin_country'),
+            'origin_line_1'       => $request->getPost('origin_line_1'),
+            'origin_city'         => $request->getPost('origin_city'),
+            'origin_state'        => $request->getPost('origin_state'),
+            'origin_postal'       => $request->getPost('origin_postal_code'),
+            'origin_country'      => $request->getPost('origin_country'),
 
             // Destination
-            'dest_line_1'    => $request->getPost('dest_line_1'),
-            'dest_city'      => $request->getPost('dest_city'),
-            'dest_state'     => $request->getPost('dest_state'),
-            'dest_postal'    => $request->getPost('dest_postal_code'),
-            'dest_country'   => $request->getPost('dest_country'),
+            'dest_line_1'         => $request->getPost('dest_line_1'),
+            'dest_city'           => $request->getPost('dest_city'),
+            'dest_state'          => $request->getPost('dest_state'),
+            'dest_postal'         => $request->getPost('dest_postal_code'),
+            'dest_country'        => $request->getPost('dest_country'),
 
             // Parcel
-            'weight'         => $request->getPost('weight'),
-            'length'         => $request->getPost('length'),
-            'width'          => $request->getPost('width'),
-            'height'         => $request->getPost('height'),
-            'category'       => $request->getPost('category'),
+            'weight'              => $request->getPost('weight'),
+            'length'              => $request->getPost('length'),
+            'width'               => $request->getPost('width'),
+            'height'              => $request->getPost('height'),
+            'category'            => $request->getPost('category'),
+
             // Easyship rate info
-            'courier_name'   => $request->getPost('courier_name'),
-            'service_name'   => $request->getPost('service_name'),
-            'delivery_time'  => $request->getPost('delivery_time'),
-            'currency'       => $request->getPost('currency'),
-            'total_charge'   => $request->getPost('total_charge'),
-            'description'    => $request->getPost('description'),
-            'set_rate'    => $request->getPost('set_rate'),
-            //user
-            'user_id'        => $user_id,
+            'courier_name'        => $request->getPost('courier_name'),
+            'service_name'        => $request->getPost('service_name'),
+            'delivery_time'       => $request->getPost('delivery_time'),
+            'currency'            => $request->getPost('currency'),
+            'total_charge'        => $request->getPost('total_charge'),
+            'description'         => $request->getPost('description'),
+            'set_rate'            => $request->getPost('set_rate'),
+
+            // New fields
+            'hs_code'             => $request->getPost('hs_code'),
+            'declared_customs_value' => $request->getPost('declared_customs_value'),
+            'declared_currency'   => $request->getPost('declared_currency'),
+            'is_insured'          => $request->getPost('is_insured') ? 1 : 0,
+            'insured_amount'      => $request->getPost('insured_amount'),
+            'incoterms'           => $request->getPost('incoterms'),
+            'set_as_residential'  => $request->getPost('set_as_residential') ? 1 : 0,
+            'tax_duty'            => $request->getPost('tax_duty'),
+
+            // User
+            'user_id'             => $user_id,
         ];
+
 
 
         $shippingModel = new \App\Models\ShippingBookingModel();
