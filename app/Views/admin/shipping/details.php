@@ -43,7 +43,7 @@
                   <h4 class="d-inline mb-1">Package Status: <?= statusBadge($request['status']) ?> </h4>
 
                   <div class="d-flex gap-3 align-items-center">
-                    <?php if (!isset($request['set_rate']) || $request['set_rate'] == 1):
+                    <?php if ($request['total_charge'] == 0.00 && !isset($request['set_rate']) || $request['set_rate'] == 1):
                       if ($role === 'admin'):
                     ?>
 
@@ -58,7 +58,7 @@
                       <?php
                       endif;
                     endif;
-                    if (isset($request['set_rate']) && $request['set_rate'] == 0): ?>
+                    if (isset($request['set_rate']) && $request['set_rate'] == 0 && $request['total_charge'] == 0.00): ?>
                       <a class="btn btn-shippex-orange" id="viewRates" data-bs-toggle="modal"
                         data-bs-target="#viewRatesModal"
                         style="cursor: pointer;"
@@ -291,7 +291,7 @@
                     <div class="row mb-3">
                       <div class="col form-group mb-2">
                         <label>Transit Days</label>
-                        <input type="number" class="form-control" name="transit_days">
+                        <input type="text" class="form-control" name="transit_days">
                       </div>
 
                       <div class="col form-group mb-2">
@@ -404,55 +404,99 @@
                 <i class="fas fa-info-circle me-2"></i>Shipping Information
               </div>
               <div class="card-body">
-                <div class="detail-item">
-                  <span class="detail-label">Courier:</span>
-                  <span class="float-end"><?= ($request['courier_name']) ? $request['courier_name'] : 'N/A'  ?></span>
+                <div class="row">
+                  <div class="col-lg-6">
+
+                    <div class="detail-item">
+                      <span class="detail-label">Courier:</span>
+                      <?php
+                      $logoFile = getCourierLogoUrl($request['courier_name'] ?? '');
+                      if ($logoFile): ?>
+                        <span class="float-end">
+                          <img src="<?= $logoFile ?>" alt="<?= esc($request['courier_name']) ?>" style="border-radius: 8px; " width="45" height="auto">
+                        </span>
+
+                      <?php else: ?>
+                        <span class="float-end"><?= $request['courier_name']; ?></span>
+                      <?php endif; ?>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Service:</span>
+                      <span class=""><?= ($request['service_name']) ? $request['service_name'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Delivery Time:</span>
+                      <span class="float-end"><?= ($request['delivery_time']) ? $request['delivery_time'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Total Charge:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? $request['currency'] . ' ' . $request['total_charge'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Tax & Duty:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['tax_duty']) ? $request['currency'] . ' ' . $request['tax_duty'] : 'N/A' ?></span>
+                    </div>
+
+                    <div class="detail-item">
+                      <span class="detail-label">Tracking Number:</span>
+                      <span class="float-end"><?= $request['tracking_number'] ? $request['tracking_number'] : 'N/A' ?></span>
+                      <button type="button" class="btn btn-sm btn-link float-end" data-bs-toggle="modal" data-bs-target="#editTrackingModal">
+                        <i class="fas fa-pencil-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+
+                    <div class="detail-item">
+                      <span class="detail-label">Customs value:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['declared_customs_value']) ? $request['declared_currency'] . ' ' . $request['declared_customs_value'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Insurance:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['is_insured'] == 1) ?  'Yes' : 'No' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Insurance Ammount:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['insured_amount']) ?  $request['insured_amount'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Incoterms:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['incoterms']) ?  $request['incoterms'] : 'N/A' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Residential Add:</span>
+                      <span class="float-end fw-bold text-success"><?= ($request['set_as_residential'] == 1) ?  'Yes' : 'No' ?></span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Reference ID:</span>
+                      <span class="float-end"><?= $request['package_number'] ? $request['package_number'] : 'N/A' ?></span>
+                    </div>
+                  </div>
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">Service:</span>
-                  <span class="float-end"><?= ($request['service_name']) ? $request['service_name'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Delivery Time:</span>
-                  <span class="float-end"><?= ($request['delivery_time']) ? $request['delivery_time'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Total Charge:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['total_charge']) ? $request['currency'] . ' ' . $request['total_charge'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Tax & Duty:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['tax_duty']) ? $request['currency'] . ' ' . $request['tax_duty'] : 'N/A' ?></span>
-                </div>
-                <hr>
-                <div class="detail-item">
-                  <span class="detail-label">Customs value:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['declared_customs_value']) ? $request['declared_currency'] . ' ' . $request['declared_customs_value'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Insurance:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['is_insured'] == 1) ?  'Yes' : 'No' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Insurance Ammount:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['insured_amount']) ?  $request['insured_amount'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Incoterms:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['incoterms']) ?  $request['incoterms'] : 'N/A' ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Residential Add:</span>
-                  <span class="float-end fw-bold text-success"><?= ($request['set_as_residential'] == 1) ?  'Yes' : 'No' ?></span>
-                </div>
-                <hr>
-                <div class="detail-item">
-                  <span class="detail-label">Tracking Number:</span>
-                  <span class="float-end"><?= $request['id'] ?></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Reference ID:</span>
-                  <span class="float-end"><?= $request['id'] ?></span>
+              </div>
+            </div>
+
+            <!-- Modal for Editing Tracking Number -->
+            <div class="modal fade" id="editTrackingModal" tabindex="-1" aria-labelledby="editTrackingModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editTrackingModalLabel">Edit Tracking Number</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="<?= base_url('customer/shipping/updateTracking') ?>" method="post">
+                      <?= csrf_field() ?>
+                      <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
+
+                      <div class="mb-3">
+                        <label for="tracking_number" class="form-label">New Tracking Number</label>
+                        <input type="text" class="form-control" id="tracking_number" name="tracking_number" value="<?= $request['tracking_number'] ?>" required>
+                      </div>
+
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -968,15 +1012,40 @@
 
           // Function to format features
           function formatFeatures(featuresObj) {
+
             if (!featuresObj) return 'Features not available';
 
-            const featuresHtml = [];
-            if (featuresObj.tracking) featuresHtml.push(`Tracking: ${featuresObj.tracking}`);
-            if (featuresObj.insurance) featuresHtml.push(`Insurance: ${featuresObj.insurance}`);
-            if (featuresObj.multi_piece) featuresHtml.push(`Multi-piece: ${featuresObj.multi_piece}`);
-            if (featuresObj.combine_and_repack) featuresHtml.push(`Combine and Repack: ${featuresObj.combine_and_repack}`);
+            // If it's a JSON string, parse it
+            if (typeof featuresObj === 'string') {
+              try {
+                featuresObj = JSON.parse(featuresObj);
+              } catch (e) {
+                console.error('Invalid features JSON:', featuresObj);
+                return 'Features not available';
+              }
+            }
 
-            return featuresHtml.join('<br>') || 'Features not available';
+            if (typeof featuresObj !== 'object') {
+              return 'Features not available';
+            }
+
+            const featuresHtml = [];
+
+            if (featuresObj.tracking)
+              featuresHtml.push(`Tracking: ${featuresObj.tracking}`);
+
+            if (featuresObj.insurance)
+              featuresHtml.push(`Insurance: ${featuresObj.insurance}`);
+
+            if (featuresObj.multi_piece)
+              featuresHtml.push(`Multi-piece: ${featuresObj.multi_piece}`);
+
+            if (featuresObj.combine_and_repack)
+              featuresHtml.push(`Combine and Repack: ${featuresObj.combine_and_repack}`);
+
+            return featuresHtml.length ?
+              featuresHtml.join('<br>') :
+              'No Features available';
           }
 
           // Generate HTML for the rates display

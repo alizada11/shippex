@@ -1,5 +1,53 @@
 <?php
 
+if (!function_exists('getCourierLogoUrl')) {
+ /**
+  * Get the logo URL for the given retailer name.
+  *
+  * @param string $retailer The name of the courier retailer.
+  * @return string The logo URL.
+  */
+ function getCourierLogoUrl($retailer)
+ {
+  // Map of courier names to logo files
+  $courierLogos = [
+   'DHL' => 'dhl.svg',
+   'UPS' => 'ups.svg',
+   'Aramex' => 'aramex.svg',
+   'FlatExportRate' => 'flatexportrate.svg',
+   'SFExpress' => 'sf-express.svg',
+   'Asendia' => 'asendia.svg',
+   'Passport' => 'passport.svg',
+   'FedEx' => 'fedex.svg',
+   'USPS' => 'usps.svg',
+   'Sendle' => 'sendle.svg',
+   'Purolator' => 'purolator.svg',
+   'Canada Post' => 'canada-post.svg',
+   'Canpar' => 'canpar.svg',
+   'StarTrack' => 'star-track.png',
+   'CouriersPlease' => 'couriers-please.svg',
+   'AlliedExpress' => 'alliedexpress.svg',
+   'TNT' => 'tnt.svg',
+   'Quantium' => 'quantium.svg',
+   'Toll' => 'toll.svg',
+   'HKPost' => 'hong-kong-post.svg',
+   'APG' => 'apg.svg',
+   'Hubbed' => 'hubbed.svg',
+  ];
+
+  // Check if the courier has a logo, if not return a default logo or empty string
+  if (array_key_exists($retailer, $courierLogos)) {
+   return base_url("logos/{$courierLogos[$retailer]}");
+  }
+
+  // Return a default logo or empty string if no logo is found
+  return null; // Adjust the default logo file as needed
+ }
+}
+
+
+
+
 if (!function_exists('calculate_shipment_progress')) {
  /**
   * Calculate progress percentage based on status

@@ -86,6 +86,13 @@ if ($role === 'admin') {
                       <i class="fas fa-download"></i>
                     </a>
                     <?php if ($role === "admin"): ?>
+                      <form class="delete-form" action="<?= base_url('packages/' . $file['id'] . '/reject_file') ?>" method="get" class="d-inline delete-form">
+                        <button class="btn btn-icon" title="Reject File">
+                          <i class="fas fa-ban"></i>
+                        </button>
+                      </form>
+                    <?php endif; ?>
+                    <?php if ($role === "admin"): ?>
                       <form class="delete-form" action="<?= base_url('packages/files/delete/' . $file['id']) ?>" method="post" class="d-inline delete-form">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-icon  "><i class="fas fa-trash"></i></button>
@@ -181,8 +188,19 @@ if ($role === 'admin') {
               <?php } ?>
 
               <!-- Tracking Number -->
-              <label class="mt-3 form-label fw-semibold">Tracking Number <span class="text-danger">*</span></label>
-              <input type="text" name="tracking_number" class="form-control" value="<?= esc($package['tracking_number']) ?>" required>
+              <div class="d-flex align-items-center justify-content-between">
+                <label for="tracking_number" class="form-label fw-semibold mb-0">
+                  Tracking Number <span class="text-danger" id="trackingStar">*</span>
+                </label>
+
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="noTrackingCheckbox" <?= old('noTrackingCheckbox') ? 'checked' : '' ?>>
+                  <label class="form-check-label text-muted small" for="noTrackingCheckbox">
+                    I don't have a tracking number yet
+                  </label>
+                </div>
+              </div>
+              <input type="text" name="tracking_number" id="trackingInput" class="form-control" value="<?= esc($package['tracking_number']) ?>" required>
             </div>
 
             <div class="col-md-6">
@@ -549,5 +567,65 @@ if ($role === 'admin') {
     }
   }
 </style>
+<?= $this->section('script') ?>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<script>
+  $(document).ready(function() {
+
+    // Initialize Select2 with search
+    $('#userSelect').select2({
+      placeholder: "Search for a user...",
+      allowClear: true,
+      templateResult: formatUserOption,
+      templateSelection: formatUserOption,
+      matcher: matchCustom
+    });
+
+    // On user change
+    $('#userSelect').on('change', function() {
+      const userName = $('#userSelect option:selected').text();
+      $('#userPreview').text(userName ? `Selected: ${userName}` : 'Selected user will appear here');
+    });
+
+    // Custom rendering for dropdown options
+    function formatUserOption(state) {
+      if (!state.id) return state.text; // placeholder
+      const user = state.text;
+      const $option = $(`<span>${user}</span>`);
+      return $option;
+    }
+
+    // Optional: custom matcher for case-insensitive search
+    function matchCustom(params, data) {
+      if ($.trim(params.term) === '') return data;
+      if (typeof data.text === 'undefined') return null;
+      if (data.text.toLowerCase().includes(params.term.toLowerCase())) {
+        return data;
+      }
+      return null;
+    }
+
+  });
+</script>
+
+<script>
+  const checkbox = document.getElementById('noTrackingCheckbox');
+  const input = document.getElementById('trackingInput');
+  const star = document.getElementById('trackingStar');
+
+  checkbox.addEventListener('change', function() {
+    if (this.checked) {
+      input.disabled = true;
+      input.removeAttribute('required');
+      star.style.display = 'none';
+    } else {
+      input.disabled = false;
+      input.setAttribute('required', 'required');
+      star.style.display = 'inline';
+    }
+  });
+</script>
+<?= $this->endSection() ?>
 <?= $this->endSection() ?>

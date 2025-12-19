@@ -12,7 +12,25 @@
 
    <div class="card-header bg-shippex-purple text-white d-flex justify-content-between align-items-center">
     <h3 class="mb-0">Shopper Requests</h3>
+    <form action="<?= base_url('search') ?>" method="post" class="search-minimal d-flex gap-2">
+     <?= csrf_field() ?>
 
+     <input
+      type="text"
+      name="q"
+      class="form-control"
+      placeholder="Search..."
+      required
+      autocomplete="off">
+
+     <input type="hidden" name="model" value="App\Models\ShopperRequestModel">
+     <input type="hidden" name="detail_url" value="admin/shopper/requests/view/">
+     <input type="hidden" name="back_url" value="<?= current_url() ?>">
+
+     <button class="btn btn-shippex-orange">
+      <i class="fas fa-search"></i>
+     </button>
+    </form>
    </div>
    <div class="card-body p-0">
     <div class="table-responsive">

@@ -11,6 +11,27 @@
 
    <div class="card-header premium-header p-3 d-flex justify-content-between align-items-center">
     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Shipping Requests</h5>
+    <form action="<?= base_url('search') ?>" method="post" class="search-minimal d-flex gap-2">
+     <?= csrf_field() ?>
+
+     <input
+      type="text"
+      name="q"
+      class="form-control "
+      placeholder="Search..."
+      required
+      autocomplete="off">
+
+     <input type="hidden" name="model" value="App\Models\ShippingBookingModel">
+     <input type="hidden" name="detail_url" value="shipping/details/">
+     <input type="hidden" name="back_url" value="<?= current_url() ?>">
+
+     <button class="btn btn-shippex-orange">
+      <i class="fas fa-search"></i>
+     </button>
+    </form>
+
+
    </div>
    <div class="card-body p-0">
     <div class="table-responsive">
@@ -18,7 +39,7 @@
       <thead class="table-light">
        <tr>
         <th>ID</th>
-        <th> Item Name</th>
+        <th>Category</th>
         <th>Weight</th>
         <th>Dimensions <small>(L×W×H cm)</small></th>
         <th>Total Charge</th>

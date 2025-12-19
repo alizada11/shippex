@@ -32,7 +32,10 @@ class PackageModel extends Model
   'over_due_fee',
   'combination_status',
   'archive',
-  'parent_package'
+  'parent_package',
+  'package_number',
+  'booked_at',
+  'booking_id'
  ];
 
  protected $validationRules = [

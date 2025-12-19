@@ -218,7 +218,7 @@ $countries = json_decode(
  </div>
 </div>
 <!-- Results Section -->
-<div class="container" style="position: relative;">
+<div class="container" style="position: relative; padding-bottom:3rem;">
  <div id="ratesResult" class="mt-3">
 
 
@@ -231,7 +231,7 @@ $countries = json_decode(
   </div>
 
   <!-- Loader for booking -->
-  <div id="bookingLoader" class="d-none text-center my-3 row" style="position: absolute; top:50%; left:calc(50%-60px); z-index:99999;">
+  <div id="bookingLoader" class="d-none text-center my-3 " style="position: absolute; top:0; left:50%; z-index:99999; transform:translateX(-50%)">
    <div class="spinner-border text-info" role="status">
     <span class="visually-hidden">Loading...</span>
    </div>

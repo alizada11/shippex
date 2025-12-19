@@ -23,6 +23,7 @@ class CombineRepackController extends BaseController
      * ---------------------------------------------- */
     public function submitRequest()
     {
+
         $data = $this->request->getJSON(true);
 
         // ✅ Validate data
@@ -79,6 +80,19 @@ class CombineRepackController extends BaseController
                 $p_id = $pkg['id'];
                 $this->packageModel->update($p_id, ['status' => 'combined', 'combination_status' => 0]);
             }
+
+            // send email: A new combine repack request is created
+
+            $title = "New Combine Repack Request Created";
+            $actionDesc = "created";
+            $modelName = "combine_repack_requests";
+            $recordId = $requestId; // the inserted record ID
+            $userName = session()->get('full_name');
+            $adminLink = base_url("admin/combine-requests/edit/$recordId");
+
+            send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+
+
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Combine & Repack request submitted successfully.',
@@ -174,11 +188,14 @@ class CombineRepackController extends BaseController
                 'length'        => $data['length'],
                 'width'         => $data['width'],
                 'height'        => $data['height'],
+                'retailer'        => $data['retailer'],
                 'value'        => $total_value,
                 'status'        => 'ready',
                 'combined_from' => $combined_from,
                 'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
+                'package_number'             => 'SHX' . date('YmdHis') . $data['user_id'],
                 'created_at'    => date('Y-m-d H:i:s'),
+
             ];
 
             // Try inserting
@@ -213,11 +230,20 @@ class CombineRepackController extends BaseController
 
                 $email->setFrom('info@shippex.online', 'Shippex Admin');
                 $email->setTo($userModel->find($request['user_id'])['email']);
-                $email->setSubject('Your Request #' . $request['id'] . ' is Waiting for Purchase Invoice');
+                $email->setSubject('Your Request #' . 'SHX' . date('YmdHis') . $request['user_id'] . ' is Waiting for Purchase Invoice');
                 $email->setMessage($message);
                 $email->setMailType('html'); // Important
+                $sent = $email->send();
 
-                if (!$email->send()) {
+                $title = "New Combine Repack Request Updated";
+                $actionDesc = "updated";
+                $modelName = "combine & repack requests";
+                $recordId = $inserted; // the inserted record ID
+                $userName = session()->get('full_name');
+                $adminLink = base_url("packages/show/$recordId");
+
+                send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+                if (!$sent) {
                     log_message('error', $email->printDebugger(['headers']));
                     return redirect()->back()->with('error', 'There has been an error while sending email.');
                 }

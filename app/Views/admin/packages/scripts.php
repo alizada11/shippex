@@ -63,8 +63,8 @@
           <td>
             <input type="hidden" name="package_ids[]" value="${p.id}">
             <select name="request_type[]" class="form-select form-select-sm">
-              <option value="dispose">Dispose</option>
-              <option value="return">Return</option>
+              <option value="disposed">Dispose</option>
+              <option value="returned">Return</option>
             </select>
           </td>
           <td><input name="reason[]" type="text" class="form-control form-control-sm" required placeholder="Reason for this package"></td>
@@ -630,6 +630,7 @@
 
         } else {
           if (currentAction === 'ship') {
+            window.selectedPackageIdsForShipping = selectedPackages;
             modalTitle.textContent = 'Shipping Configuration';
             modalSubtitle.textContent = `Configure shipping for ${selectedPackages.length} package${selectedPackages.length !== 1 ? 's' : ''}`;
 
@@ -1100,10 +1101,45 @@
 
     // Book shipping function
     function bookShipping(rate = null, noRate = false) {
+
       const totals = window.packageTotals;
 
-      const bookingData = new URLSearchParams();
+      // Get the selected package IDs for shipping
+      const packageIds = window.selectedPackageIdsForShipping || selectedPackages;
 
+      if (!packageIds || packageIds.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'No Packages Selected',
+          text: 'Please select packages to ship.',
+          confirmButtonColor: '#ff6600'
+        });
+        return;
+      }
+      // Get the selected category from the dropdown
+      const categorySelect = document.getElementById('categorySelect');
+      let selectedCategory = 'general';
+      let hsCode = '';
+
+      if (categorySelect && categorySelect.value) {
+        selectedCategory = categorySelect.value;
+        hsCode = categorySelect.options[categorySelect.selectedIndex]?.dataset.hsCode || '';
+      } else {
+        // Fallback: show warning if no category selected
+        Swal.fire({
+          icon: 'warning',
+          title: 'Category Not Selected',
+          text: 'Please select a category before booking.',
+          confirmButtonColor: '#ff6600'
+        });
+        return;
+      }
+
+      // let = package_ids;
+      const bookingData = new URLSearchParams();
+      packageIds.forEach(id => {
+        bookingData.append('package_ids[]', id);
+      });
       // Origin address
       bookingData.append('origin_line_1', currentOrigin.address_line_1 || '');
       bookingData.append('origin_city', currentOrigin.city || '');
@@ -1123,7 +1159,7 @@
       bookingData.append('length', totals.length || '');
       bookingData.append('width', totals.width || '');
       bookingData.append('height', totals.height || '');
-      bookingData.append('category', 'general');
+      bookingData.append('category', selectedCategory);
 
       if (noRate) {
         // No rate booking
@@ -1136,10 +1172,10 @@
         bookingData.append('description', 'No rates available!');
 
 
-        console.log('set_rate_1', 111);
       } else {
+
         // Booking with rate
-        bookingData.append('set_rate', 1);
+        bookingData.append('set_rate', 0);
         bookingData.append('total_charge', rate.total_charge || 0);
         bookingData.append('courier_name', rate.courier_service?.umbrella_name || '');
         bookingData.append('service_name', rate.courier_service?.name || '');

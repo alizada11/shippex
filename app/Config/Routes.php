@@ -108,10 +108,11 @@ $routes->group(
   $routes->get('admin/shopper-requests/get-items', 'Shopper::getItems');
  }
 );
+// overdue fee payment
+$routes->post('package/payOverdueFee/(:num)', 'PackageController::payOverdueFee/$1');
+$routes->get('package/completePayment/(:num)', 'PackageController::completePayment/$1');
+$routes->get('package/cancelPayment/(:num)', 'PackageController::cancelPayment/$1');
 
-$routes->group('package/history', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
- $routes->get('(:num)', 'PackageController::history/$1');
-});
 
 $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'App\Controllers'], function ($routes) {
  $routes->get('(:num)', 'PackageController::index/$1');
@@ -120,6 +121,7 @@ $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'A
  $routes->get('show/(:num)', 'PackageController::show/$1');
  $routes->get('(:num)/edit', 'PackageController::edit/$1');
  $routes->post('(:num)/update', 'PackageController::update/$1');
+ $routes->get('(:num)/reject_file', 'PackageController::rejectFile/$1');
  $routes->post('(:num)/delete', 'PackageController::delete/$1');
  $routes->get('shipping-categories', 'PackageController::getShippingCategories');
 
@@ -138,6 +140,19 @@ $routes->group('packages', ['filter' => 'role:admin,customer', 'namespace' => 'A
 
 
 $routes->get('virtual-addresses', 'PackageController::getVirtualAddresses', ['filter' => 'role:admin,customer']);
+
+
+//notiications
+$routes->group('',  static function ($routes) {
+ $routes->get('notifications/all', 'NotificationController::all');
+ $routes->get('notifications', 'NotificationController::index');
+ $routes->get('notifications/unread', 'NotificationController::getUnreadNotifications');
+ $routes->get('notifications/unread/count', 'NotificationController::getUnreadCount');
+ $routes->post('notifications/read/(:num)', 'NotificationController::markAsRead/$1');
+ $routes->post('notifications/read-all', 'NotificationController::markAllAsRead');
+ $routes->delete('notifications/delete/(:num)', 'NotificationController::delete/$1');
+ $routes->delete('notifications/delete-all', 'NotificationController::deleteAll');
+});
 
 // faqs
 $routes->get('faqs', 'Admin\FaqController::faqs');
@@ -268,16 +283,17 @@ $routes->group(
 );
 $routes->group(
  'customer',
- ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
+ ['filter' => 'role:customer,admin', 'namespace' => 'App\Controllers'],
  function ($routes) {
   $routes->get('shipping/requests', 'CustomersController::requests');
   $routes->get('shipping/details/(:num)', 'CustomersController::details/$1');
   $routes->post('shipping/delete/(:num)', 'CustomersController::destroy/$1');
+  $routes->post('shipping/updateTracking', 'Shipping::updateTracking');
  }
 );
 $routes->group(
  'shopper',
- ['filter' => 'role:customer', 'namespace' => 'App\Controllers'],
+ ['filter' => 'role:customer,admin', 'namespace' => 'App\Controllers'],
  function ($routes) {
   $routes->get('/', 'Shopper::index');
   $routes->post('submit', 'Shopper::submit');
@@ -290,7 +306,10 @@ $routes->group(
   $routes->get('/shopper/view/(:num)', 'Shopper::view/$1');
  }
 );
-// warehouses
+// search
+$routes->post('search', 'SearchController::index');
+$routes->get('search/live', 'SearchController::live');
+
 // Frontend route
 $routes->get('warehouse/(:segment)', 'WarehouseController::show/$1');
 

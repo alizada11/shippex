@@ -9,379 +9,7 @@ if ($role === 'admin') {
   $this->extend('customers/layouts/main');
 }
 ?>
-<?= $this->section('content') ?>
-<div class="premium-admin-container">
-  <!-- Premium Header Section -->
-  <div class="premium-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="page-title-section">
-          <h1 class="page-title">
-            <i class="fas fa-box-open me-2"></i>Package Details
-          </h1>
-          <p class="page-subtitle">Tracking #<?= esc($package['tracking_number']) ?> • Complete package information and history</p>
-        </div>
-        <div class="header-actions">
-          <a href="<?= base_url('packages/' . $package['virtual_address_id']) ?>" class="btn btn-outline-light me-2">
-            <i class="fas fa-arrow-left me-2"></i> Back to Packages
-          </a>
-          <a href="<?= base_url('packages/' . $package['id'] . '/edit') ?>" class="btn btn-shippex-orange">
-            <i class="fas fa-edit me-2"></i> Edit Package
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content Section -->
-  <div class="container py-4">
-    <!-- Package Overview Cards -->
-    <div class="row mb-4">
-      <div class="col">
-        <div class="stat-card">
-          <div class="stat-icon primary">
-            <i class="fas fa-weight-hanging"></i>
-          </div>
-          <div class="stat-content">
-            <h3><?= esc($package['weight']) ?> Kg</h3>
-            <p>Weight</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="stat-card">
-          <div class="stat-icon success">
-            <i class="fas fa-dollar-sign"></i>
-          </div>
-          <div class="stat-content">
-            <h3>$<?= esc($package['value']) ?></h3>
-            <p>Value</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="stat-card">
-          <div class="stat-icon success">
-            <i class="fas fa-dollar"></i>
-          </div>
-          <div class="stat-content">
-            <h3><?= isset($package['shipping_fee']) ? '$' . $package['shipping_fee']  : 'N/A' ?></h3>
-            <p>Shipping Fee</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="stat-card">
-          <div class="stat-icon warning">
-            <i class="fas fa-calendar-day"></i>
-          </div>
-          <?php
-          $createdAt = new DateTime($package['created_at']);
-          $now = new DateTime();
-
-          // how many days have passed since creation
-          $daysPassed = $createdAt->diff($now)->days;
-
-          // calculate remaining days
-          $remainingDays = $package['storage_days'] - $daysPassed;
-          ?>
-          <div class="stat-content">
-            <h3>
-              <?= esc($remainingDays) ?>
-
-              <!-- Info icon with tooltip -->
-              <i class="fas fa-info-circle text-muted ms-2"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="⚠️ Notice: Free storage is available for the first 30 days. After that, a daily storage fee will be applied.">
-              </i>
-            </h3>
-            <p>Storage Days</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="stat-card">
-          <?php if ($package['status'] === 'ready'): ?>
-            <div class="stat-icon delivered">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-content">
-              <h3>Ready</h3>
-              <p>Status</p>
-            </div>
-          <?php else: ?>
-            <div class="stat-icon pending">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-              <h3><?= ucfirst($package['status']) ?></h3>
-              <p>Status</p>
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <!-- Package Details Card -->
-      <div class="col-lg-8">
-        <!-- Package Information Card -->
-        <div class="premium-card mb-4">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-info-circle me-2"></i>Package Information
-            </h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="detail-item">
-                  <div class="detail-label">Tracking Number</div>
-                  <div class="detail-value">#<?= esc($package['tracking_number']) ?></div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Retailer</div>
-                  <div class="detail-value"><?= esc($package['retailer']) ?></div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Weight</div>
-                  <div class="detail-value"><?= esc($package['weight']) ?> kg</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="detail-item">
-                  <div class="detail-label">Status</div>
-                  <div class="detail-value">
-                    <?php if ($package['status'] === 'ready'): ?>
-                      <span class="status-badge status-ready">
-                        <i class="fas fa-check me-1"></i>Ready
-                      </span>
-                    <?php else: ?>
-                      <span class="status-badge status-<?= $package['status'] ?>">
-                        <i class="fas fa-clock me-1"></i><?= ucfirst($package['status']) ?>
-                      </span>
-                    <?php endif; ?>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Dimensions <small>(L × W × H)</small></div>
-                  <div class="detail-value"><?= esc($package['length'] . 'x' . $package['width'] . 'x' . $package['height']) ?></div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Received Date</div>
-                  <div class="detail-value"><?= esc($package['created_at']) ?></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-        <!-- Files Card -->
-        <div class="premium-card mb-4" id="files">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-paperclip me-2"></i>Attached Files
-            </h3>
-
-          </div>
-          <div class="card-body">
-            <?php if (empty($files)): ?>
-              <div class="empty-state small">
-                <div class="empty-icon">
-                  <i class="fas fa-file-alt"></i>
-                </div>
-                <h5>No Files Attached</h5>
-                <p>There are no files attached to this package yet.</p>
-              </div>
-            <?php else: ?>
-              <div class="row">
-                <?php foreach ($files as $file): ?>
-                  <div class="col mb-3">
-                    <div class="file-card">
-                      <div class="file-icon">
-                        <?php
-                        $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
-                        $iconClass = 'fas fa-file';
-                        if (in_array($fileExtension, ['pdf'])) {
-                          $iconClass = 'fas fa-file-pdf';
-                        } elseif (in_array($fileExtension, ['doc', 'docx'])) {
-                          $iconClass = 'fas fa-file-word';
-                        } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
-                          $iconClass = 'fas fa-file-excel';
-                        } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                          $iconClass = 'fas fa-file-image';
-                        }
-                        ?>
-                        <i class="<?= $iconClass ?>"></i>
-                      </div>
-                      <div class="file-info">
-                        <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
-                        <div class="file-type"><?= strtoupper($fileExtension) ?> File</div>
-                      </div>
-                      <div class="file-actions">
-                        <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
-                          <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
-                          <i class="fas fa-download"></i>
-                        </a>
-                        <?php if ($role === "admin"): ?>
-                          <form class="delete-form" action="<?= base_url('packages/files/delete/' . $file['id']) ?>" method="post" class="d-inline delete-form">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-icon  "><i class="fas fa-trash"></i></button>
-                          </form>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar  -->
-      <div class="col-lg-4">
-        <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)):
-
-        ?>
-          <div class="premium-card">
-            <div class="card-header">
-              <h4><i class="fas fa-receipt"></i> Payment Summary</h4>
-            </div>
-            <div class="card-body">
-              <?php if (!empty($over_due) && $over_due > 0): ?>
-                <div class="fee-item">
-                  <div class="fee-label">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Overdue Storage Fee</span>
-                  </div>
-                  <div class="fee-value overdue">$<?= number_format($over_due, 2); ?></div>
-                </div>
-
-              <?php endif; ?>
-
-              <?php if (!empty($package['shipping_fee']) && $package['shipping_fee'] > 0): ?>
-                <div class="fee-item">
-                  <div class="fee-label">
-                    <i class="fas fa-shipping-fast"></i>
-                    <span>Shipping Fee</span>
-
-                  </div>
-                  <div class="fee-value">$<?= number_format($package['shipping_fee'], 2) ?></div>
-                </div>
-                <div class="total">
-                  <div class="total-label">Total Amount</div>
-                  <div class="total-value">$<?= number_format($package['shipping_fee'] + $over_due, 2); ?></div>
-                </div>
-              <?php endif; ?>
-            </div>
-            <div class="card-footer">
-              <button class="btn-pay">
-                <i class="fas fa-credit-card"></i> Pay Now
-              </button>
-              <p class="info-text">All fees are calculated based on your package details</p>
-            </div>
-          </div>
-
-
-          <!-- Shipping Fee -->
-
-
-          <!-- Total Amount -->
-
-        <?php endif; ?>
-
-
-        <!-- package combination info -->
-        <?php if (!empty($package['combined_from'])): ?>
-          <div class="premium-card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <?php if ($package['status'] === 'combined'): ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined With
-
-
-                <?php else: ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined from
-                <?php endif; ?>
-              </h3>
-            </div>
-            <div class="card-body">
-              <span class="d-flex align-items-center flex-wrap gap-3 status-badge ">
-                <?php $combined_from = json_decode($package['combined_from'], true);
-
-                foreach ($combined_from as $packageId) {
-
-                  // Skip if this ID is the same as the current package
-                  if ($packageId == $package['id']) {
-                    continue;
-                  }
-                ?>
-                  <a href="<?= base_url('packages/show/' . $packageId) ?>"
-                    class="bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-box text-primary"></i>
-                    <?= $packageId ?>
-                  </a>
-
-                <?php } ?>
-                <?php if ($package['status'] === 'combined'): ?>
-                  <a href="<?= base_url('packages/show/' . $package['parent_package']) ?>" class="btn bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-eye"></i> View Parent Package</a>
-                <?php endif; ?>
-              </span>
-            </div>
-          </div>
-        <?php endif; ?>
-
-        <!-- actions history -->
-        <div class="premium-card">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-history me-2"></i>Actions History
-            </h3>
-          </div>
-          <div class="card-body">
-            <?php if (empty($actions)): ?>
-              <div class="empty-state small">
-                <div class="empty-icon">
-                  <i class="fas fa-history"></i>
-                </div>
-                <h5>No History</h5>
-                <p>No actions recorded for this package yet.</p>
-              </div>
-            <?php else: ?>
-              <div class="timeline">
-                <?php foreach ($actions as $log): ?>
-                  <div class="">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                      <div class="timeline-header">
-                        <strong><?= esc($log['action']) ?></strong>
-                        <small class="text-muted"><?= esc($log['created_at']) ?></small>
-                      </div>
-                      <div class="timeline-body">
-                        <p class="mb-1"><?= esc($log['notes']) ?></p>
-                        <small class="text-muted">by <?= fullname($log['performed_by']) ?? 'System' ?></small>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-  </div>
-</div>
-
+<?= $this->section('styles') ?>
 <style>
   /* Premium Admin Styling - Building on existing auth_style.css */
   :root {
@@ -915,6 +543,415 @@ if ($role === 'admin') {
     }
   }
 </style>
+<?= $this->endSection() ?>
+<?= $this->section('content') ?>
+
+<div class="premium-admin-container">
+  <!-- Premium Header Section -->
+  <div class="premium-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="page-title-section">
+          <h1 class="page-title">
+            <i class="fas fa-box-open me-2"></i>Package Details
+          </h1>
+          <p class="page-subtitle">Package #<?= esc($package['package_number']) ?> • Complete package information and history</p>
+        </div>
+        <div class="header-actions">
+          <a href="<?= base_url('packages/' . $package['virtual_address_id']) ?>" class="btn btn-outline-light me-2">
+            <i class="fas fa-arrow-left me-2"></i> Back to Packages
+          </a>
+          <a href="<?= base_url('packages/' . $package['id'] . '/edit') ?>" class="btn btn-shippex-orange">
+            <i class="fas fa-edit me-2"></i> Edit Package
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="container py-4">
+    <!-- Package Overview Cards -->
+    <div class="row mb-4">
+      <div class="col">
+        <div class="stat-card">
+          <div class="stat-icon primary">
+            <i class="fas fa-weight-hanging"></i>
+          </div>
+          <div class="stat-content">
+            <h3><?= esc($package['weight']) ?> Kg</h3>
+            <p>Weight</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card">
+          <div class="stat-icon success">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-content">
+            <h3>$<?= esc($package['value']) ?></h3>
+            <p>Value</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card">
+          <div class="stat-icon success">
+            <i class="fas fa-dollar"></i>
+          </div>
+          <div class="stat-content">
+            <h3><?= isset($package['shipping_fee']) ? '$' . $package['shipping_fee']  : 'N/A' ?></h3>
+            <p>Shipping Fee</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card">
+          <div class="stat-icon warning">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <?php
+          $createdAt = new DateTime($package['created_at']);
+          $now = new DateTime();
+
+          // how many days have passed since creation
+          $daysPassed = $createdAt->diff($now)->days;
+
+          // calculate remaining days
+          $remainingDays = $package['storage_days'] - $daysPassed;
+          ?>
+          <div class="stat-content">
+            <h3>
+              <?= esc($remainingDays) ?>
+
+              <!-- Info icon with tooltip -->
+              <i class="fas fa-info-circle text-muted ms-2"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="⚠️ Notice: Free storage is available for the first 30 days. After that, a daily storage fee will be applied.">
+              </i>
+            </h3>
+            <p>Storage Days</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card">
+          <?php if ($package['status'] === 'ready'): ?>
+            <div class="stat-icon delivered">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <h3>Ready</h3>
+              <p>Status</p>
+            </div>
+          <?php else: ?>
+            <div class="stat-icon pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <h3><?= ucfirst($package['status']) ?></h3>
+              <p>Status</p>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Package Details Card -->
+      <div class="col-lg-8">
+        <!-- Package Information Card -->
+        <div class="premium-card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-info-circle me-2"></i>Package Information
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="detail-item">
+                  <div class="detail-label">Tracking Number</div>
+                  <div class="detail-value">#<?= esc($package['tracking_number']) ?></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Retailer</div>
+                  <div class="detail-value">
+                    <?php
+                    $logoFile = getCourierLogoUrl($package['retailer'] ?? '');
+                    if ($logoFile): ?>
+                      <span class="float-end">
+                        <img src="<?= $logoFile ?>" alt="<?= esc($package['retailer']) ?>" style="border-radius: 8px; " width="45" height="auto">
+                      </span>
+
+                    <?php else: ?>
+                      <span class="float-end"><?= $package['retailer']; ?></span>
+                    <?php endif; ?>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Weight</div>
+                  <div class="detail-value"><?= esc($package['weight']) ?> kg</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="detail-item">
+                  <div class="detail-label">Package Number</div>
+                  <div class="detail-value">
+                    <div class="detail-value">#<?= esc($package['package_number']) ?></div>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Dimensions <small>(L × W × H)</small></div>
+                  <div class="detail-value"><?= esc($package['length'] . 'x' . $package['width'] . 'x' . $package['height']) ?></div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Received Date</div>
+                  <div class="detail-value"><?= esc($package['created_at']) ?></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Files Card -->
+        <div class="premium-card mb-4" id="files">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-paperclip me-2"></i>Attached Files
+            </h3>
+
+          </div>
+          <div class="card-body">
+            <?php if (empty($files)): ?>
+              <div class="empty-state small">
+                <div class="empty-icon">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+                <h5>No Files Attached</h5>
+                <p>There are no files attached to this package yet.</p>
+              </div>
+            <?php else: ?>
+              <div class="row">
+                <?php foreach ($files as $file): ?>
+                  <div class="col mb-3">
+                    <div class="file-card">
+                      <div class="file-icon">
+                        <?php
+                        $fileExtension = pathinfo($file['file_path'], PATHINFO_EXTENSION);
+                        $iconClass = 'fas fa-file';
+                        if (in_array($fileExtension, ['pdf'])) {
+                          $iconClass = 'fas fa-file-pdf';
+                        } elseif (in_array($fileExtension, ['doc', 'docx'])) {
+                          $iconClass = 'fas fa-file-word';
+                        } elseif (in_array($fileExtension, ['xls', 'xlsx'])) {
+                          $iconClass = 'fas fa-file-excel';
+                        } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                          $iconClass = 'fas fa-file-image';
+                        }
+                        ?>
+                        <i class="<?= $iconClass ?>"></i>
+                      </div>
+                      <div class="file-info">
+                        <div class="file-name"><?= ucfirst($file['file_type']) ?> Document</div>
+                        <div class="file-type"><?= strtoupper($fileExtension) ?> File</div>
+                      </div>
+                      <div class="file-actions">
+                        <a href="<?= base_url($file['file_path']) ?>" target="_blank" class="btn btn-icon" title="View File">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="<?= base_url($file['file_path']) ?>" download class="btn btn-icon" title="Download File">
+                          <i class="fas fa-download"></i>
+                        </a>
+                        <?php if ($role === "admin"): ?>
+                          <form class="delete-form" action="<?= base_url('packages/' . $file['id'] . '/reject_file') ?>" method="get" class="d-inline delete-form">
+                            <button class="btn btn-icon" title="Reject File">
+                              <i class="fas fa-ban"></i>
+                            </button>
+                          </form>
+                        <?php endif; ?>
+                        <?php if ($role === "admin"): ?>
+                          <form class="delete-form" action="<?= base_url('packages/files/delete/' . $file['id']) ?>" method="post" class="d-inline delete-form">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-icon  "><i class="fas fa-trash"></i></button>
+                          </form>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar  -->
+      <div class="col-lg-4">
+        <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)):
+
+        ?>
+          <div class="premium-card">
+            <div class="card-header">
+              <h4><i class="fas fa-receipt"></i> Payment Summary</h4>
+            </div>
+            <div class="card-body">
+              <?php if (!empty($over_due) && $over_due > 0): ?>
+                <div class="fee-item">
+                  <div class="fee-label">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Overdue Storage Fee</span>
+                  </div>
+                  <div class="fee-value overdue">$<?= number_format($over_due, 2); ?></div>
+                </div>
+              <?php endif; ?>
+
+              <?php if (!empty($package['shipping_fee']) && $package['shipping_fee'] > 0): ?>
+                <div class="fee-item">
+                  <div class="fee-label">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Shipping Fee</span>
+                  </div>
+                  <div class="fee-value">$<?= number_format($package['shipping_fee'], 2) ?></div>
+                </div>
+                <div class="total">
+                  <div class="total-label">Total Amount</div>
+                  <div class="total-value">$<?= number_format($package['shipping_fee'] + $over_due, 2); ?></div>
+                </div>
+              <?php endif; ?>
+              <div class="card-footer">
+                <?php if ($over_due > 0): ?>
+                  <form method="POST" action="<?= base_url('package/payOverdueFee/' . $package['id']) ?>">
+                    <button type="submit" class="btn-pay">
+                      <i class="fas fa-credit-card"></i> Pay Overdue Fee
+                    </button>
+                  </form>
+                <?php endif; ?>
+                <p class="info-text">All fees are calculated based on your package details</p>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Shipping Fee -->
+
+          <script src="https://www.paypal.com/sdk/js?client-id=AR_PoU6NaXw2h4y9qwFGoYMBMpw9_I0AzvNGSARRucV84VoZA_x1OHH9781pe1E4rdiW7uvr7st4lX4j&currency=USD"></script>
+          <script>
+            paypal.Buttons({
+              createOrder: function(data, actions) {
+                return fetch('<?= base_url("package/createOrder/" . $package['id']) ?>', {
+                  method: 'post'
+                }).then(res => res.json()).then(order => order.id);
+              },
+              onApprove: function(data, actions) {
+                return fetch('<?= base_url("package/captureOrder/" . $package['id']) ?>', {
+                  method: 'post',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                  body: 'orderID=' + data.orderID
+                }).then(res => res.json()).then(details => {
+                  alert('Payment Completed!');
+                  location.reload();
+                });
+              }
+            }).render('#paypal-button-container');
+          </script>
+          <!-- Total Amount -->
+
+        <?php endif; ?>
+
+
+        <!-- package combination info -->
+        <?php if (!empty($package['combined_from'])): ?>
+          <div class="premium-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <?php if ($package['status'] === 'combined'): ?>
+                  <i class="fas fa-compress-arrows-alt"></i> Combined With
+
+
+                <?php else: ?>
+                  <i class="fas fa-compress-arrows-alt"></i> Combined from
+                <?php endif; ?>
+              </h3>
+            </div>
+            <div class="card-body">
+              <span class="d-flex align-items-center flex-wrap gap-3 status-badge ">
+                <?php $combined_from = json_decode($package['combined_from'], true);
+
+                foreach ($combined_from as $packageId) {
+
+                  // Skip if this ID is the same as the current package
+                  if ($packageId == $package['id']) {
+                    continue;
+                  }
+                ?>
+                  <a href="<?= base_url('packages/show/' . $packageId) ?>"
+                    class="bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
+                    <i class="fas fa-box text-primary"></i>
+                    <?= $packageId ?>
+                  </a>
+
+                <?php } ?>
+                <?php if ($package['status'] === 'combined'): ?>
+                  <a href="<?= base_url('packages/show/' . $package['parent_package']) ?>" class="btn bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
+                    <i class="fas fa-eye"></i> View Parent Package</a>
+                <?php endif; ?>
+              </span>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <!-- actions history -->
+        <div class="premium-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-history me-2"></i>Actions History
+            </h3>
+          </div>
+          <div class="card-body">
+            <?php if (empty($actions)): ?>
+              <div class="empty-state small">
+                <div class="empty-icon">
+                  <i class="fas fa-history"></i>
+                </div>
+                <h5>No History</h5>
+                <p>No actions recorded for this package yet.</p>
+              </div>
+            <?php else: ?>
+              <div class="timeline">
+                <?php foreach ($actions as $log): ?>
+                  <div class="">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <strong><?= esc($log['action']) ?></strong>
+                        <small class="text-muted"><?= esc($log['created_at']) ?></small>
+                      </div>
+                      <div class="timeline-body">
+                        <p class="mb-1"><?= esc($log['notes']) ?></p>
+                        <small class="text-muted">by <?= fullname($log['performed_by']) ?? 'System' ?></small>
+                      </div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

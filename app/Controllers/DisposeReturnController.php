@@ -85,7 +85,7 @@ class DisposeReturnController extends BaseController
         $reason = $reasons[$index] ?? null;
 
         // basic server validation
-        if (!in_array($type, ['dispose', 'return'])) {
+        if (!in_array($type, ['disposed', 'returned'])) {
           $errors[] = "Invalid type for package {$pkgId}";
           continue;
         }
@@ -118,11 +118,11 @@ class DisposeReturnController extends BaseController
           'reason' => trim($reason) ?: null,
           'status' => 'pending'
         ]);
-        if ($type === 'dispose') {
+        if ($type === 'disposed') {
 
           $this->packageModel->update($pkgId, ['status' => 'disposed']);
         }
-        if ($type === 'return') {
+        if ($type === 'returned') {
 
           $this->packageModel->update($pkgId, ['status' => 'returned']);
         }
@@ -138,6 +138,17 @@ class DisposeReturnController extends BaseController
 
     $message = "{$inserted} request(s) created.";
     if ($errors) $message .= ' Some items skipped: ' . implode(' ; ', $errors);
+
+    // send email: A new combine repack request is created
+
+    $title = 'You have a ' . $type . ' Request ';
+    $actionDesc = 'created ';
+    $modelName = "Return / Dispose ";
+    $recordId = $inserted; // the inserted record ID
+    $userName = session()->get('full_name');
+    $adminLink = base_url("admin/dispose_return/edit/$recordId");
+
+    send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
 
     return $this->response->setJSON(['success' => true, 'message' => $message, 'inserted' => $inserted, 'errors' => $errors]);
   }
@@ -214,6 +225,15 @@ class DisposeReturnController extends BaseController
       }
 
       $this->db->transComplete();
+
+      $title = ' a ' . $req['request_type'] . ' Request has been' . $status;
+      $actionDesc = 'updated';
+      $modelName = "Return / Dispose ";
+      $recordId = $id; // the inserted record ID
+      $userName = session()->get('full_name');
+      $adminLink = base_url("admin/dispose_return/edit/$recordId");
+
+      send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
 
       return $this->response->setJSON(['success' => true, 'message' => 'Request processed']);
     } catch (\Throwable $e) {

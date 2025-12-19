@@ -158,6 +158,18 @@
   border-top: none;
 }
 
+#ready {
+  position: relative;
+}
+#ready .table-responsive {
+  margin-bottom: 100px;
+}
+#ready #bulkActionsCard {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
+}
 /* Animation for tab content */
 .shippex-tabs .tab-pane {
   animation: fadeIn 0.3s ease-in;
@@ -250,6 +262,8 @@
   color: var(--shippex-success);
 }
 
+.status-requested,
+.status-Requested,
 .status-incoming {
   background-color: rgba(255, 193, 7, 0.15);
   color: #ffc107;
@@ -661,7 +675,7 @@
 .form-select {
   border: 2px solid #e9ecef;
   border-radius: 8px;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 

@@ -46,7 +46,9 @@ class ShippingBookingModel extends Model
   'incoterms',
   'set_as_residential',
   'tax_duty',
-  'price_set'
+  'price_set',
+  'package_number',
+  'tracking_number'
  ];
 
  protected $useTimestamps = true;

@@ -29,7 +29,7 @@
                   Pay Now <?= "$" . $request['price'] ?>
                 </a>
               </p>
-              <p><i class="fas fa-info-circle text-danger"></i> Your package will be shipped to <a href="<?= base_url('warehouse-requests/my-requests') ?>"><?= $default_wh['city'] . ', ' . $default_wh['country'] ?></a>, which is your default warehouse.<br><i><small>After payment you can't change the destination.</small></i></p>
+              <p><i class="fas fa-info-circle text-danger"></i> After the payment your package will be shipped to <a href="<?= base_url('warehouse-requests/my-requests') ?>"><?= $default_wh['city'] . ', ' . $default_wh['country'] ?></a>, which is your default warehouse.<br><i><small>If you need to change the default ware house click <a href="<?= base_url('warehouse-requests/my-requests') ?>">here.</a> After payment you can't change the destination.</small></i></p>
 
               <div id="paymentContainer" class="mt-3" style="display:none;">
                 <div id="paypal-button-container"></div>

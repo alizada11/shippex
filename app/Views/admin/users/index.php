@@ -6,6 +6,25 @@
 <div class="card mt-4 p-0">
  <div class="card-header d-flex justify-content-between">
   <span>Recent Users</span>
+  <form action="<?= base_url('search') ?>" method="post" class="search-minimal d-flex gap-2">
+   <?= csrf_field() ?>
+
+   <input
+    type="text"
+    name="q"
+    class="form-control"
+    placeholder="Search..."
+    required
+    autocomplete="off">
+
+   <input type="hidden" name="model" value="App\Models\UserModel">
+   <input type="hidden" name="detail_url" value="users/profile/">
+   <input type="hidden" name="back_url" value="<?= current_url() ?>">
+
+   <button class="btn btn-shippex-orange">
+    <i class="fas fa-search"></i>
+   </button>
+  </form>
  </div>
  <div class="card-body table-responsive">
   <table class="table table-hover">

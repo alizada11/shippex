@@ -14,6 +14,10 @@ use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 class PackageController extends BaseController
 {
@@ -28,105 +32,97 @@ class PackageController extends BaseController
       throw new \Exception('Easyship API token is missing.');
     }
   }
-  public function index($id)
+  public function index($warehouseId)
   {
     $session = session();
-    $role = $session->get('role');       // 'admin' or 'customer'
-    $userId = $session->get('user_id');  // logged-in user id
+    $role    = $session->get('role');
+    $userId  = $session->get('user_id');
 
+    $perPage = 16;
+    $status  = $this->request->getGet('status') ?? 'incoming';
+
+    $doneStatuses = ['combined', 'missing', 'shipped', 'returned', 'disposed'];
+
+    /**
+     * ----------------------------------------
+     * BASE FILTERS (shared safely)
+     * ----------------------------------------
+     */
+    $baseFilters = [
+      'packages.archive'            => 0,
+      'packages.virtual_address_id' => $warehouseId,
+    ];
+
+    /**
+     * ----------------------------------------
+     * BADGE COUNTS (NO JOINS NEEDED)
+     * ----------------------------------------
+     */
     $packageModel = new PackageModel();
-    $itemModel = new PackageItemModel();
-    $fileModel = new PackageFileModel();
-    $actionModel = new PackageActionModel();
 
-    // Number of records per page
-    $perPage = 30;
+    $counts['incoming'] = $packageModel
+      ->where($baseFilters)
+      ->where('packages.status', 'incoming')
+      ->when($role !== 'admin', fn($q) => $q->where('packages.user_id', $userId))
+      ->countAllResults();
 
-    // Base query with join
-    $packageModel->select('packages.*, virtual_addresses.country as warehouse_name, virtual_addresses.postal_code')
-      ->join('virtual_addresses', 'virtual_addresses.id = packages.virtual_address_id', 'left')
-      ->where('archive', 0)
-      ->orderBy('packages.created_at', 'DESC');
+    $counts['ready'] = $packageModel
+      ->where($baseFilters)
+      ->where('packages.status', 'ready')
+      ->when($role !== 'admin', fn($q) => $q->where('packages.user_id', $userId))
+      ->countAllResults();
 
-    // If the logged-in user is not admin, restrict to their own packages
-    if ($role !== 'admin') {
-      $packageModel->where('packages.user_id', $userId);
+    $counts['done'] = $packageModel
+      ->where($baseFilters)
+      ->whereIn('packages.status', $doneStatuses)
+      ->when($role !== 'admin', fn($q) => $q->where('packages.user_id', $userId))
+      ->countAllResults();
+
+    /**
+     * ----------------------------------------
+     * PAGINATED LIST QUERY (WITH JOIN)
+     * ----------------------------------------
+     */
+    $listModel = new PackageModel();
+
+    $listModel
+      ->select('packages.*, virtual_addresses.country AS warehouse_name, virtual_addresses.postal_code')
+      ->join(
+        'virtual_addresses',
+        'virtual_addresses.id = packages.virtual_address_id',
+        'left'
+      )
+      ->where($baseFilters)
+      ->when($role !== 'admin', fn($q) => $q->where('packages.user_id', $userId));
+
+    if ($status === 'done') {
+      $listModel->whereIn('packages.status', $doneStatuses);
+    } else {
+      $listModel->where('packages.status', $status);
     }
 
-    // Optional: filter by virtual address id if needed
-    if ($id) {
-      $packageModel->where('virtual_addresses.id', $id);
-    }
+    $data['packages'] = $listModel
+      ->orderBy('packages.created_at', 'DESC')
+      ->paginate($perPage);
 
-    // Pagination
-    $data['packages'] = $packageModel->paginate($perPage);
-    $data['pager'] = $packageModel->pager;
+    $data['pager'] = $listModel->pager;
 
-    // If no packages found
-    if (!$data['packages']) {
-      $data['packages'] = [];
-    }
+    /**
+     * ----------------------------------------
+     * VIEW DATA
+     * ----------------------------------------
+     */
+    $data['counts']             = $counts;
+    $data['activeStatus']       = $status;
+    $data['virtual_address_id'] = $warehouseId;
+    $data['title']              = 'Packages';
 
-    // Optional: load specific package details (if $id refers to package id)
-    $data['package'] = $packageModel->find($id);
-    $data['items'] = $itemModel->getByPackage($id);
-    $data['files'] = $fileModel->getFilesByPackage($id);
-    $data['actions'] = $actionModel->getHistory($id);
-    $data['virtual_address_id'] = $id;
-    $data['title'] = 'Packages';
-    // Render the same layout for everyone
     return view('admin/packages/index', $data);
   }
 
-  public function history($id)
-  {
-    $session = session();
-    $role = $session->get('role');       // 'admin' or 'customer'
-    $userId = $session->get('user_id');  // logged-in user id
 
-    $packageModel = new PackageModel();
-    $itemModel = new PackageItemModel();
-    $fileModel = new PackageFileModel();
-    $actionModel = new PackageActionModel();
 
-    // Number of records per page
-    $perPage = 10;
 
-    // Base query with join
-    $packageModel->select('packages.*, virtual_addresses.country as warehouse_name, virtual_addresses.postal_code')
-      ->join('virtual_addresses', 'virtual_addresses.id = packages.virtual_address_id', 'left')
-      ->where('packages.archive', 1)
-      ->orderBy('packages.created_at', 'DESC');
-
-    // If the logged-in user is not admin, restrict to their own packages
-    if ($role !== 'admin') {
-      $packageModel->where('packages.user_id', $userId);
-    }
-
-    // Optional: filter by virtual address id if needed
-    if ($id) {
-      $packageModel->where('virtual_addresses.id', $id);
-    }
-
-    // Pagination
-    $data['packages'] = $packageModel->paginate($perPage);
-    $data['pager'] = $packageModel->pager;
-
-    // If no packages found
-    if (!$data['packages']) {
-      $data['packages'] = [];
-    }
-
-    // Optional: load specific package details (if $id refers to package id)
-    $data['package'] = $packageModel->find($id);
-    $data['items'] = $itemModel->getByPackage($id);
-    $data['files'] = $fileModel->getFilesByPackage($id);
-    $data['actions'] = $actionModel->getHistory($id);
-    $data['virtual_address_id'] = $id;
-    $data['title'] = 'Packages';
-    // Render the same layout for everyone
-    return view('admin/packages_history/index', $data);
-  }
 
 
   public function create($id)
@@ -172,7 +168,7 @@ class PackageController extends BaseController
     // Save package
     $packageData = [
       'retailer' => $this->request->getPost('retailer'),
-      // 'tracking_number' => 'PENDING-' . strtoupper(uniqid()),
+      'package_number' => 'SHX' . date('YmdHis') . session()->get('user_id'),
       'user_id' => $this->request->getPost('user_id'),
       'virtual_address_id' => $this->request->getPost('warehouse_id'),
       'weight' => $this->request->getPost('weight') ?: '',
@@ -234,6 +230,16 @@ class PackageController extends BaseController
         }
       }
     }
+    // send email: A new combine repack request is created
+
+    $title = "New Package  Created";
+    $actionDesc = "created";
+    $modelName = "Packages";
+    $recordId = $packageId; // the inserted record ID
+    $userName = session()->get('full_name');
+    $adminLink = base_url("packages/show/$packageId");
+
+    send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
 
     return redirect()->to(base_url("packages/show/$packageId"))
       ->with('success', 'Package created successfully!');
@@ -249,7 +255,7 @@ class PackageController extends BaseController
     $actionModel = new PackageActionModel();
 
     $data['pkg'] = $packageModel->find($id);
-
+    $user_id = $data['pkg']['user_id'];
     $createdAt = new DateTime($data['pkg']['created_at']);
     $now = new DateTime();
     $daysPassed = $createdAt->diff($now)->days;
@@ -264,6 +270,43 @@ class PackageController extends BaseController
 
       // Update the separate over_due_fee field
       $packageModel->update($data['pkg']['id'], ['over_due_fee' => $overdueFee]);
+
+      if ($data['pkg']['overdue_fee_paid'] == 0) {
+
+
+        $email = \Config\Services::email();
+
+        // Prepare data for email
+
+        $userModel = new UserModel();
+
+        // Fetch main request
+
+        $userName = $userModel->find($user_id)['firstname'] . ' ' . $userModel->find($user_id)['lastname'];
+        $emaildata = [
+          'overdue_fee' => $overdueFee, // the $request row
+          'userName' => $userName ?? 'Customer',
+          'link' => base_url("packages/show/" . $data['pkg']['id'])
+        ];
+
+        $message = view('emails/overdue_storage', $emaildata);
+
+        $email->setFrom('info@shippex.online', 'Shippex Admin');
+        $email->setTo($userModel->find($user_id)['email']);
+        $email->setSubject('You have an overdue storage fee');
+        $email->setMessage($message);
+        $email->setMailType('html'); // Important
+        $sent = $email->send();
+
+        $title = "Overdue Storage fee detected";
+        $actionDesc = "payment";
+        $modelName = "Packages";
+        $recordId = $data['pkg']['id']; // the inserted record ID
+        $userName = session()->get('full_name');
+        $adminLink = base_url("packages/show/$recordId");
+
+        send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+      }
     }
 
     // Re-fetch package for view
@@ -305,6 +348,59 @@ class PackageController extends BaseController
     return view('admin/packages/edit', $data);
   }
 
+  public function rejectFile($id)
+  {
+
+    $fileModel = new PackageFileModel();
+    $file = $fileModel->find($id);
+    $file_type = $file['file_type'];
+    $packageId = $file['package_id'];
+
+    $packageModel = new PackageModel();
+    $package = $packageModel->find($packageId);
+
+    $user_id = $package['user_id'];
+
+    if (!$file) {
+      return redirect()->back()->with('error', 'File not found.');
+    }
+
+    if (file_exists(FCPATH . $file['file_path'])) {
+      unlink(FCPATH . $file['file_path']);
+    }
+
+    $fileModel->delete($id);
+
+
+
+    $model = new \App\Models\UserModel();
+    $user = $model->where('id', $user_id)->first();
+
+    if ($user) {
+
+      $data['name'] = $user['firstname'] . ' ' . $user['lastname'];
+      $user_email = $user['email'];
+
+      $data['text'] = base_url("packages/$packageId/edit");
+      $data['file_type'] = $file_type;
+      $message = view('emails/file_reject', $data);
+
+
+      $email = \Config\Services::email();
+
+      $email->setFrom('info@shippex.online', 'Shippex Admin');
+      $email->setTo($user_email);
+      $email->setSubject($file_type . ' Rejected');
+      $email->setMessage($message);
+      $email->setMailType('html'); // Important
+
+      $email->send();
+    }
+
+
+    return redirect()->to(base_url("packages/show/" . $file['package_id']))
+      ->with('success', 'File deleted successfully.');
+  }
   public function update($id)
   {
     $packageModel = new PackageModel();
@@ -313,7 +409,6 @@ class PackageController extends BaseController
     // Basic validation
     $rules = [
       'retailer'        => 'required|min_length[2]|max_length[255]',
-      'tracking_number' => 'required|min_length[3]|max_length[255]',
       'weight'          => 'permit_empty|decimal',
       'value'           => 'permit_empty|decimal',
       'dimensions'      => 'permit_empty|string',
@@ -322,20 +417,21 @@ class PackageController extends BaseController
 
     if (! $this->validate($rules)) {
       return redirect()->back()->withInput()
-        ->with('error', 'Please correct the highlighted errors.')
+        ->with('error ', 'Please correct the highlighted errors.')
         ->with('validation', $this->validator);
     }
 
     // Collect and sanitize input
     $data = [
       'retailer'        => $this->request->getPost('retailer'),
-      'tracking_number' => $this->request->getPost('tracking_number'),
+      'tracking_number' => $this->request->getPost('tracking_number') ?? null,
       'weight'          => $this->request->getPost('weight'),
       'value'           => $this->request->getPost('value'),
       'dimensions'      => $this->request->getPost('dimensions'),
       'height'          => $this->request->getPost('height'),
       'width'          => $this->request->getPost('width'),
       'length'          => $this->request->getPost('length'),
+      'user_id'          => $this->request->getPost('user_id'),
       'status'          => $this->request->getPost('status'),
       'updated_at'      => date('Y-m-d H:i:s'),
     ];
@@ -534,17 +630,25 @@ class PackageController extends BaseController
 
         $email->setFrom('info@shippex.online', 'Shippex Admin');
         $email->setTo($user_email);
-        $email->setSubject('Password Reset Link');
+        $email->setSubject('Label has been uploaded');
         $email->setMessage($message);
         $email->setMailType('html'); // Important
 
         $email->send();
       }
-
-      // Redirect back to the package detail page
-      return redirect()->to(base_url("packages/show/$packageId"))
-        ->with('success', 'File uploaded successfully.');
     }
+    // Redirect back to the package detail page
+    $title = "New " . $fileType . " uploaded";
+    $actionDesc = "uploaded";
+    $modelName = "Packages";
+    $recordId = $packageId; // the inserted record ID
+    $userName = session()->get('full_name');
+    $adminLink = base_url("packages/show/$packageId");
+
+    send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+
+    return redirect()->to(base_url("packages/show/$packageId"))
+      ->with('success', 'File uploaded successfully.');
   }
 
   public function deleteFile($id)
@@ -730,5 +834,93 @@ class PackageController extends BaseController
         'error' => 'Unable to fetch categories at this time.'
       ]);
     }
+  }
+
+  // Pay overdue fee
+  public function payOverdueFee($packageId)
+  {
+    $packageModel = new PackageModel();
+    $package = $packageModel->find($packageId);
+
+    if (!$package) {
+      return redirect()->back()->with('error', 'Package not found.');
+    }
+
+    if ($package['overdue_fee_paid'] == 1) {
+      return redirect()->back()->with('error', 'Overdue fee already paid.');
+    }
+
+    // Calculate total amount for overdue fee and shipping fee
+    $totalAmount = $package['over_due_fee'] + $package['shipping_fee'];
+
+    // PayPal client setup (assuming you're using PayPal)
+    $clientId = getenv('PAYPAL_CLIENT_ID');
+    $clientSecret = getenv('PAYPAL_SECRET');
+    $environment = new SandboxEnvironment($clientId, $clientSecret);
+    $client = new PayPalHttpClient($environment);
+
+    // Create order request
+    $request = new OrdersCreateRequest();
+    $request->prefer('return=representation');
+    $request->body = [
+      "intent" => "CAPTURE",
+      "purchase_units" => [[
+        "amount" => [
+          "value" => $totalAmount,
+          "currency_code" => "USD"
+        ]
+      ]],
+      "application_context" => [
+        "return_url" => base_url('package/completePayment/' . $packageId),
+        "cancel_url" => base_url('package/cancelPayment/' . $packageId)
+      ]
+    ];
+
+    try {
+      $response = $client->execute($request);
+      return redirect()->to($response->result->links[1]->href); // redirect to PayPal checkout
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Payment creation failed: ' . $e->getMessage());
+    }
+  }
+
+  // Capture payment after PayPal approval
+  public function completePayment($packageId)
+  {
+    $orderId = $this->request->getGet('orderID');
+    if (!$orderId) {
+      return redirect()->back()->with('error', 'Order ID missing.');
+    }
+
+    $request = new OrdersCaptureRequest($orderId);
+    $request->prefer('return=representation');
+
+    $clientId = getenv('PAYPAL_CLIENT_ID');
+    $clientSecret = getenv('PAYPAL_SECRET');
+    $environment = new SandboxEnvironment($clientId, $clientSecret);
+    $client = new PayPalHttpClient($environment);
+
+    try {
+      $response = $client->execute($request);
+      // Update the package status to mark overdue fee as paid
+      $packageModel = new PackageModel();
+      $packageModel->update($packageId, [
+        'overdue_fee_paid' => 1,
+        'payment_info' => json_encode($response->result),
+        'status' => 'paid', // You can change this to your own status, such as 'paid' or 'completed'
+      ]);
+
+      return redirect()->to(base_url('package/view/' . $packageId))
+        ->with('success', 'Payment completed successfully.');
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Payment capture failed: ' . $e->getMessage());
+    }
+  }
+
+  // Cancel payment
+  public function cancelPayment($packageId)
+  {
+    return redirect()->to(base_url('package/view/' . $packageId))
+      ->with('error', 'Payment canceled.');
   }
 }

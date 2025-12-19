@@ -94,26 +94,17 @@ class ShippingServices extends BaseController
   $featuresString = implode(', ', $featuresArray);
 
   // Build description
-  $descriptionParts = [
-   $service['transit_text'],
-   $service['service_name']
-  ];
-
-  if (!empty($featuresString)) {
-   $descriptionParts[] = $featuresString;
-  }
-
-  $description = implode(', ', $descriptionParts);
 
 
   // Update booking fields
   $bookingData = [
    'courier_name'  => $service['provider_name'],
    'service_name'  => $service['service_name'],
-   'delivery_time' => $service['transit_days'],
+   'delivery_time' => $service['transit_days'] . ' days',
    'total_charge'  => $service['price'],
-   'description'   => $description,
-   'price_set'       => 1, // default to 1 if not set
+   'description'   => $service['transit_text'],
+   'currency'      => $service['currency'],
+   'price_set'     => 1, // default to 1 if not set
   ];
 
 
@@ -171,10 +162,51 @@ class ShippingServices extends BaseController
   if (isset($input['features']) && is_array($input['features'])) {
    $input['features'] = json_encode($input['features']);
   }
+  $requestId = $input['request_id'];
 
   $this->model->insert($input);
   $id = $this->model->getInsertID();
+  if ($id) {
 
+   $bookingModel = new ShippingBookingModel();
+   $id = $input['request_id'];
+   $bookingModel->update($id, ['set_rate' => 0]);
+
+   $user_id = $bookingModel->select('user_id')->where('id', $id)->first();
+   $user_id = $user_id['user_id'] ?? null; // now you have the actual user_id
+
+
+   $userModel = new UserModel();
+
+   // Fetch main request
+   $user = $userModel->find($user_id);
+   $userName = $user ? ($user['firstname'] . ' ' . $user['lastname']) : 'Customer';
+
+   $data = [
+    'userName' => $userName ?? 'Customer'
+   ];
+   $email = \Config\Services::email();
+   $email->setFrom('info@shippex.online', 'Shippex Admin');
+   $email->setTo($user['email']);
+   $email->setSubject("We've Set The Shipping Prices");
+   $data['reqLink'] = base_url("customer/shipping/details/" . $id);
+
+   $message = view('emails/shipping_price_set', $data);
+
+
+   $email->setMessage($message);
+   $email->setMailType('html');
+   $email->send();
+
+   $title = "New Price Inserted";
+   $actionDesc = "created";
+   $modelName = "Shipping Service";
+   $recordId = $id; // the inserted record ID
+   $userName = session()->get('full_name');
+   $adminLink = base_url("shipping/details/" . $id);
+
+   send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+  }
   return $this->response->setStatusCode(201)->setJSON(['status' => 'ok', 'id' => $id]);
  }
 
@@ -202,6 +234,7 @@ class ShippingServices extends BaseController
    'provider_logo'  => $request['provider_logo'],
    'service_name'  => $request['service_name'],
    'price'         => $request['price'],
+   'rating'         => 5,
    'currency'      => $request['currency'],
    'transit_text'  => $request['transit_text'],
    'transit_days'  => $request['transit_days'],
@@ -243,6 +276,15 @@ class ShippingServices extends BaseController
    $email->setMessage($message);
    $email->setMailType('html');
    $email->send();
+
+   $title = "New Price Inserted";
+   $actionDesc = "created";
+   $modelName = "Shipping Service";
+   $recordId = $id; // the inserted record ID
+   $userName = session()->get('full_name');
+   $adminLink = base_url("shipping/details/" . $id);
+
+   send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
   }
   return $this->response->setJSON([
    'success' => true,
@@ -264,8 +306,16 @@ class ShippingServices extends BaseController
   if (isset($input['features']) && is_array($input['features'])) {
    $input['features'] = json_encode($input['features']);
   }
-  $ok = $this->model->update($id, $input);
 
+  $ok = $this->model->update($id, $input);
+  $title = "New Price Inserted";
+  $actionDesc = "created";
+  $modelName = "Shipping Service";
+  $recordId = $id; // the inserted record ID
+  $userName = session()->get('full_name');
+  $adminLink = base_url("customer/shipping/details/" . $id);
+
+  send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
   if ($ok === false) {
    return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Update failed']);
   }
@@ -445,6 +495,15 @@ class ShippingServices extends BaseController
     $email->setMessage(view('emails/shipping_price_set', $dataEmail));
     $email->setMailType('html');
     $email->send();
+
+    $title = "New Price Inserted";
+    $actionDesc = "created";
+    $modelName = "Shipping Service";
+    $recordId = $id; // the inserted record ID
+    $userName = session()->get('full_name');
+    $adminLink = base_url("customer/shipping/details/" . $id);
+
+    send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
    }
   }
 

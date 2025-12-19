@@ -7,9 +7,10 @@ $lang = $session->get('lang');
 
 use App\Models\UserModel;
 use App\Models\VirtualAddressModel;
-
-
-
+use CodeIgniter\Email\Email;
+use App\Models\NotificationModel;
+use Config\Services;
+use CodeIgniter\Model;
 
 
 
@@ -102,42 +103,87 @@ if (!function_exists('adminWarehousesMenu')) {
   }
 }
 
-if (!function_exists('adminShipmentHistory')) {
-  function adminShipmentHistory(): string
-  {
-    $addressesModel = new \App\Models\VirtualAddressModel();
-    $addresses = $addressesModel->findAll();
 
-    $currentUrl = current_url(); // get current URL
-    $html = '';
 
-    foreach ($addresses as $adr) {
-      $code = strtolower($adr['code'] ?? 'us');
 
-      // Fix or map invalid country codes
-      $map = [
-        'uk' => 'gb', // show UK flag for 'uk'
-        'gp' => 'gb', // treat 'gp' as UK
-      ];
+if (! function_exists('send_admin_notification')) {
 
-      $flagCode = $map[$code] ?? $code;
-      $id = $adr['id'];
-      $url = base_url('package/history/' . $id);
+  /**
+   * Send a general admin notification (DB + Email)
+   */
+  function send_admin_notification(
+    string $actionDescription,
+    ?string $title = null,
+    ?string $modelName = null,
+    ?int $recordId = null,
+    ?string $userName = null,
+    ?string $userEmail = null,
+    ?string $adminEmail = null,
+    ?string $actionLink = null
+  ): ?int {
 
-      // Check if current URL matches any of the related routes
-      $isActive =
-        strpos($currentUrl, '/package/history/' . $id) !== false;
+    // -----------------------------
+    // 1. Resolve admin email
+    // -----------------------------
+    $adminEmail = $adminEmail ?? 'codewithja@gmail.com';
 
-      $html .= '
-        <li class="nav-item">
-            <a class="nav-link ' . ($isActive ? 'active' : '') . '" href="' . $url . '">
-                <i class="fi fi-' . $flagCode . '"></i> ' . esc($adr['country']) . '
-            </a>
-        </li>';
+    // -----------------------------
+    // 2. Insert notification to DB
+    // -----------------------------
+    $notificationModel = new NotificationModel();
+
+    $notificationData = [
+      'title'        => $title,
+      'action'       => $actionDescription,
+      'model'        => $modelName,
+      'record_id'    => $recordId,
+      'user_name'    => $userName,
+      'user_email'   => $userEmail,
+      'link'         => $actionLink,
+      'is_read'      => 0,
+      'created_at'   => date('Y-m-d H:i:s'),
+    ];
+
+    try {
+      $notificationId = $notificationModel->insert($notificationData, true);
+    } catch (\Throwable $e) {
+      log_message('error', 'Notification DB insert failed: ' . $e->getMessage());
+      return null;
     }
 
+    // -----------------------------
+    // 3. Send email (non-blocking)
+    // -----------------------------
+    try {
+      $email = Services::email();
 
-    return $html;
+      $email->setFrom('info@shippex.online', 'Shippex System');
+      $email->setTo('codewithja@gmail.com');
+      $email->setSubject('New Notification: ' . $title);
+      $email->setMailType('html');
+
+      $email->setMessage(view('emails/general_notification', [
+        'title' => $title,
+        'actionDescription' => $actionDescription,
+        'modelName'         => $modelName,
+        'recordId'          => $recordId,
+        'userName'          => $userName,
+        'userEmail'         => $userEmail,
+        'actionLink'        => $actionLink,
+      ]));
+
+      if (! $email->send()) {
+        log_message('error', 'Admin notification email failed');
+        log_message('error', $email->printDebugger(['headers']));
+      }
+    } catch (\Throwable $e) {
+      log_message('error', 'Email exception: ' . $e->getMessage());
+    }
+
+    // -----------------------------
+    // 4. Return notification ID
+    // -----------------------------
+    return $notificationId;
   }
 }
 
@@ -190,5 +236,199 @@ if (!function_exists("warehouse_name")) {
     $wh = $model->select(['city', 'country', 'address_line'])->where('id', $id)->first();
 
     return $wh;
+  }
+}
+
+// search
+
+if (!function_exists('global_search')) {
+
+  /**
+   * Global database search with metadata
+   */
+  function global_search(string $modelClass, string $query, int $limit = 50): array
+  {
+    $allowedModels = [
+      \App\Models\UserModel::class => 'user',
+      \App\Models\PackageModel::class => 'package',
+      \App\Models\ShippingBookingModel::class => 'shipping',
+      \App\Models\ShopperRequestModel::class => 'shopper_request',
+      \App\Models\WarehouseRequestModel::class => 'warehouse_request',
+      \App\Models\CombineRepackRequestModel::class => 'combine_request',
+      \App\Models\DisposeReturnRequestModel::class => 'dispose_request'
+    ];
+
+    if (!isset($allowedModels[$modelClass])) {
+      log_message('error', 'Global search blocked invalid model: ' . $modelClass);
+      return [];
+    }
+
+    $modelType = $allowedModels[$modelClass];
+    $model = new $modelClass();
+    $db = \Config\Database::connect();
+    $table = $model->getTable();
+
+    // Get searchable columns (exclude sensitive fields)
+    $excludeFields = ['password', 'remember_token', 'deleted_at', 'payment_info'];
+    $fields = array_diff($db->getFieldNames($table), $excludeFields);
+
+    if (empty($fields)) {
+      return [];
+    }
+
+    // Build search query
+    $builder = $db->table($table);
+    $builder->groupStart();
+    foreach ($fields as $field) {
+      $builder->orLike($field, $query);
+    }
+    $builder->groupEnd();
+    $builder->limit($limit);
+
+    $results = $builder->get()->getResultArray();
+
+    // Add metadata to each result
+    foreach ($results as &$result) {
+      $result['_search_type'] = $modelType;
+      $result['_model_class'] = $modelClass;
+    }
+
+    return $results;
+  }
+}
+
+if (!function_exists('get_search_type_icon')) {
+  function get_search_type_icon($type)
+  {
+    $icons = [
+      'user' => 'fas fa-user',
+      'package' => 'fas fa-box',
+      'shipping' => 'fas fa-shipping-fast',
+      'shopper_request' => 'fas fa-shopping-cart',
+      'warehouse_request' => 'fas fa-warehouse',
+      'combine_request' => 'fas fa-boxes',
+      'dispose_request' => 'fas fa-trash'
+    ];
+    return $icons[$type] ?? 'fas fa-search';
+  }
+}
+
+if (!function_exists('get_search_type_color')) {
+  function get_search_type_color($type)
+  {
+    $colors = [
+      'user' => 'success',
+      'package' => 'primary',
+      'shipping' => 'info',
+      'shopper_request' => 'warning',
+      'warehouse_request' => 'secondary',
+      'combine_request' => 'purple',
+      'dispose_request' => 'danger'
+    ];
+    return $colors[$type] ?? 'dark';
+  }
+}
+
+if (!function_exists('get_search_type_label')) {
+  function get_search_type_label($type)
+  {
+    $labels = [
+      'user' => 'User',
+      'package' => 'Package',
+      'shipping' => 'Shipping',
+      'shopper_request' => 'Shopper Request',
+      'warehouse_request' => 'Warehouse Request',
+      'combine_request' => 'Combine Request',
+      'dispose_request' => 'Dispose Request'
+    ];
+    return $labels[$type] ?? 'Item';
+  }
+}
+
+if (!function_exists('get_search_result_title')) {
+  function get_search_result_title($result)
+  {
+    $type = $result['_search_type'] ?? 'unknown';
+
+    switch ($type) {
+      case 'user':
+        return trim(($result['firstname'] ?? '') . ' ' . ($result['lastname'] ?? '')) ?: $result['username'] ?? 'User #' . $result['id'];
+
+      case 'package':
+        $title = 'Package';
+        if (isset($result['retailer'])) $title .= ' from ' . $result['retailer'];
+        if (isset($result['tracking_number'])) $title .= ' (' . $result['tracking_number'] . ')';
+        return $title;
+
+      case 'shipping':
+        $title = 'Shipping';
+        if (isset($result['courier_name'])) $title .= ' via ' . $result['courier_name'];
+        if (isset($result['dest_city'])) $title .= ' to ' . $result['dest_city'];
+        return $title;
+
+      case 'shopper_request':
+        return 'Shopper Request #' . ($result['id'] ?? '');
+
+      case 'warehouse_request':
+        return 'Warehouse Request #' . ($result['id'] ?? '');
+
+      case 'combine_request':
+        return 'Combine Request #' . ($result['id'] ?? '');
+
+      case 'dispose_request':
+        return 'Dispose Request #' . ($result['id'] ?? '');
+
+      default:
+        return 'Item #' . ($result['id'] ?? '');
+    }
+  }
+}
+
+if (!function_exists('get_search_key_fields')) {
+  function get_search_key_fields($result)
+  {
+    $type = $result['_search_type'] ?? 'unknown';
+    $keyFields = [];
+
+    switch ($type) {
+      case 'user':
+        $keyFields['Username'] = $result['username'] ?? '';
+        $keyFields['Email'] = $result['email'] ?? '';
+        $keyFields['Phone'] = $result['phone_number'] ?? '';
+        $keyFields['Role'] = $result['role'] ?? '';
+        break;
+
+      case 'package':
+        $keyFields['Status'] = $result['status'] ?? '';
+        $keyFields['Tracking'] = $result['tracking_number'] ?? '';
+        $keyFields['Weight'] = isset($result['weight']) ? $result['weight'] . 'kg' : '';
+        $keyFields['User'] = $result['user_id'] ?? '';
+        break;
+
+      case 'shipping':
+        $keyFields['Status'] = $result['status'] ?? '';
+        $keyFields['Courier'] = $result['courier_name'] ?? '';
+        $keyFields['Destination'] = $result['dest_city'] ?? '';
+        $keyFields['Amount'] = isset($result['total_charge']) ? $result['currency'] . ' ' . $result['total_charge'] : '';
+        break;
+
+      case 'shopper_request':
+        $keyFields['Status'] = $result['status'] ?? '';
+        $keyFields['Price'] = isset($result['price']) ? '$' . $result['price'] : '';
+        $keyFields['Warehouse'] = $result['warehouse_id'] ?? '';
+        break;
+
+      default:
+        // Generic fields for other types
+        $genericFields = ['status', 'user_id', 'created_at', 'updated_at'];
+        foreach ($genericFields as $field) {
+          if (isset($result[$field]) && $result[$field]) {
+            $keyFields[ucfirst(str_replace('_', ' ', $field))] = $result[$field];
+          }
+        }
+    }
+
+    // Filter out empty values
+    return array_filter($keyFields);
   }
 }

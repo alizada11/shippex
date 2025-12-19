@@ -105,7 +105,14 @@ class Shopper extends Controller
     if (! empty($itemsToInsert)) {
       $itemModel->insertBatch($itemsToInsert);
     }
+    $title = "New Shopper Request ";
+    $actionDesc = "created";
+    $modelName = "Shopper Service";
+    $recordId = $reqId; // the inserted record ID
+    $userName = session()->get('full_name');
+    $adminLink = base_url("admin/shopper/requests/view/$recordId");
 
+    send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
     // success
     $session->setFlashdata('success', $isSaved ? 'Request saved.' : 'Request submitted. We will contact you shortly.');
     return redirect()->to('/shopper/thank-you');
@@ -323,6 +330,7 @@ class Shopper extends Controller
         'weight'             => (float)$itemData['weight'],
         'value'              => (float)$itemData['value'],
         'tracking_number'    => $trackingNumber,
+        'package_number'    => 'SHX' . date('YmdHis') . $userId,
         'status'             => $status,
         'created_at'         => date('Y-m-d H:i:s')
       ];
@@ -414,6 +422,14 @@ class Shopper extends Controller
     ];
 
     if ($this->shopperModel->update($id, $data)) {
+      $title = "Payment For Shopper Request";
+      $actionDesc = "payment";
+      $modelName = "Shipping Service";
+      $recordId = $id; // the inserted record ID
+      $userName = session()->get('full_name');
+      $adminLink = base_url("admin/shopper/requests/view/" . $id);
+
+      send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
       return redirect()->to(base_url('shipping/view/' . $id))
         ->with('success', 'Payment completed successfully.');
     } else {

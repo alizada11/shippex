@@ -35,7 +35,7 @@
       <thead class="table-light">
        <tr>
         <th>ID</th>
-        <th>Item Name</th>
+        <th>Category</th>
         <th>Weight</th>
         <th>Dimensions <small>(L×W×H cm)</small></th>
         <th>Total Charge</th>

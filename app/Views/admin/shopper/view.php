@@ -182,7 +182,7 @@
           <?php if (!empty($items)): ?>
             <div class="table-responsive">
               <table class="table table-hover">
-                <thead class="bg-shippex-purple text-white">
+                <thead class="bg-gray">
                   <tr>
                     <th>#</th>
                     <th>Item Name</th>
@@ -227,7 +227,7 @@
           <?php endif; ?>
         </div>
 
-        <div class="card-footer bg-light">
+        <div class="card-footer flex-row justfiy-content-between bg-light">
           <a href="<?= base_url('admin/shopper/requests') ?>" class="btn btn-outline-shippex-purple float-end">
             <i class="fas fa-arrow-left me-2"></i> Back to Requests
           </a>
@@ -465,10 +465,20 @@
         .then(data => {
           if (data.success) {
             bootstrap.Modal.getInstance(setPriceModal).hide();
-            alert('Request accepted and user notified.');
-            window.location.reload();
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: data.message || 'Request accepted and user notified.',
+              showConfirmButton: false,
+              timer: 2000
+            });
           } else {
-            alert('Error: ' + (data.message || 'Something went wrong.'));
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'Something went wrong.'
+            });
           }
         })
         .catch(err => {

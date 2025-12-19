@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\PackageModel;
 use App\Models\ShippingBookingModel;
 use App\Models\UserModel;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
@@ -163,11 +164,6 @@ class Shipping extends BaseController
 
     public function book()
     {
-        // $request = service('request');
-        // echo "<pre>";
-        // print_r($request->getPost());
-        // echo "<pre>";
-        // exit;
         $session = session();
         // Check if user is logged in
         if (!$session->has('user_id')) {
@@ -179,6 +175,10 @@ class Shipping extends BaseController
             $user_id = session()->get('user_id');
         }
         $request = service('request');
+        $packageIds = $this->request->getPost('package_ids') ?: [];
+
+        // Validate package IDs
+
 
 
         $data = [
@@ -224,6 +224,7 @@ class Shipping extends BaseController
 
             // User
             'user_id'             => $user_id,
+            'package_number'             => 'SHX' . date('YmdHis') . session()->get('user_id'),
         ];
 
 
@@ -232,6 +233,25 @@ class Shipping extends BaseController
         $id = $shippingModel->insert($data);
 
         if ($id) {
+            $packageModel = new PackageModel();
+            foreach ($packageIds as $packageId) {
+                $packageModel->update($packageId, [
+                    'booking_id' => $id,
+                    'status' => 'shipped',
+                    'booked_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+            // send email: A new booking request is created
+
+            $title = "New Booking Request Created";
+            $actionDesc = "created";
+            $modelName = "Shipping";
+            $recordId = $id; // the inserted record ID
+            $userName = session()->get('full_name');
+            $adminLink = base_url("shipping/details//$recordId");
+
+            send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
+
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Booking saved successfully',
@@ -409,6 +429,16 @@ class Shipping extends BaseController
             $email->setMailType('html');
             $email->send();
         }
+        // send email: A new combine repack request is created
+
+        $title = "Booking Status Cnaged to " . $newStatus;
+        $actionDesc = "updated";
+        $modelName = "Shipping";
+        $recordId = $bookingId; // the inserted record ID
+        $userName = session()->get('full_name');
+        $adminLink = base_url("shipping/details//$recordId");
+
+        send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
         // $users_warehouse = $usersWarehouseModel->where('user_id', $booking['user_id'])->where('is_default', 1)->first();
 
         // $ware_house_id  =  $users_warehouse['warehouse_id'];
@@ -491,6 +521,16 @@ class Shipping extends BaseController
                 $email->setMailType('html'); // Important
 
                 $email->send();
+
+                // send notification to admin
+                $title = "New Invoice uploaded";
+                $actionDesc = "uploaded";
+                $modelName = "Shipping ";
+                $recordId = $id; // the inserted record ID
+                $userName = session()->get('full_name');
+                $adminLink = base_url("shipping/details/" . $id);
+
+                send_admin_notification($actionDesc, $title, $modelName, $recordId, $userName, null, '', $adminLink);
             }
             return redirect()->to('/shipping/details/' . $id)->with('success', 'Label uploaded successfully!');
         }
@@ -677,6 +717,32 @@ class Shipping extends BaseController
 
         return redirect()->back()->with('success', 'Shipping request deleted successfully.');
     }
+
+    public function updateTracking()
+    {
+        $request_id = $this->request->getPost('request_id');
+        $tracking_number = $this->request->getPost('tracking_number');
+
+        // Validate input
+        if (empty($tracking_number)) {
+            return redirect()->back()->with('error', 'Tracking number is required!');
+        }
+
+        // Get the model
+        $shippingModel = new ShippingBookingModel();
+
+        // Update the tracking number in the database
+        $updated = $shippingModel->update($request_id, [
+            'tracking_number' => $tracking_number
+        ]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Tracking number updated successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update tracking number.');
+        }
+    }
+
     public function notify_user($id)
     {
 
