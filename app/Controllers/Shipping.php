@@ -5,10 +5,6 @@ namespace App\Controllers;
 use App\Models\PackageModel;
 use App\Models\ShippingBookingModel;
 use App\Models\UserModel;
-use PayPalCheckoutSdk\Core\PayPalHttpClient;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use App\Services\EasyshipService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -33,10 +29,6 @@ class Shipping extends BaseController
             throw new \Exception('Easyship API token is missing.');
         }
         $this->shippingModel = new ShippingBookingModel();
-        $clientId = getenv('PAYPAL_CLIENT_ID');
-        $clientSecret = getenv('PAYPAL_SECRET');
-        $environment = new SandboxEnvironment($clientId, $clientSecret); // use LiveEnvironment for production
-        $this->paypalClient = new PayPalHttpClient($environment);
     }
 
     public function getRates()
@@ -328,6 +320,7 @@ class Shipping extends BaseController
             ->orderBy('changed_at', 'AESC')
             ->findAll();
         // dd($data);
+
         $data['title'] = 'Shipping Req Details';
         return view('admin/shipping/details', $data);
     }

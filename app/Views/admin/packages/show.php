@@ -792,9 +792,7 @@ if ($role === 'admin') {
 
       <!-- Sidebar  -->
       <div class="col-lg-4">
-        <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)):
-
-        ?>
+        <?php if ($package['status'] === 'ready' && ($package['shipping_fee'] !== null || $over_due > 0)): ?>
           <div class="premium-card">
             <div class="card-header">
               <h4><i class="fas fa-receipt"></i> Payment Summary</h4>
@@ -822,133 +820,150 @@ if ($role === 'admin') {
                   <div class="total-label">Total Amount</div>
                   <div class="total-value">$<?= number_format($package['shipping_fee'] + $over_due, 2); ?></div>
                 </div>
+                <br>
+
+            </div>
+          <?php endif; ?>
+          <div class="card-footer">
+            <?php if ($over_due > 0 && $package['payment_status'] !== 'paid'): ?>
+              <div id="paypal-button-container">
+              <?php elseif ($package['payment_status'] === 'paid'): ?>
+                <p>Fees Paid</p>
               <?php endif; ?>
-              <div class="card-footer">
-                <?php if ($over_due > 0): ?>
-                  <form method="POST" action="<?= base_url('package/payOverdueFee/' . $package['id']) ?>">
-                    <button type="submit" class="btn-pay">
-                      <i class="fas fa-credit-card"></i> Pay Overdue Fee
-                    </button>
-                  </form>
-                <?php endif; ?>
-                <p class="info-text">All fees are calculated based on your package details</p>
+              <p class="info-text">All fees are calculated based on your package details</p>
               </div>
-            </div>
           </div>
+          </div>
+      </div>
 
+      <!-- Shipping Fee -->
 
-          <!-- Shipping Fee -->
-
-          <script src="https://www.paypal.com/sdk/js?client-id=AR_PoU6NaXw2h4y9qwFGoYMBMpw9_I0AzvNGSARRucV84VoZA_x1OHH9781pe1E4rdiW7uvr7st4lX4j&currency=USD"></script>
-          <script>
-            paypal.Buttons({
-              createOrder: function(data, actions) {
-                return fetch('<?= base_url("package/createOrder/" . $package['id']) ?>', {
-                  method: 'post'
-                }).then(res => res.json()).then(order => order.id);
+      <script src="https://www.paypal.com/sdk/js?client-id=<?= esc($client_id) ?>&currency=USD"></script>
+      <script>
+        paypal.Buttons({
+          createOrder: function(data, actions) {
+            return fetch('<?= base_url('payment/create-order') ?>', {
+              method: 'post',
+              headers: {
+                'content-type': 'application/json'
               },
-              onApprove: function(data, actions) {
-                return fetch('<?= base_url("package/captureOrder/" . $package['id']) ?>', {
-                  method: 'post',
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                  body: 'orderID=' + data.orderID
-                }).then(res => res.json()).then(details => {
-                  alert('Payment Completed!');
-                  location.reload();
-                });
+              body: JSON.stringify({
+                amount: '<?= $package['shipping_fee'] ?>'
+              })
+            }).then(res => res.json()).then(order => order.id);
+          },
+          onApprove: function(data, actions) {
+            return fetch('<?= base_url('payment/capture-order') ?>', {
+              method: 'post',
+              headers: {
+                'content-type': 'application/json'
+              },
+              body: JSON.stringify({
+                orderID: data.orderID,
+                payFor: 'package'
+              })
+            }).then(res => res.json()).then(details => {
+              if (details.status === 'COMPLETED') {
+                window.location.href = '<?= base_url('payment/success') ?>';
+              } else {
+                alert('Payment failed');
               }
-            }).render('#paypal-button-container');
-          </script>
-          <!-- Total Amount -->
+            });
+          },
+          onError: function(err) {
+            console.error(err);
+            alert('An error occurred');
+          }
+        }).render('#paypal-button-container');
+      </script>
+      <!-- Total Amount -->
 
-        <?php endif; ?>
-
-
-        <!-- package combination info -->
-        <?php if (!empty($package['combined_from'])): ?>
-          <div class="premium-card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <?php if ($package['status'] === 'combined'): ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined With
+    <?php endif; ?>
 
 
-                <?php else: ?>
-                  <i class="fas fa-compress-arrows-alt"></i> Combined from
-                <?php endif; ?>
-              </h3>
-            </div>
-            <div class="card-body">
-              <span class="d-flex align-items-center flex-wrap gap-3 status-badge ">
-                <?php $combined_from = json_decode($package['combined_from'], true);
+    <!-- package combination info -->
+    <?php if (!empty($package['combined_from'])): ?>
+      <div class="premium-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <?php if ($package['status'] === 'combined'): ?>
+              <i class="fas fa-compress-arrows-alt"></i> Combined With
 
-                foreach ($combined_from as $packageId) {
 
-                  // Skip if this ID is the same as the current package
-                  if ($packageId == $package['id']) {
-                    continue;
-                  }
-                ?>
-                  <a href="<?= base_url('packages/show/' . $packageId) ?>"
-                    class="bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-box text-primary"></i>
-                    <?= $packageId ?>
-                  </a>
-
-                <?php } ?>
-                <?php if ($package['status'] === 'combined'): ?>
-                  <a href="<?= base_url('packages/show/' . $package['parent_package']) ?>" class="btn bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
-                    <i class="fas fa-eye"></i> View Parent Package</a>
-                <?php endif; ?>
-              </span>
-            </div>
-          </div>
-        <?php endif; ?>
-
-        <!-- actions history -->
-        <div class="premium-card">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-history me-2"></i>Actions History
-            </h3>
-          </div>
-          <div class="card-body">
-            <?php if (empty($actions)): ?>
-              <div class="empty-state small">
-                <div class="empty-icon">
-                  <i class="fas fa-history"></i>
-                </div>
-                <h5>No History</h5>
-                <p>No actions recorded for this package yet.</p>
-              </div>
             <?php else: ?>
-              <div class="timeline">
-                <?php foreach ($actions as $log): ?>
-                  <div class="">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                      <div class="timeline-header">
-                        <strong><?= esc($log['action']) ?></strong>
-                        <small class="text-muted"><?= esc($log['created_at']) ?></small>
-                      </div>
-                      <div class="timeline-body">
-                        <p class="mb-1"><?= esc($log['notes']) ?></p>
-                        <small class="text-muted">by <?= fullname($log['performed_by']) ?? 'System' ?></small>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
+              <i class="fas fa-compress-arrows-alt"></i> Combined from
             <?php endif; ?>
-          </div>
+          </h3>
         </div>
+        <div class="card-body">
+          <span class="d-flex align-items-center flex-wrap gap-3 status-badge ">
+            <?php $combined_from = json_decode($package['combined_from'], true);
 
+            foreach ($combined_from as $packageId) {
 
+              // Skip if this ID is the same as the current package
+              if ($packageId == $package['id']) {
+                continue;
+              }
+            ?>
+              <a href="<?= base_url('packages/show/' . $packageId) ?>"
+                class="bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
+                <i class="fas fa-box text-primary"></i>
+                <?= $packageId ?>
+              </a>
+
+            <?php } ?>
+            <?php if ($package['status'] === 'combined'): ?>
+              <a href="<?= base_url('packages/show/' . $package['parent_package']) ?>" class="btn bg-light text-dark text-decoration-none d-flex flex-grow align-items-center gap-1">
+                <i class="fas fa-eye"></i> View Parent Package</a>
+            <?php endif; ?>
+          </span>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <!-- actions history -->
+    <div class="premium-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-history me-2"></i>Actions History
+        </h3>
+      </div>
+      <div class="card-body">
+        <?php if (empty($actions)): ?>
+          <div class="empty-state small">
+            <div class="empty-icon">
+              <i class="fas fa-history"></i>
+            </div>
+            <h5>No History</h5>
+            <p>No actions recorded for this package yet.</p>
+          </div>
+        <?php else: ?>
+          <div class="timeline">
+            <?php foreach ($actions as $log): ?>
+              <div class="">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <strong><?= esc($log['action']) ?></strong>
+                    <small class="text-muted"><?= esc($log['created_at']) ?></small>
+                  </div>
+                  <div class="timeline-body">
+                    <p class="mb-1"><?= esc($log['notes']) ?></p>
+                    <small class="text-muted">by <?= fullname($log['performed_by']) ?? 'System' ?></small>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
+
+
+    </div>
   </div>
+</div>
 </div>
 
 

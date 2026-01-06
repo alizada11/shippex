@@ -58,7 +58,7 @@
         <td colspan="5" class="text-center text-muted py-4">
          <i class="fas fa-box-open fa-2x mb-2"></i>
          <p class="mb-0">No shipping requests found</p>
-         <a href="<?= site_url('shopper/requests/create') ?>" class="btn btn-primary mt-2">
+         <a href="<?= site_url('shopper') ?>" class="btn btn-primary mt-2">
           Create your first request
          </a>
         </td>

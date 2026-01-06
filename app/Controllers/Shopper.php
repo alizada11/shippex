@@ -7,10 +7,6 @@ use App\Models\ShopperRequestModel;
 use App\Models\ShopperItemModel;
 use App\Models\WarehouseRequestModel;
 use CodeIgniter\Controller;
-use PayPalCheckoutSdk\Core\PayPalHttpClient;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 class Shopper extends Controller
 {
@@ -31,8 +27,6 @@ class Shopper extends Controller
     $this->shopperModel = new ShopperRequestModel();
     $clientId = getenv('PAYPAL_CLIENT_ID');
     $clientSecret = getenv('PAYPAL_SECRET');
-    $environment = new SandboxEnvironment($clientId, $clientSecret); // use LiveEnvironment for production
-    $this->paypalClient = new PayPalHttpClient($environment);
   }
   protected $helpers = ['form', 'url', 'text'];
 
@@ -262,10 +256,11 @@ class Shopper extends Controller
 
     // Fetch related items
     $items = $itemModel->where('request_id', $id)->findAll();
-
+    $data['client_id'] = env('paypal.' . env('paypal.mode', 'sandbox') . '.client_id');
     return view('shopper/view', [
       'request' => $request,
       'items'   => $items,
+      'client_id' => $data['client_id'],
       'title' => 'Request Details',
       'default_wh' => $user_default_warehouse
     ]);

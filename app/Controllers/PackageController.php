@@ -326,6 +326,7 @@ class PackageController extends BaseController
     $data['actions'] = $actionModel->getHistory($id);
     $data['title'] = 'Package Details';
     $data['over_due'] = $overdueFee;
+    $data['client_id'] = env('paypal.' . env('paypal.mode', 'sandbox') . '.client_id');
     return view('admin/packages/show', $data);
   }
 

@@ -309,6 +309,12 @@ $routes->group(
 // search
 $routes->post('search', 'SearchController::index');
 $routes->get('search/live', 'SearchController::live');
+// paymment
+$routes->get('payment', 'Payment::index');
+$routes->post('payment/create-order', 'Payment::create_order');
+$routes->post('payment/capture-order', 'Payment::capture_order');
+$routes->get('payment/success', 'Payment::success');
+$routes->get('payment/cancel', 'Payment::cancel');
 
 // Frontend route
 $routes->get('warehouse/(:segment)', 'WarehouseController::show/$1');

@@ -104,7 +104,97 @@ if (!function_exists('adminWarehousesMenu')) {
 }
 
 
+if (! function_exists('get_paypal_access_token')) {
+  function get_paypal_access_token()
+  {
+    $cacheKey = 'paypal_access_token';
+    $cached   = cache()->get($cacheKey);
 
+    if ($cached && isset($cached['token']) && isset($cached['expires_at']) && $cached['expires_at'] > time()) {
+      return $cached['token'];
+    }
+
+    $mode   = env('paypal.mode', 'sandbox');
+    $client = env("paypal.{$mode}.client_id");
+    $secret = env("paypal.{$mode}.client_secret");
+
+    if (! $client || ! $secret) {
+      log_message('error', 'PayPal credentials missing in .env');
+      return null;
+    }
+
+    $url = $mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+    $ch = curl_init("{$url}/v1/oauth2/token");
+    curl_setopt_array($ch, [
+      CURLOPT_USERPWD        => "{$client}:{$secret}",
+      CURLOPT_POST           => true,
+      CURLOPT_POSTFIELDS     => 'grant_type=client_credentials',
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HTTPHEADER     => [
+        'Accept: application/json',
+        'Accept-Language: en_US',
+      ],
+    ]);
+
+    $response    = curl_exec($ch);
+    $httpCode    = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError   = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError || $httpCode !== 200) {
+      log_message('error', 'PayPal token request failed: ' . $curlError . ' | HTTP: ' . $httpCode);
+      return null;
+    }
+
+    $data = json_decode($response, true);
+
+    if (isset($data['access_token']) && isset($data['expires_in'])) {
+      // Cache 60 seconds early to avoid edge-case expiration
+      $expiresAt = time() + $data['expires_in'] - 60;
+
+      cache()->save($cacheKey, [
+        'token'      => $data['access_token'],
+        'expires_at' => $expiresAt,
+      ], $data['expires_in'] - 60);
+
+      return $data['access_token'];
+    }
+
+    log_message('error', 'Invalid PayPal token response: ' . $response);
+    return null;
+  }
+}
+
+if (! function_exists('paypal_api_request')) {
+  function paypal_api_request(string $endpoint = '', string $method = 'POST', array $body = [])
+  {
+    $mode  = env('paypal.mode', 'sandbox');
+    $base  = $mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+    $token = get_paypal_access_token();
+
+    $ch = curl_init("{$base}/v2/checkout/orders{$endpoint}");
+    curl_setopt_array($ch, [
+      CURLOPT_CUSTOMREQUEST  => $method,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HTTPHEADER     => [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $token,
+        'PayPal-Request-Id: ' . uniqid(), // Idempotency
+      ],
+    ]);
+
+    if (! empty($body)) {
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+    }
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return ['code' => $httpCode, 'data' => json_decode($response, true)];
+  }
+}
 
 if (! function_exists('send_admin_notification')) {
 

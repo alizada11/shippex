@@ -29,6 +29,45 @@
                   Pay Now <?= "$" . $request['price'] ?>
                 </a>
               </p>
+              <script src="https://www.paypal.com/sdk/js?client-id=<?= esc($client_id) ?>&currency=USD"></script>
+              <script>
+                paypal.Buttons({
+                  createOrder: function(data, actions) {
+                    return fetch('<?= base_url('payment/create-order') ?>', {
+                      method: 'post',
+                      headers: {
+                        'content-type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        amount: '<?= $request['price'] ?>'
+                      })
+                    }).then(res => res.json()).then(order => order.id);
+                  },
+                  onApprove: function(data, actions) {
+                    return fetch('<?= base_url('payment/capture-order') ?>', {
+                      method: 'post',
+                      headers: {
+                        'content-type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        orderID: data.orderID,
+                        payFor: 'shopper'
+                      })
+                    }).then(res => res.json()).then(details => {
+                      if (details.status === 'COMPLETED') {
+                        window.location.href = '<?= base_url('payment/success') ?>';
+                      } else {
+                        alert('Payment failed');
+                      }
+                    });
+                  },
+                  onError: function(err) {
+                    console.error(err);
+                    alert('An error occurred');
+                  }
+                }).render('#paypal-button-container');
+              </script>
+              <div id="paypal-button-container"></div>
               <p><i class="fas fa-info-circle text-danger"></i> After the payment your package will be shipped to <a href="<?= base_url('warehouse-requests/my-requests') ?>"><?= $default_wh['city'] . ', ' . $default_wh['country'] ?></a>, which is your default warehouse.<br><i><small>If you need to change the default ware house click <a href="<?= base_url('warehouse-requests/my-requests') ?>">here.</a> After payment you can't change the destination.</small></i></p>
 
               <div id="paymentContainer" class="mt-3" style="display:none;">
@@ -265,65 +304,7 @@
   }
 </style>
 <?= $this->section('script') ?>
-<script src="https://www.paypal.com/sdk/js?client-id=AR_PoU6NaXw2h4y9qwFGoYMBMpw9_I0AzvNGSARRucV84VoZA_x1OHH9781pe1E4rdiW7uvr7st4lX4j&currency=USD"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const showPaymentBtn = document.getElementById('showPaymentBtn');
-    const paymentContainer = document.getElementById('paymentContainer');
-    let paypalRendered = false; // Ensure buttons render only once
-    const loader = document.getElementById('loader');
-    showPaymentBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      paymentContainer.style.display = 'block';
 
-      if (paypalRendered) return; // Don't re-render
-
-      paypal.Buttons({
-        createOrder: function(data, actions) {
-          loader.style.display = 'block';
-          return fetch('<?= base_url("shopper/createOrder/" . $request['id']) ?>', {
-              method: 'post'
-            }).then(res => res.json())
-            .then(order => {
-              loader.style.display = 'none';
-              if (order.id) {
-                return order.id; // Must return the order ID!
-              } else {
-                loader.style.display = 'none';
-                console.error('No order ID returned', order);
-                alert('Error creating PayPal order.');
-              }
-            });
-        },
-        onApprove: function(data, actions) {
-          loader.style.display = 'block'; // 👈 Show loader during payment capture
-
-          return fetch('<?= base_url("shopper/captureOrder/" . $request['id']) ?>', {
-              method: 'post',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: 'orderID=' + data.orderID
-            })
-            .then(res => res.json())
-            .then(details => {
-              loader.style.display = 'none'; // 👈 Hide loader after success
-              alert('Payment completed!');
-              location.reload();
-            })
-            .catch(err => {
-              loader.style.display = 'none';
-              alert('Payment capture failed.');
-              console.error(err);
-            });
-        }
-      }).render('#paypal-button-container');
-
-
-      paypalRendered = true; // Mark as rendered
-    });
-  });
-</script>
 
 <?= $this->endSection() ?>
 <?= $this->endSection() ?>

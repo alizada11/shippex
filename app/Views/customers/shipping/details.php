@@ -462,31 +462,48 @@ $role = $session->get('role');
                 <div class="detail-item">
                   <span class="detail-label">Amount to pay:</span>
                   <span class="float-end fw-bold text-success"> $<?= $request['total_charge'] ?></span>
-
+                  <br>
+                  <div id="paypal-button-container"></div>
                 </div>
 
                 <!-- PayPal Buttons -->
-                <div id="paypal-button-container"></div>
+                <!-- <div id="paypal-button-container"></div> -->
 
-                <script src="https://www.paypal.com/sdk/js?client-id=AR_PoU6NaXw2h4y9qwFGoYMBMpw9_I0AzvNGSARRucV84VoZA_x1OHH9781pe1E4rdiW7uvr7st4lX4j&currency=USD"></script>
+                <script src="https://www.paypal.com/sdk/js?client-id=<?= esc($client_id) ?>&currency=USD"></script>
                 <script>
                   paypal.Buttons({
                     createOrder: function(data, actions) {
-                      return fetch('<?= base_url("shipping/createOrder/" . $request['id']) ?>', {
-                        method: 'post'
+                      return fetch('<?= base_url('payment/create-order') ?>', {
+                        method: 'post',
+                        headers: {
+                          'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          amount: '<?= $request['total_charge'] ?>'
+                        })
                       }).then(res => res.json()).then(order => order.id);
                     },
                     onApprove: function(data, actions) {
-                      return fetch('<?= base_url("shipping/captureOrder/" . $request['id']) ?>', {
+                      return fetch('<?= base_url('payment/capture-order') ?>', {
                         method: 'post',
                         headers: {
-                          'Content-Type': 'application/x-www-form-urlencoded'
+                          'content-type': 'application/json'
                         },
-                        body: 'orderID=' + data.orderID
+                        body: JSON.stringify({
+                          orderID: data.orderID,
+                          payFor: 'shipping'
+                        })
                       }).then(res => res.json()).then(details => {
-                        alert('Payment Completed!');
-                        location.reload();
+                        if (details.status === 'COMPLETED') {
+                          window.location.href = '<?= base_url('payment/success') ?>';
+                        } else {
+                          alert('Payment failed');
+                        }
                       });
+                    },
+                    onError: function(err) {
+                      console.error(err);
+                      alert('An error occurred');
                     }
                   }).render('#paypal-button-container');
                 </script>
@@ -827,7 +844,7 @@ $role = $session->get('role');
           cancelButtonText: 'Cancel'
         }).then(result => {
           if (result.isConfirmed) {
-            fetch('/shipping-services/set-price/', {
+            fetch('/shipping-services/set-price', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'

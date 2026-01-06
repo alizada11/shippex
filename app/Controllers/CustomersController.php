@@ -80,6 +80,8 @@ class CustomersController extends BaseController
             ->orderBy('changed_at', 'AESC')
             ->findAll();
         $data['title'] = 'Shipping Details';
+
+        $data['client_id'] = env('paypal.' . env('paypal.mode', 'sandbox') . '.client_id');
         return view('customers/shipping/details', $data);
     }
 

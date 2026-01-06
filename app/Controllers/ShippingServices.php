@@ -60,7 +60,8 @@ class ShippingServices extends BaseController
   if (!isset($request['service_id'], $request['request_id'])) {
    return $this->failValidationErrors('Service ID and Request ID are required.');
   }
-
+  return $request['request_id'];
+  die();
   $serviceId = $request['service_id'];
   $requestId = $request['request_id'];
 
