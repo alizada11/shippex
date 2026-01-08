@@ -860,7 +860,8 @@ if ($role === 'admin') {
               },
               body: JSON.stringify({
                 orderID: data.orderID,
-                payFor: 'package'
+                payFor: 'package',
+                reqId: $package['id']
               })
             }).then(res => res.json()).then(details => {
               if (details.status === 'COMPLETED') {

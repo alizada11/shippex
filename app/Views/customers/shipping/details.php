@@ -491,7 +491,8 @@ $role = $session->get('role');
                         },
                         body: JSON.stringify({
                           orderID: data.orderID,
-                          payFor: 'shipping'
+                          payFor: 'shipping',
+                          reqId: $request['id']
                         })
                       }).then(res => res.json()).then(details => {
                         if (details.status === 'COMPLETED') {

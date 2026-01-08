@@ -33,6 +33,9 @@ class Shipping extends BaseController
 
     public function getRates()
     {
+
+
+
         if (!$this->request->isAJAX()) {
             return $this->response->setStatusCode(405)->setJSON(['error' => 'Method not allowed']);
         }
@@ -63,28 +66,34 @@ class Shipping extends BaseController
 
         // Ensure parcels structure
         if (empty($parcels) || !is_array($parcels)) {
-            // build a default parcel from single item fields if provided (compat fallback)
+            // Build a default parcel from single item fields if provided
             $parcels = [[
                 'total_actual_weight' => floatval($body['weight'] ?? 1),
-                'box' => [
-                    'length' => floatval($body['length'] ?? 0),
-                    'width'  => floatval($body['width'] ?? 0),
-                    'height' => floatval($body['height'] ?? 0),
-                ],
+                'box' => null, // optional, main structure is in item dimensions
                 'items' => [[
-                    'quantity' => 1,
+                    'quantity' => $body['quantity'] ?? 1,
+                    'dimensions' => [
+                        'length' => floatval($body['length'] ?? 0),
+                        'width'  => floatval($body['width'] ?? 0),
+                        'height' => floatval($body['height'] ?? 0),
+                    ],
                     'declared_currency' => $body['declared_currency'] ?? 'USD',
-                    'declared_customs_value' => floatval($body['declared_customs_value'] ?? 0),
+                    'description' => $body['description'] ?? 'item',  // required
+                    'category' => $body['category'] ?? 'general',      // required
+                    'sku' => $body['sku'] ?? 'SKU000',                 // required
+                    'origin_country_alpha2' => $origin['country_alpha2'] ?? '',
                     'actual_weight' => floatval($body['weight'] ?? 1),
-                    'display_weight_unit' => 'kg',
-                    'hs_code' => $body['hs_code'] ?? null,
-                    'category' => $body['category'] ?? null,
-                    'set_as_residential' => isset($dest['set_as_residential']) ? (bool)$dest['set_as_residential'] : false
+                    'declared_customs_value' => floatval($body['declared_customs_value'] ?? 0),
+                    'hs_code' => $body['hs_code'] ?? null
                 ]]
             ]];
         }
 
-        // Build final payload according to Easyship public API spec (2024-09)
+        // Ensure emails are valid (Easyship requires proper format)
+        $origin['contact_email'] =  'info@shippex.online';
+        $dest['contact_email'] = 'info@shippex.online';
+
+        // Build final payload
         $payload = [
             'origin_address' => [
                 'line_1' => $origin['line_1'] ?? '',
@@ -92,7 +101,11 @@ class Shipping extends BaseController
                 'state'  => $origin['state'] ?? null,
                 'city'   => $origin['city'] ?? '',
                 'postal_code' => $origin['postal_code'] ?? null,
-                'country_alpha2' => $origin['country_alpha2'] ?? ''
+                'country_alpha2' => $origin['country_alpha2'] ?? '',
+                'contact_name' => $origin['contact_name'] ?? '',
+                'company_name' => $origin['company_name'] ?? null,
+                'contact_phone' => !empty($origin['contact_phone']) ? $origin['contact_phone'] : '+0000000000',
+                'contact_email' => $origin['contact_email']
             ],
             'destination_address' => [
                 'line_1' => $dest['line_1'] ?? '',
@@ -101,19 +114,25 @@ class Shipping extends BaseController
                 'city'   => $dest['city'] ?? '',
                 'postal_code' => $dest['postal_code'] ?? null,
                 'country_alpha2' => $dest['country_alpha2'] ?? '',
-                'delivery_instructions' => $dest['delivery_instructions'] ?? null,
+                'contact_name' => $dest['contact_name'] ?? '',
+                'company_name' => $dest['company_name'] ?? null,
+                'contact_phone' => !empty($dest['contact_phone']) ? $dest['contact_phone'] : '+0000000000',
+                'contact_email' => $dest['contact_email'],
                 'set_as_residential' => isset($dest['set_as_residential']) ? (bool)$dest['set_as_residential'] : false
             ],
             'incoterms' => in_array($incoterms, ['DDU', 'DDP']) ? $incoterms : 'DDU',
             'insurance' => [
-                'is_insured' => $isInsured
+                'is_insured' => $isInsured ?? false,
+                'insured_currency' => $body['insurance_currency'] ?? 'USD'
             ],
-            'parcels' => $parcels,
-            // optional: prefer currency passed from client
-            'shipping_settings'   => (object) ($body['shipping_settings'] ?? []),
-            'courier_settings'    => (object) ($body['courier_settings'] ?? [])
-
-
+            'courier_settings' => (object) ($body['courier_settings'] ?? [
+                'show_courier_logo_url' => false,
+                'apply_shipping_rules' => true
+            ]),
+            'shipping_settings' => (object) ($body['shipping_settings'] ?? [
+                'units' => ['weight' => 'kg', 'dimensions' => 'cm']
+            ]),
+            'parcels' => $parcels
         ];
 
         try {

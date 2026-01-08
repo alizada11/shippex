@@ -26,9 +26,11 @@
               <p class="mb-1">
                 <strong>Price:</strong> <?= "$" . $request['price'] ?> -
                 <a href="#" class="btn btn-sm btn btn-shippex-orange" id="showPaymentBtn">
-                  Pay Now <?= "$" . $request['price'] ?>
+                  Pay now
                 </a>
+
               </p>
+
               <script src="https://www.paypal.com/sdk/js?client-id=<?= esc($client_id) ?>&currency=USD"></script>
               <script>
                 paypal.Buttons({
@@ -51,7 +53,8 @@
                       },
                       body: JSON.stringify({
                         orderID: data.orderID,
-                        payFor: 'shopper'
+                        payFor: 'shopper',
+                        reqId: $request['id']
                       })
                     }).then(res => res.json()).then(details => {
                       if (details.status === 'COMPLETED') {
@@ -231,7 +234,7 @@
       <?php endif; ?>
     </div>
 
-    <div class="card-footer bg-light">
+    <div class="card-footer flex-row-reverse justify-content-between bg-light">
       <a href="#" onclick="downloadCurrentPage({
                       filename: 'shopper_request',
                       title: 'Personal Shoppr request details',

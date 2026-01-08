@@ -11,14 +11,15 @@ class Payment extends BaseController
 {
     public function index()
     {
-        $data['amount']    = '10.00';
+
         $data['client_id'] = env('paypal.' . env('paypal.mode', 'sandbox') . '.client_id');
         return view('payment/index', $data);
     }
 
     public function create_order()
     {
-        $amount = $this->request->getPost('amount') ?? '10.00';
+        $data = $this->request->getJSON(true);
+        $amount = $data['amount'] ?? 0;
 
         $body = [
             "intent" => "CAPTURE",
